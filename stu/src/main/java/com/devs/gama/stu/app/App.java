@@ -1,5 +1,6 @@
 package com.devs.gama.stu.app;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import javax.sql.DataSource;
@@ -11,7 +12,10 @@ import jakarta.inject.Named;
 
 @Named("stApp")
 @ApplicationScoped
-public class App {
+public class App implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	private Locale locale = new Locale("pt", "BR");
 	private DataSource dataSource;
 	private PoolProperties poolProperties;
