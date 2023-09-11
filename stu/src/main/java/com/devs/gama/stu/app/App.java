@@ -17,7 +17,7 @@ public class App implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private Locale locale = new Locale("pt", "BR");
-	private DataSource dataSource;
+	private static DataSource dataSource;
 	
 	private String dbName = "stu";
 
@@ -38,12 +38,8 @@ public class App implements Serializable {
 		this.locale = locale;
 	}
 
-	public DataSource getDataSource() {
+	public static DataSource getDataSource() {
 		return dataSource;
-	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
 	}
 
 }
