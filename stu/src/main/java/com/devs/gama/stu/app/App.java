@@ -18,14 +18,16 @@ public class App implements Serializable {
 	
 	private Locale locale = new Locale("pt", "BR");
 	private DataSource dataSource;
+	
+	private String dbName = "stu";
 
 	public App() {
 		PoolProperties poolProperties = new PoolProperties();
-		//poolProperties.setUrl("jdbc:mysql://localhost:5432/" + "my_database_name");
-		//poolProperties.setDriverClassName("org.postgresql.Driver");
-		//poolProperties.setUsername("someUserName");
-		//poolProperties.setPassword("somePassword");
-		//dataSource = new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
+		poolProperties.setUrl("jdbc:mysql://localhost:3306/" + dbName);
+		poolProperties.setDriverClassName("com.mysql.jdbc.Driver");
+		poolProperties.setUsername("stustd");
+		poolProperties.setPassword("senha");
+		dataSource = new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
 	}
 
 	public Locale getLocale() {
