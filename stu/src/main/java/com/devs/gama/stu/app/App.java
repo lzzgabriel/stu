@@ -18,10 +18,9 @@ public class App implements Serializable {
 	
 	private Locale locale = new Locale("pt", "BR");
 	private DataSource dataSource;
-	private PoolProperties poolProperties;
 
 	public App() {
-		//poolProperties = new PoolProperties();
+		PoolProperties poolProperties = new PoolProperties();
 		//poolProperties.setUrl("jdbc:mysql://localhost:5432/" + "my_database_name");
 		//poolProperties.setDriverClassName("org.postgresql.Driver");
 		//poolProperties.setUsername("someUserName");
