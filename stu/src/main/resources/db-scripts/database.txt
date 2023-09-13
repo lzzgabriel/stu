@@ -1,0 +1,2 @@
+banco de dados MySQL v 8.0.33
+nome do banco: stu
