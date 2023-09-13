@@ -1,2 +1,21 @@
 banco de dados MySQL v 8.0.33
 nome do banco: stu
+
+-----------------------------
+PARA RODAR O BANCO PELO CMD:
+
+mysqld --initialize
+	^-- isso vai inicializar o banco
+
+mysqld --console
+	^-- inicia o servidor
+	o banco vai gerar uma senha padrão para o superuser "root"
+	copiar a senha e trocar depois
+	* obs: o banco vai ficar rodando por esse terminal até ser desligado,
+	então é preciso abrir OUTRA janela do cmd para usar
+	
+mysql -u root -p --console
+	^-- conecta com o banco (vai pedir a senha)
+	
+mysqladmin -u root -p shutdown
+	^-- desliga o servidor
