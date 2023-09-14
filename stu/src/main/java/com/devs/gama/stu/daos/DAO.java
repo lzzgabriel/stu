@@ -1,4 +1,4 @@
-package daos;
+package com.devs.gama.stu.daos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

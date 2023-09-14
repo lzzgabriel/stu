@@ -1,4 +1,4 @@
-package daos;
+package com.devs.gama.stu.daos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

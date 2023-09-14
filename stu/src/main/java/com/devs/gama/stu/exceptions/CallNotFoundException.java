@@ -1,4 +1,4 @@
-package exceptions;
+package com.devs.gama.stu.exceptions;
 
 public class CallNotFoundException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package utils;
+package com.devs.gama.stu.utils;
 
 public class SqlUtils {
 

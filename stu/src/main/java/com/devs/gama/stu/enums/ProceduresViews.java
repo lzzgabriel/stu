@@ -2,7 +2,7 @@ package com.devs.gama.stu.enums;
 
 import java.util.Arrays;
 
-import exceptions.CallNotFoundException;
+import com.devs.gama.stu.exceptions.CallNotFoundException;
 
 public enum ProceduresViews {
 

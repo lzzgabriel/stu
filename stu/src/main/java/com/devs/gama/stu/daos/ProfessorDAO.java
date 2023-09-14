@@ -1,4 +1,4 @@
-package daos;
+package com.devs.gama.stu.daos;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -14,9 +14,9 @@ import com.devs.gama.stu.app.App;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViews;
+import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.inject.Inject;
-import utils.SqlUtils;
 
 public class ProfessorDAO implements DAO<Professor> {
 	// Falta trocar locais de consulta, tirar a tabela e adicionar a view e
