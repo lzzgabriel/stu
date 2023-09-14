@@ -1,0 +1,30 @@
+@charset "ISO-8859-1";
+
+/* CSS HEX */
+:root {
+--bittersweet: #f06260ff;
+--fawn: #e5a562ff;
+--antiflash-white: #e9eaecff;
+--alabaster: #e2dfd4ff;
+--onyx: #32373aff;
+}
+
+.stu-red {
+	background-color: var(--bittersweet);
+}
+
+.stu-yellow {
+	background-color: var(--fawn);
+}
+
+.stu-white {
+	background-color: var(--antiflash-white);
+}
+
+.stu-whitish {
+	background-color: var(--alabaster);
+}
+
+.stu-black {
+	background-color: var(--onyx);
+}
