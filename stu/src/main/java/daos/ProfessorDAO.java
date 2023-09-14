@@ -2,41 +2,43 @@ package daos;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.devs.gama.stu.app.App;
+import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Professor;
+import com.devs.gama.stu.enums.ProceduresViews;
+
+import jakarta.inject.Inject;
+import utils.SqlUtils;
 
 public class ProfessorDAO implements DAO<Professor> {
-
+	// Falta trocar locais de consulta, tirar a tabela e adicionar a view e
+	// metodos de cadastro de aluno
 	private String tableName = "professor";
+	@Inject
+	private AlunoDAO alunoDao;
 
 	@Override
-	public void save(Professor t) throws SQLException {
-		if (findById(t.getId()) == null) {
+	public void save(Professor professor) throws SQLException {
+		if (findById(professor.getId()) == null) {
 			try (Connection conn = App.getDataSource().getConnection()) {
-//				PreparedStatement ps = conn.prepareStatement(SqlUtils.montarProcedure("cadastrar_professor", 3, 0)); // Procedure
-//				int parametro = 1;
-//				ps.setString(parametro++, t.getNome());
-//				ps.setString(parametro++, t.getEmail());
-//				ps.setString(parametro++, t.getSenha());
-//				ps.execute();
-				String sql = "INSERT INTO " + tableName + " (id, nome, email, senha) VALUES (?, ?, ?, ?)";
-				PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				CallableStatement callableStatement = conn.prepareCall(
+						SqlUtils.montarProcedure(ProceduresViews.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 3, 0));
 				int parametro = 1;
-				preparedStatement.setNull(parametro++, Types.INTEGER);
-				preparedStatement.setString(parametro++, t.getNome());
-				preparedStatement.setString(parametro++, t.getEmail());
-				preparedStatement.setString(parametro++, t.getSenha());
-				int linhasAfetadas = preparedStatement.executeUpdate();
+				callableStatement.setString(parametro++, professor.getNome());
+				callableStatement.setString(parametro++, professor.getEmail());
+				callableStatement.setString(parametro++, professor.getSenha());
+				callableStatement.execute();
+				int linhasAfetadas = callableStatement.executeUpdate();
 				if (linhasAfetadas > 0) {
-					ResultSet chavesGeradas = preparedStatement.getGeneratedKeys();
+					ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
 					if (chavesGeradas.next()) {
 						int novoId = chavesGeradas.getInt(1);
 						System.out.println(novoId);
@@ -47,23 +49,23 @@ public class ProfessorDAO implements DAO<Professor> {
 				}
 			}
 		} else {
-			edit(t);
+			edit(professor);
 		}
 	}
 
 	@Override
-	public void edit(Professor t) throws SQLException {
+	public void edit(Professor professor) throws SQLException {
 		try (Connection conn = App.getDataSource().getConnection()) {
 			String sql = "UPDATE " + tableName + " SET nome = ?, email = ?, senha = ? WHERE id = ?";
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
-			preparedStatement.setString(parametro++, t.getNome());
-			preparedStatement.setString(parametro++, t.getEmail());
-			preparedStatement.setString(parametro++, t.getSenha());
-			preparedStatement.setInt(parametro++, t.getId());
+			preparedStatement.setString(parametro++, professor.getNome());
+			preparedStatement.setString(parametro++, professor.getEmail());
+			preparedStatement.setString(parametro++, professor.getSenha());
+			preparedStatement.setInt(parametro++, professor.getId());
 			int linhasAfetadas = preparedStatement.executeUpdate();
 			if (linhasAfetadas > 0) {
-				// atualizou
+				// registro atualizado
 			} else {
 				// nenhum registro atualizado
 			}
@@ -71,18 +73,18 @@ public class ProfessorDAO implements DAO<Professor> {
 	}
 
 	@Override
-	public void delete(Professor t) throws SQLException {
+	public void delete(Professor professor) throws SQLException {
 
 		try (Connection conn = App.getDataSource().getConnection()) {
 			String sql = "DELETE FROM " + tableName + " WHERE id = ?";
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
-			preparedStatement.setInt(parametro++, t.getId());
+			preparedStatement.setInt(parametro++, professor.getId());
 			int linhasAfetadas = preparedStatement.executeUpdate();
 			if (linhasAfetadas > 0) {
 				// registro excluido
 			} else {
-				// nenhum registro deletado
+				// nenhum registro excluido
 			}
 		}
 
@@ -90,34 +92,29 @@ public class ProfessorDAO implements DAO<Professor> {
 
 	@Override
 	public List<Professor> findAll() throws SQLException {
-
 		List<Professor> returnList = new ArrayList<>();
-
-		String sql = "select * from " + tableName;
-
+		String sql = "SELECT * FROM " + tableName;
 		try (Connection conn = App.getDataSource().getConnection()) {
-
-			CallableStatement callableStatement = conn.prepareCall(sql);
-
-			try (ResultSet resultSet = callableStatement.executeQuery()) {
-				while (resultSet.next()) {
-					returnList.add(fetch(resultSet));
-				}
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				returnList.add(fetch(resultSet));
 			}
 		}
-
 		return returnList;
 	}
 
 	@Override
-	public List<Professor> findAllFiltered(Professor t) {
-		return null;
+	public List<Professor> findAllFiltered(Professor professor) throws SQLException {
+		List<Professor> returnList = findAll();
+		returnList.removeIf(p -> !p.equals(professor));
+		return returnList;
 	}
 
 	@Override
 	public Professor findById(int id) throws SQLException {
 		Professor professor = null;
-		String sql = "select * from " + tableName + " where id = ?";
+		String sql = "SELECT * FROM" + tableName + " WHERE id = ?";
 		try (Connection conn = App.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
@@ -133,13 +130,40 @@ public class ProfessorDAO implements DAO<Professor> {
 	@Override
 	public Professor fetch(ResultSet res) throws SQLException {
 		Professor professor = new Professor();
-
 		professor.setId(res.getInt("id"));
 		professor.setNome(res.getString("nome"));
 		professor.setEmail(res.getString("email"));
 		professor.setSenha(res.getString("senha"));
-
 		return professor;
+	}
+
+	public void saveNewAluno(Professor professor, Aluno aluno, Double valorCobrado) throws SQLException {
+		try (Connection conn = App.getDataSource().getConnection()) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.MONTH, 1);
+			CallableStatement callableStatement = conn
+					.prepareCall(SqlUtils.montarProcedure(ProceduresViews.PROCEDURE_CADASTRAR_ALUNO.getValue(), 6, 0));
+			int parametro = 1;
+			callableStatement.setString(parametro++, aluno.getNome());
+			callableStatement.setString(parametro++, aluno.getEmail());
+			callableStatement.setString(parametro++, aluno.getCelular());
+			callableStatement.setInt(parametro++, professor.getId());
+			callableStatement.setDouble(parametro++, valorCobrado);
+			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
+
+			callableStatement.execute();
+			int linhasAfetadas = callableStatement.executeUpdate();
+			if (linhasAfetadas > 0) {
+				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
+				if (chavesGeradas.next()) {
+					int novoId = chavesGeradas.getInt(1);
+					System.out.println(novoId);
+					// registro inserido
+				} else {
+					// nenhum registro inserido
+				}
+			}
+		}
 	}
 
 }
