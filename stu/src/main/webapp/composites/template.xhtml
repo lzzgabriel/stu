@@ -4,11 +4,13 @@
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:h="http://xmlns.jcp.org/jsf/html">
+	
 <h:head>
 	<title><ui:insert name="title">Default title</ui:insert></title>
 </h:head>
 
 <f:view>
+<f:event listener="#{stSession}" type="preRenderView"/>
 	<ui:debug hotkey="x"
 		rendered="#{initParam['jakarta.faces.FACELETS_DEVELOPMENT']}" />
 

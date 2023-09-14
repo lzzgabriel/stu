@@ -30,4 +30,7 @@ public class UserSession implements Serializable {
 		this.menuModel = menuModel;
 	}
 	
+	public void checkSession() {
+	}
+	
 }

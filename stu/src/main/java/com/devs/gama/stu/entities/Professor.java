@@ -1,6 +1,11 @@
 package com.devs.gama.stu.entities;
 
-public class Professor {
+import java.io.Serializable;
+
+public class Professor implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	private Integer id;
 	private String nome;
 	private String email;
