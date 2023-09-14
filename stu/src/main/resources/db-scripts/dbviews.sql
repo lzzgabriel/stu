@@ -45,3 +45,28 @@ from
     (`mensalidade_cobrada` `mc`
 left join `aluno` `a` on
     ((`mc`.`id_aluno` = `a`.`id`)));
+
+
+-- stu.view_formas_pagamento source
+
+create or replace
+algorithm = UNDEFINED view `view_formas_pagamento` as
+select
+    `fp`.`id` as `id`,
+    `fp`.`descricao` as `descricao`
+from
+    `forma_pagamento` `fp`;
+
+
+-- stu.view_professor source
+
+create or replace
+algorithm = UNDEFINED view `view_professor` as
+select
+    `p`.`id` as `id`,
+    `p`.`nome` as `nome`,
+    `p`.`email` as `email`,
+    `p`.`senha` as `senha`,
+    `p`.`momento_cadastro` as `momento_cadastro`
+from
+    `professor` `p`;

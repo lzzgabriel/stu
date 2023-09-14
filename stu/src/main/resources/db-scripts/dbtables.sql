@@ -1,3 +1,15 @@
+-- stu.aluno definition
+
+CREATE TABLE `aluno` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `celular` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `momento_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=220 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 -- stu.forma_pagamento definition
 
 CREATE TABLE `forma_pagamento` (
@@ -20,19 +32,16 @@ CREATE TABLE `professor` (
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
--- stu.aluno definition
+-- stu.aluno_de_professor definition
 
-CREATE TABLE `aluno` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(100) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `celular` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+CREATE TABLE `aluno_de_professor` (
+  `id_aluno` int NOT NULL,
   `id_professor` int NOT NULL,
-  `momento_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `fk_professor` (`id_professor`),
-  CONSTRAINT `fk_professor` FOREIGN KEY (`id_professor`) REFERENCES `professor` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`id_aluno`,`id_professor`),
+  KEY `aluno_de_professor_FK_1` (`id_professor`),
+  CONSTRAINT `aluno_de_professor_FK` FOREIGN KEY (`id_aluno`) REFERENCES `aluno` (`id`),
+  CONSTRAINT `aluno_de_professor_FK_1` FOREIGN KEY (`id_professor`) REFERENCES `professor` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 -- stu.mensalidade_aberta definition
