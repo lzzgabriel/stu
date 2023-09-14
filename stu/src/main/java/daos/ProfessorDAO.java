@@ -27,6 +27,7 @@ public class ProfessorDAO implements DAO<Professor> {
 
 	@Override
 	public void save(Professor professor) throws SQLException {
+		//TODO vamos deixar esse check?
 		if (findById(professor.getId()) == null) {
 			try (Connection conn = App.getDataSource().getConnection()) {
 				CallableStatement callableStatement = conn.prepareCall(

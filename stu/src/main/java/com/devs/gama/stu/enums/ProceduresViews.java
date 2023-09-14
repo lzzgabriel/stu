@@ -2,6 +2,8 @@ package com.devs.gama.stu.enums;
 
 import java.util.Arrays;
 
+import exceptions.CallNotFoundException;
+
 public enum ProceduresViews {
 
 	PROCEDURE_CADASTRAR_PROFESSOR("CADASTRAR_PROFESSOR"),
@@ -30,6 +32,6 @@ public enum ProceduresViews {
 
 	public static ProceduresViews valueOfProceduresViews(String value) {
 		return Arrays.asList(ProceduresViews.values()).stream().filter(s -> s.getValue().equalsIgnoreCase(value))
-				.findFirst().orElseThrow(() -> new IllegalArgumentException("Procedure or View not found: " + value));
+				.findFirst().orElseThrow(() -> new CallNotFoundException("Procedure or View not found: " + value));
 	}
 }
