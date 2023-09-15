@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -152,7 +153,7 @@ public class ProfessorDAO implements DAO<Professor> {
 			callableStatement.setInt(parametro++, professor.getId());
 			callableStatement.setDouble(parametro++, valorCobrado);
 			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
-			callableStatement.setDate(parametro++, new Date(new java.util.Date().getTime())); // verificar uso
+			callableStatement.setDate(parametro++, Date.valueOf(LocalDate.now())); // verificar uso
 			int linhasAfetadas = callableStatement.executeUpdate();
 			if (linhasAfetadas > 0) {
 				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
