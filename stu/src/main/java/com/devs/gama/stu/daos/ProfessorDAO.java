@@ -188,7 +188,7 @@ public class ProfessorDAO {
 	public static Professor validateLogin(String email, String senha) throws SQLException, EntityNotFoundException {
 		try (Connection connection = App.getDataSource().getConnection()) {
 			
-			String sql = "SELECT id, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE email = ? AND senha = ? ";
+			String sql = "SELECT id, nome, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE email = ? AND senha = ? ";
 			
 			PreparedStatement statement = connection.prepareStatement(sql);
 			

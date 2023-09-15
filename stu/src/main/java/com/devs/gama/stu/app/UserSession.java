@@ -29,5 +29,5 @@ public class UserSession implements Serializable {
 	public void setMenuModel(DefaultMenuModel menuModel) {
 		this.menuModel = menuModel;
 	}
-	
+
 }

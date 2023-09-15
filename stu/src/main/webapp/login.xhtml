@@ -1,12 +1,58 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
 
-	<ui:composition template="/templates/common.xhtml">
-			<ui:define name="content">
-			</ui:define>
-	</ui:composition>
+<h:head>
+
+	<title>Login</title>
+
+	<h:outputStylesheet library="webjars"
+		name="primeflex/3.3.1/primeflex.min.css" />
+
+</h:head>
+
+<h:body styleClass="bg-bluegray-200">
+
+	<p:growl id="messages"/>
+
+	<div class="block h-6rem" />
+
+	<div class="grid">
+
+		<div class="col" />
+
+		<h:form styleClass="col bg-white shadow-6 border-round-md p-2">
+
+			<p:panelGrid columns="1" styleClass="ui-fluid">
+
+				<p:panelGrid columns="1" styleClass="ui-fluid text-center my-0">
+					<h:outputText styleClass="text-3xl my-0" value="Login" />
+				</p:panelGrid>
+
+				<p:outputLabel for="@next" value="E-mail:" />
+				<p:inputText value="#{stLogin.email}" />
+
+				<p:outputLabel for="@next" value="Senha:" />
+				<p:inputText value="#{stLogin.senha}" />
+
+				<p:panelGrid layout="flex" styleClass="ui-fluid" columns="3"
+					columnClasses="col-3, col-6, col-3">
+					<div />
+					<p:commandButton value="Entrar" action="#{stLogin.login()}" />
+					<div />
+				</p:panelGrid>
+
+			</p:panelGrid>
+
+		</h:form>
+
+		<div class="col" />
+
+	</div>
+
+</h:body>
 
 </html>

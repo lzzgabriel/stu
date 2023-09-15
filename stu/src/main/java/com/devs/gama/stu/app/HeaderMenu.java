@@ -49,6 +49,7 @@ public class HeaderMenu {
 		exitSubMenu.getElements().add(DefaultMenuItem.builder()
 				.value("Logout")
 				.icon("pi pi-sign-out")
+				.command("#{stLogin.logout()}")
 				.build());
 		
 		menuModel.getElements().add(exitSubMenu);

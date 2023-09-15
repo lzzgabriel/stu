@@ -29,12 +29,36 @@ public class AutorizationFilter implements Filter {
 			
 			HttpSession session = req.getSession(false);
 			
-			String reqUri = req.getRequestURI();
-			if (reqUri.indexOf(reqUri) >= 0 || (session != null && session.getAttribute("stuprofessorname") != null) || reqUri.indexOf("/public/") >= 0 || reqUri.contains("jakarta.faces.resource")) {
-				chain.doFilter(request, response);
-			} else {
-				resp.sendRedirect(req.getContextPath() + "/faces/login.xhtml");
+			boolean userLogged = true;
+			
+			if (session == null) {
+				userLogged = false;
+			} else if (session.getAttribute("stuprofessornome") == null) {
+				userLogged = false;
+			} else if (session.getAttribute("stuprofessoremail") == null) {
+				userLogged = false;
+			} else if (session.getAttribute("stuprofessorid") == null) {
+				userLogged = false;
 			}
+			
+			String reqUri = req.getRequestURI();
+			
+			if (reqUri.contains("jakarta.faces.resource")) {
+				chain.doFilter(request, response);
+				return;
+			}
+			
+			if (userLogged && reqUri.indexOf("/login.xhtml") >= 0) {
+				resp.sendRedirect(req.getContextPath() + "/index.xhtml");
+				return;
+			}
+			if (!userLogged && reqUri.indexOf("/login.xhtml") < 0) {
+				resp.sendRedirect(req.getContextPath() + "/login.xhtml");
+				return;
+			}
+			
+			chain.doFilter(request, response);
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
