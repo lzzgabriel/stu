@@ -49,8 +49,37 @@ begin
 		p_id_professor);
 END;
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `stu`.`cadastrar_professor`(in p_nome varchar(100), in p_email varchar(100), in p_senha varchar(100))
-begin
-	insert into stu.professor (nome, email, senha)
-	values (p_nome, p_emal, p_senha);
-END;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cadastrar_professor`PROCEDURE `cadastrar_professor`(OUT retId INT,
+         IN p_id INT,
+         IN p_nome VARCHAR(100),
+         IN p_email VARCHAR(100),
+         IN p_senha VARCHAR(100))
+BEGIN
+	IF p_id IS NULL THEN
+ INSERT INTO stu.professor (nome,
+         email,
+         senha) VALUES (p_nome,
+         p_email,
+         p_senha);
+ SET retId = LAST_INSERT_ID();
+ ELSE
+ INSERT INTO stu.professor (id,
+         nome,
+         email,
+         senha) VALUES (p_id,
+         p_nome,
+         p_email,
+         p_senha)
+    ON DUPLICATE KEY UPDATE
+ nome = VALUES(nome),
+ email = VALUES(email),
+ senha = VALUES(senha);
+ SET retId = p_id;
+    END IF;
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_professor`(OUT result INT, IN p_id INT)
+BEGIN
+	DELETE FROM professor p WHERE p.id = p_id;
+    SET result = 1;
+END

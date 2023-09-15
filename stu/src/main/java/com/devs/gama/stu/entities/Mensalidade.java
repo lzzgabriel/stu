@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Mensalidade {
-	
+
 	private Aluno aluno;
 	private LocalDate mensalidade;
 	private LocalDate proximoVencimento;
@@ -13,7 +13,7 @@ public class Mensalidade {
 	private BigDecimal valor;
 	private FormaPagamento formaPagamento;
 	private LocalDateTime momentoPagamento;
-	
+
 	public Aluno getAluno() {
 		return aluno;
 	}
@@ -69,8 +69,6 @@ public class Mensalidade {
 	public void setMomentoPagamento(LocalDateTime momentoPagamento) {
 		this.momentoPagamento = momentoPagamento;
 	}
-
-
 
 	public static enum Status {
 		EM_ABERTO, ATRASADA

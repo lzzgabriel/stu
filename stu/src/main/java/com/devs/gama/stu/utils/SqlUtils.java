@@ -12,9 +12,9 @@ public class SqlUtils {
 	 */
 	public static String montarProcedure(String nomeProcedure, int parametrosEntrada, int parametrosRetorno) {
 		StringBuilder procedure = new StringBuilder("{call " + nomeProcedure + "(");
-		procedure.append(parametrosEntrada > 0 ? "?" + StringUtils.stringReplicate(", ?", parametrosEntrada - 1) : "");
+		procedure.append(parametrosRetorno > 0 ? "?" + StringUtils.stringReplicate(", ?", parametrosRetorno - 1) : "");
 		procedure
-				.append(parametrosRetorno > 0 ? ", ?" + StringUtils.stringReplicate(", ?", parametrosRetorno - 1) : "");
+				.append(parametrosEntrada > 0 ? ", ?" + StringUtils.stringReplicate(", ?", parametrosEntrada - 1) : "");
 		procedure.append(")}");
 		return procedure.toString();
 	}
