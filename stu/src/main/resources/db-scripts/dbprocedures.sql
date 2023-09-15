@@ -49,7 +49,7 @@ begin
 		p_id_professor);
 END;
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `cadastrar_professor`PROCEDURE `cadastrar_professor`(OUT retId INT,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cadastrar_professor` (OUT retId INT,
          IN p_id INT,
          IN p_nome VARCHAR(100),
          IN p_email VARCHAR(100),
