@@ -9,18 +9,21 @@ import java.util.List;
 
 import com.devs.gama.stu.app.App;
 import com.devs.gama.stu.entities.Aluno;
+import com.devs.gama.stu.exceptions.EntityNotFoundException;
 
-public class AlunoDAO implements DAO<Aluno> {
-	private String tableName = "aluno";
+public class AlunoDAO {
+	
+	private static String tableName = "aluno";
 
-	@Override
-	public void save(Aluno t) throws SQLException {
+	public static void save(Aluno t) throws SQLException {
 
 	}
 
-	@Override
-	public void edit(Aluno t) throws SQLException {
+	public static void edit(Aluno t) throws SQLException, EntityNotFoundException {
 		try (Connection conn = App.getDataSource().getConnection()) {
+			
+			//TODO cadastro, atualização e delete serão por procedures
+			
 			String sql = "UPDATE " + tableName + " SET nome = ?, email = ?, senha = ? WHERE id = ?";
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
@@ -32,13 +35,12 @@ public class AlunoDAO implements DAO<Aluno> {
 			if (linhasAfetadas > 0) {
 				// registro atualizado
 			} else {
-				// nenhum registro atualizado
+				throw new EntityNotFoundException("Aluno não encontrado: nenhum dado atualizado na tabela");
 			}
 		}
 	}
 
-	@Override
-	public void delete(Aluno t) throws SQLException {
+	public static void delete(Aluno t) throws SQLException, EntityNotFoundException {
 
 		try (Connection conn = App.getDataSource().getConnection()) {
 			String sql = "DELETE FROM " + tableName + " WHERE id = ?";
@@ -49,14 +51,13 @@ public class AlunoDAO implements DAO<Aluno> {
 			if (linhasAfetadas > 0) {
 				// registro excluido
 			} else {
-				// nenhum registro excluido
+				throw new EntityNotFoundException("Aluno não encontrado: nenhum dado deletado");
 			}
 		}
 
 	}
 
-	@Override
-	public List<Aluno> findAll() throws SQLException {
+	public static List<Aluno> findAll() throws SQLException {
 		List<Aluno> returnList = new ArrayList<>();
 		String sql = "SELECT * FROM " + tableName;
 		try (Connection conn = App.getDataSource().getConnection()) {
@@ -69,15 +70,13 @@ public class AlunoDAO implements DAO<Aluno> {
 		return returnList;
 	}
 
-	@Override
-	public List<Aluno> findAllFiltered(Aluno t) throws SQLException {
+	public static List<Aluno> findAllFiltered(Aluno t) throws SQLException {
 		List<Aluno> returnList = findAll();
 		returnList.removeIf(p -> !p.equals(t));
 		return returnList;
 	}
 
-	@Override
-	public Aluno findById(int id) throws SQLException {
+	public static Aluno findById(int id) throws SQLException {
 		Aluno aluno = null;
 		String sql = "SELECT * FROM" + tableName + " WHERE id = ?";
 		try (Connection conn = App.getDataSource().getConnection()) {
@@ -92,13 +91,14 @@ public class AlunoDAO implements DAO<Aluno> {
 		return aluno;
 	}
 
-	@Override
-	public Aluno fetch(ResultSet res) throws SQLException {
+	public static Aluno fetch(ResultSet res) throws SQLException {
 		Aluno aluno = new Aluno();
+		
 		aluno.setId(res.getInt("id"));
 		aluno.setNome(res.getString("nome"));
 		aluno.setEmail(res.getString("email"));
 		aluno.setCelular(res.getString("celular"));
+		
 		return aluno;
 	}
 

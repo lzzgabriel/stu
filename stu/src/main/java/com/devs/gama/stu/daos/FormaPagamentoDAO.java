@@ -10,16 +10,15 @@ import java.util.List;
 import com.devs.gama.stu.app.App;
 import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
+import com.devs.gama.stu.exceptions.EntityNotFoundException;
 
-public class FormaPagamentoDAO implements DAO<FormaPagamento> {
+public class FormaPagamentoDAO {
 
-	@Override
-	public void save(FormaPagamento formaPagamento) throws SQLException {
+	public static void save(FormaPagamento formaPagamento) throws SQLException {
 		// TODO procedure ou insert direto na tabela
 	}
 
-	@Override
-	public void edit(FormaPagamento formaPagamento) throws SQLException {
+	public static void edit(FormaPagamento formaPagamento) throws SQLException, EntityNotFoundException {
 		try (Connection conn = App.getDataSource().getConnection()) {
 			String sql = "UPDATE " + ProceduresViewsTables.TABELA_FORMA_PAGAMENTO.getValue()
 					+ " SET descricao = ? WHERE id = ?";
@@ -31,13 +30,12 @@ public class FormaPagamentoDAO implements DAO<FormaPagamento> {
 			if (linhasAfetadas > 0) {
 				// registro atualizado
 			} else {
-				// nenhum registro atualizado
+				throw new EntityNotFoundException("Forma de pagamento não encontrada: nenhum dado atualizado");
 			}
 		}
 	}
 
-	@Override
-	public void delete(FormaPagamento formaPagamento) throws SQLException {
+	public static void delete(FormaPagamento formaPagamento) throws SQLException, EntityNotFoundException {
 
 		try (Connection conn = App.getDataSource().getConnection()) {
 			String sql = "DELETE FROM " + ProceduresViewsTables.TABELA_FORMA_PAGAMENTO + " WHERE id = ?";
@@ -48,14 +46,13 @@ public class FormaPagamentoDAO implements DAO<FormaPagamento> {
 			if (linhasAfetadas > 0) {
 				// registro excluido
 			} else {
-				// nenhum registro excluido
+				throw new EntityNotFoundException("Forma de pagamento não encontrada: nenhum dado excluído");
 			}
 		}
 
 	}
 
-	@Override
-	public List<FormaPagamento> findAll() throws SQLException {
+	public static List<FormaPagamento> findAll() throws SQLException {
 		List<FormaPagamento> returnList = new ArrayList<>();
 		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue();
 		try (Connection conn = App.getDataSource().getConnection()) {
@@ -68,15 +65,13 @@ public class FormaPagamentoDAO implements DAO<FormaPagamento> {
 		return returnList;
 	}
 
-	@Override
-	public List<FormaPagamento> findAllFiltered(FormaPagamento formaPagamento) throws SQLException {
+	public static List<FormaPagamento> findAllFiltered(FormaPagamento formaPagamento) throws SQLException {
 		List<FormaPagamento> returnList = findAll();
 		returnList.removeIf(p -> !p.equals(formaPagamento));
 		return returnList;
 	}
 
-	@Override
-	public FormaPagamento findById(int id) throws SQLException {
+	public static FormaPagamento findById(int id) throws SQLException {
 		FormaPagamento formaPagamento = null;
 		String sql = "SELECT * FROM" + ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue() + " WHERE id = ?";
 		try (Connection conn = App.getDataSource().getConnection()) {
@@ -91,11 +86,12 @@ public class FormaPagamentoDAO implements DAO<FormaPagamento> {
 		return formaPagamento;
 	}
 
-	@Override
-	public FormaPagamento fetch(ResultSet res) throws SQLException {
+	public static FormaPagamento fetch(ResultSet res) throws SQLException {
 		FormaPagamento formaPagamento = new FormaPagamento();
+		
 		formaPagamento.setId(res.getInt("id"));
 		formaPagamento.setDescricao(res.getString("descricao"));
+		
 		return formaPagamento;
 	}
 

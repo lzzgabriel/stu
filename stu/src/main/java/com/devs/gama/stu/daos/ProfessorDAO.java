@@ -16,18 +16,14 @@ import com.devs.gama.stu.app.App;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
+import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.SqlUtils;
 
-import jakarta.inject.Inject;
-
-public class ProfessorDAO implements DAO<Professor> {
+public class ProfessorDAO {
 	// Falta trocar locais de consulta, tirar a tabela e adicionar a view e
 	// metodos de cadastro de aluno
-	@Inject
-	private AlunoDAO alunoDao;
-
-	@Override
-	public void save(Professor professor) throws SQLException {
+	
+	public static void save(Professor professor) throws SQLException {
 		try (Connection conn = App.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
@@ -48,8 +44,7 @@ public class ProfessorDAO implements DAO<Professor> {
 		}
 	}
 
-	@Override
-	public void edit(Professor professor) throws SQLException {
+	public static void edit(Professor professor) throws SQLException {
 		try (Connection conn = App.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
@@ -70,9 +65,7 @@ public class ProfessorDAO implements DAO<Professor> {
 		}
 	}
 
-	@Override
-	public void delete(Professor professor) throws SQLException {
-
+	public static void delete(Professor professor) throws SQLException, EntityNotFoundException {
 		try (Connection conn = App.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_DELETE_PROFESSOR.getValue(), 1, 1));
@@ -87,14 +80,13 @@ public class ProfessorDAO implements DAO<Professor> {
 					// excluido
 				}
 			} else {
-				System.out.println("Falha exclusão");
+				throw new EntityNotFoundException("Professor não encotrado: nenhum dado deletado ");
 			}
 		}
 
 	}
 
-	@Override
-	public List<Professor> findAll() throws SQLException {
+	public static List<Professor> findAll() throws SQLException {
 		List<Professor> returnList = new ArrayList<>();
 		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue();
 		try (Connection conn = App.getDataSource().getConnection()) {
@@ -107,15 +99,13 @@ public class ProfessorDAO implements DAO<Professor> {
 		return returnList;
 	}
 
-	@Override
-	public List<Professor> findAllFiltered(Professor professor) throws SQLException {
+	public static List<Professor> findAllFiltered(Professor professor) throws SQLException {
 		List<Professor> returnList = findAll();
 		returnList.removeIf(p -> !p.equals(professor));
 		return returnList;
 	}
 
-	@Override
-	public Professor findById(int id) throws SQLException {
+	public static Professor findById(int id) throws SQLException {
 		Professor professor = null;
 		String sql = "SELECT * FROM" + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE id = ?";
 		try (Connection conn = App.getDataSource().getConnection()) {
@@ -130,17 +120,18 @@ public class ProfessorDAO implements DAO<Professor> {
 		return professor;
 	}
 
-	@Override
-	public Professor fetch(ResultSet res) throws SQLException {
+	public static Professor fetch(ResultSet res) throws SQLException {
 		Professor professor = new Professor();
+		
 		professor.setId(res.getInt("id"));
 		professor.setNome(res.getString("nome"));
 		professor.setEmail(res.getString("email"));
 		professor.setSenha(res.getString("senha"));
+		
 		return professor;
 	}
 
-	public void saveNewAluno(Professor professor, Aluno aluno, Double valorCobrado) throws SQLException {
+	public static void saveNewAluno(Professor professor, Aluno aluno, Double valorCobrado) throws SQLException {
 		try (Connection conn = App.getDataSource().getConnection()) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.MONTH, 1);
@@ -168,7 +159,7 @@ public class ProfessorDAO implements DAO<Professor> {
 		}
 	}
 
-	public void saveNewAlunoFree(Professor professor, Aluno aluno) throws SQLException {
+	public static void saveNewAlunoFree(Professor professor, Aluno aluno) throws SQLException {
 		try (Connection conn = App.getDataSource().getConnection()) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.MONTH, 1);
@@ -191,6 +182,36 @@ public class ProfessorDAO implements DAO<Professor> {
 					// nenhum registro inserido
 				}
 			}
+		}
+	}
+	
+	public static Professor validateLogin(String email, String senha) throws SQLException, EntityNotFoundException {
+		try (Connection connection = App.getDataSource().getConnection()) {
+			
+			String sql = "SELECT id, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE email = ? AND senha = ? ";
+			
+			PreparedStatement statement = connection.prepareStatement(sql);
+			
+			int parametro = 1;
+			statement.setString(parametro++, email);
+			statement.setString(parametro++, senha);
+			
+			ResultSet res = statement.executeQuery();
+			
+			if (res.next()) {
+				Professor professor = new Professor();
+				
+				professor.setId(res.getInt("id"));
+				professor.setNome(res.getString("nome"));
+				professor.setEmail(res.getString("email"));
+				
+				return professor;
+			} else {
+				throw new EntityNotFoundException("Professor não encontrado");
+			}
+			
+		} catch (SQLException e) {
+			throw e;
 		}
 	}
 
