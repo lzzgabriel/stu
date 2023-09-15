@@ -19,11 +19,15 @@ public class SessionUtils {
 	}
 	
 	public static String getLoggedProfessorName() {
-		return getSession().getAttribute("stuprofessorname").toString();
+		return getSession().getAttribute("stuprofessornome").toString();
 	}
 	
 	public static String getLoggedProfessorId() {
 		return getSession().getAttribute("stuprofessorid").toString();
+	}
+	
+	public static String getLoggedProfessorEmail() {
+		return getSession().getAttribute("stuprofessoremail").toString();
 	}
 
 }
