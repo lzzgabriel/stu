@@ -7,7 +7,6 @@ select
     `a`.`nome` as `nome`,
     `a`.`email` as `email`,
     `a`.`celular` as `celular`,
-    `a`.`id_professor` as `id_professor`,
     `a`.`momento_cadastro` as `momento_cadastro`
 from
     `aluno` `a`;
