@@ -1,0 +1,21 @@
+a pool connection não vai mais ser registrada na mão no java, mas vai estar configurada no servidor
+
+O ECLIPSE FAZ UMA CONFIGURAÇÃO PRÓPRIA DO TOTMCAT: ELE USA O SERVIDOR QUE VOCÊ MANDAR, MAS USA AS CONFIGURAÇÕES
+QUE ELE COLOCA, GERALMENTE NA PASTA Servers/Tomcat v10.1 Server at localhost-config
+
+ADICIONAR NO server.xml:
+
+ <GlobalNamingResources>
+    <Resource name="jdbc/StuDB" auth="Container" type="javax.sql.DataSource"
+               maxTotal="100" maxIdle="30" maxWaitMillis="10000"
+               username="stustd" password="senha" driverClassName="com.mysql.cj.jdbc.Driver"
+               url="jdbc:mysql://localhost:3306/stu"/>
+ </GlobalNamingResources>
+  
+ Essa primeira tag já tem lá já tem lá
+ 
+ ADICIONAR NO context.xml
+ 
+ <Context>
+ <ResourceLink  name="jdbc/StuDB"  global="jdbc/StuDB" type="javax.sql.DataSource"/>
+ </Context>

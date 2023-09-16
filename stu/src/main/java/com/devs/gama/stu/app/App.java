@@ -1,25 +1,36 @@
 package com.devs.gama.stu.app;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class App {
 
-	private static DataSource dataSource;
+	private static App instance = new App();
+	
+	private Logger logger = LogManager.getLogger();
 
-	public static DataSource getDataSource() {
-		if (dataSource == null) {
-			PoolProperties poolProperties = new PoolProperties();
-			
-			poolProperties.setUrl("jdbc:mysql://localhost:3306/stu");
-			poolProperties.setDriverClassName("com.mysql.cj.jdbc.Driver");
-			poolProperties.setUsername("stustd");
-			poolProperties.setPassword("senha");
-			
-			dataSource = new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
+	private App() {
+		try {
+			Context c = InitialContext.doLookup("java:comp/env");
+			dataSource = (DataSource) c.lookup("jdbc/StuDB");
+		} catch (NamingException e) {
+			logger.error(e.getMessage(), e);
 		}
+	}
+
+	private DataSource dataSource;
+
+	public DataSource getDataSource() {
 		return dataSource;
+	}
+
+	public static App getInstance() {
+		return instance;
 	}
 
 }

@@ -1,26 +1,29 @@
 package com.devs.gama.stu.daos;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.devs.gama.stu.app.App;
 import com.devs.gama.stu.entities.Aluno;
+import com.devs.gama.stu.entities.Professor;
+import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
+import com.devs.gama.stu.utils.SqlUtils;
 
 public class AlunoDAO {
 	
 	private static String tableName = "aluno";
 
-	public static void save(Aluno t) throws SQLException {
-
-	}
-
 	public static void edit(Aluno t) throws SQLException, EntityNotFoundException {
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			
 			//TODO cadastro, atualização e delete serão por procedures
 			
@@ -42,7 +45,7 @@ public class AlunoDAO {
 
 	public static void delete(Aluno t) throws SQLException, EntityNotFoundException {
 
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			String sql = "DELETE FROM " + tableName + " WHERE id = ?";
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
@@ -60,7 +63,7 @@ public class AlunoDAO {
 	public static List<Aluno> findAll() throws SQLException {
 		List<Aluno> returnList = new ArrayList<>();
 		String sql = "SELECT * FROM " + tableName;
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
@@ -79,7 +82,7 @@ public class AlunoDAO {
 	public static Aluno findById(int id) throws SQLException {
 		Aluno aluno = null;
 		String sql = "SELECT * FROM" + tableName + " WHERE id = ?";
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
@@ -100,6 +103,60 @@ public class AlunoDAO {
 		aluno.setCelular(res.getString("celular"));
 		
 		return aluno;
+	}
+
+	public static void save(Professor professor, Aluno aluno, Double valorCobrado) throws SQLException {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.MONTH, 1);
+			CallableStatement callableStatement = conn.prepareCall(
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO.getValue(), 7, 0));
+			int parametro = 1;
+			callableStatement.setString(parametro++, aluno.getNome());
+			callableStatement.setString(parametro++, aluno.getEmail());
+			callableStatement.setString(parametro++, aluno.getCelular());
+			callableStatement.setInt(parametro++, professor.getId());
+			callableStatement.setDouble(parametro++, valorCobrado);
+			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
+			callableStatement.setDate(parametro++, Date.valueOf(LocalDate.now())); // verificar uso
+			int linhasAfetadas = callableStatement.executeUpdate();
+			if (linhasAfetadas > 0) {
+				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
+				if (chavesGeradas.next()) {
+					int novoId = chavesGeradas.getInt(1);
+					System.out.println(novoId);
+					// registro inserido
+				} else {
+					// nenhum registro inserido
+				}
+			}
+		}
+	}
+
+	public static void saveFree(Professor professor, Aluno aluno) throws SQLException {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.MONTH, 1);
+			CallableStatement callableStatement = conn.prepareCall(
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO_FREE.getValue(), 4, 0));
+			int parametro = 1;
+			callableStatement.setString(parametro++, aluno.getNome());
+			callableStatement.setString(parametro++, aluno.getEmail());
+			callableStatement.setString(parametro++, aluno.getCelular());
+			callableStatement.setInt(parametro++, professor.getId());
+			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
+			int linhasAfetadas = callableStatement.executeUpdate();
+			if (linhasAfetadas > 0) {
+				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
+				if (chavesGeradas.next()) {
+					int novoId = chavesGeradas.getInt(1);
+					System.out.println(novoId);
+					// registro inserido
+				} else {
+					// nenhum registro inserido
+				}
+			}
+		}
 	}
 
 }

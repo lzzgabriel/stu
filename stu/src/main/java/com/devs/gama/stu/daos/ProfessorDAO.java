@@ -1,19 +1,19 @@
 package com.devs.gama.stu.daos;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import com.devs.gama.stu.app.App;
-import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
@@ -22,18 +22,23 @@ import com.devs.gama.stu.utils.SqlUtils;
 public class ProfessorDAO {
 	// Falta trocar locais de consulta, tirar a tabela e adicionar a view e
 	// metodos de cadastro de aluno
-	
+
 	public static void save(Professor professor) throws SQLException {
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
+			
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
+			
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
+			
 			callableStatement.setNull(parametro++, Types.INTEGER); // Deve ser passado null para registrar
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
-			callableStatement.setString(parametro++, professor.getSenha());
+			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
+			
 			int linhasAfetadas = callableStatement.executeUpdate();
+			
 			if (linhasAfetadas > 0) {
 				int novoId = callableStatement.getInt(1);
 				if (novoId > 0) {
@@ -45,7 +50,7 @@ public class ProfessorDAO {
 	}
 
 	public static void edit(Professor professor) throws SQLException {
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
 			int parametro = 1;
@@ -66,7 +71,7 @@ public class ProfessorDAO {
 	}
 
 	public static void delete(Professor professor) throws SQLException, EntityNotFoundException {
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_DELETE_PROFESSOR.getValue(), 1, 1));
 			int parametro = 1;
@@ -89,7 +94,7 @@ public class ProfessorDAO {
 	public static List<Professor> findAll() throws SQLException {
 		List<Professor> returnList = new ArrayList<>();
 		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue();
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
@@ -108,7 +113,7 @@ public class ProfessorDAO {
 	public static Professor findById(int id) throws SQLException {
 		Professor professor = null;
 		String sql = "SELECT * FROM" + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE id = ?";
-		try (Connection conn = App.getDataSource().getConnection()) {
+		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
@@ -122,96 +127,57 @@ public class ProfessorDAO {
 
 	public static Professor fetch(ResultSet res) throws SQLException {
 		Professor professor = new Professor();
-		
+
 		professor.setId(res.getInt("id"));
 		professor.setNome(res.getString("nome"));
 		professor.setEmail(res.getString("email"));
 		professor.setSenha(res.getString("senha"));
-		
+
 		return professor;
 	}
 
-	public static void saveNewAluno(Professor professor, Aluno aluno, Double valorCobrado) throws SQLException {
-		try (Connection conn = App.getDataSource().getConnection()) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.add(Calendar.MONTH, 1);
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO.getValue(), 7, 0));
-			int parametro = 1;
-			callableStatement.setString(parametro++, aluno.getNome());
-			callableStatement.setString(parametro++, aluno.getEmail());
-			callableStatement.setString(parametro++, aluno.getCelular());
-			callableStatement.setInt(parametro++, professor.getId());
-			callableStatement.setDouble(parametro++, valorCobrado);
-			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
-			callableStatement.setDate(parametro++, Date.valueOf(LocalDate.now())); // verificar uso
-			int linhasAfetadas = callableStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
-				if (chavesGeradas.next()) {
-					int novoId = chavesGeradas.getInt(1);
-					System.out.println(novoId);
-					// registro inserido
-				} else {
-					// nenhum registro inserido
-				}
-			}
-		}
-	}
-
-	public static void saveNewAlunoFree(Professor professor, Aluno aluno) throws SQLException {
-		try (Connection conn = App.getDataSource().getConnection()) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.add(Calendar.MONTH, 1);
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO_FREE.getValue(), 4, 0));
-			int parametro = 1;
-			callableStatement.setString(parametro++, aluno.getNome());
-			callableStatement.setString(parametro++, aluno.getEmail());
-			callableStatement.setString(parametro++, aluno.getCelular());
-			callableStatement.setInt(parametro++, professor.getId());
-			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
-			int linhasAfetadas = callableStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
-				if (chavesGeradas.next()) {
-					int novoId = chavesGeradas.getInt(1);
-					System.out.println(novoId);
-					// registro inserido
-				} else {
-					// nenhum registro inserido
-				}
-			}
-		}
-	}
-	
 	public static Professor validateLogin(String email, String senha) throws SQLException, EntityNotFoundException {
-		try (Connection connection = App.getDataSource().getConnection()) {
-			
-			String sql = "SELECT id, nome, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE email = ? AND senha = ? ";
-			
+		try (Connection connection = App.getInstance().getDataSource().getConnection()) {
+
+			String sql = "SELECT id, nome, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue()
+					+ " WHERE email = ? AND senha = ? ";
+
+			// TODO hash aqui ou no bean?
+
 			PreparedStatement statement = connection.prepareStatement(sql);
-			
+
 			int parametro = 1;
 			statement.setString(parametro++, email);
-			statement.setString(parametro++, senha);
-			
+			statement.setString(parametro++, hashSenha(senha));
+
 			ResultSet res = statement.executeQuery();
-			
+
 			if (res.next()) {
 				Professor professor = new Professor();
-				
+
 				professor.setId(res.getInt("id"));
 				professor.setNome(res.getString("nome"));
 				professor.setEmail(res.getString("email"));
-				
+
 				return professor;
 			} else {
 				throw new EntityNotFoundException("Professor não encontrado");
 			}
-			
+
 		} catch (SQLException e) {
 			throw e;
+		}
+	}
+	
+	private static String hashSenha(String senha) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("sha-256");
+			md.update(senha.getBytes(StandardCharsets.UTF_8));
+			byte[] digest = md.digest();
+			
+			return String.format("%064x", new BigInteger(1, digest));
+		} catch (NoSuchAlgorithmException e) {
+			return null;
 		}
 	}
 
