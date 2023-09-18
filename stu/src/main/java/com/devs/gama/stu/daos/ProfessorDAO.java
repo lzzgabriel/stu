@@ -20,25 +20,22 @@ import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.SqlUtils;
 
 public class ProfessorDAO {
-	// Falta trocar locais de consulta, tirar a tabela e adicionar a view e
-	// metodos de cadastro de aluno
 
 	public static void save(Professor professor) throws SQLException {
 		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
-			
+
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
-			
+
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			
 			callableStatement.setNull(parametro++, Types.INTEGER); // Deve ser passado null para registrar
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
 			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
-			
+
 			int linhasAfetadas = callableStatement.executeUpdate();
-			
+
 			if (linhasAfetadas > 0) {
 				int novoId = callableStatement.getInt(1);
 				if (novoId > 0) {
@@ -110,7 +107,7 @@ public class ProfessorDAO {
 		return returnList;
 	}
 
-	public static Professor findById(int id) throws SQLException {
+	public static Professor findById(int id) throws SQLException, EntityNotFoundException {
 		Professor professor = null;
 		String sql = "SELECT * FROM" + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE id = ?";
 		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
@@ -120,6 +117,8 @@ public class ProfessorDAO {
 			ResultSet rs = preparedStatement.executeQuery();
 			if (rs.next()) {
 				professor = fetch(rs);
+			} else {
+				throw new EntityNotFoundException("Professor não encontrado");
 			}
 		}
 		return professor;
@@ -168,13 +167,13 @@ public class ProfessorDAO {
 			throw e;
 		}
 	}
-	
+
 	private static String hashSenha(String senha) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("sha-256");
 			md.update(senha.getBytes(StandardCharsets.UTF_8));
 			byte[] digest = md.digest();
-			
+
 			return String.format("%064x", new BigInteger(1, digest));
 		} catch (NoSuchAlgorithmException e) {
 			return null;

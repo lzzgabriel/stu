@@ -1,3 +1,4 @@
+-- Cadastrar Aluno
 CREATE DEFINER=`root`@`localhost` PROCEDURE `stu`.`cadastrar_aluno`(
 in p_nome varchar(100),
 in p_email varchar(100),
@@ -31,24 +32,7 @@ begin
 		p_mensalidade);
 END;
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `stu`.`cadastrar_aluno_free`(
-in p_nome varchar(100),
-in p_email varchar(100),
-in p_celular varchar(11),
-in p_id_professor int)
-begin
-	insert into stu.aluno(
-		nome,
-		email,
-		celular,
-		id_professor)
-		values (
-		p_nome,
-		p_email,
-		p_celular,
-		p_id_professor);
-END;
-
+-- Cadastrar professor
 CREATE DEFINER=`root`@`localhost` PROCEDURE `cadastrar_professor` (OUT retId INT,
          IN p_id INT,
          IN p_nome VARCHAR(100),
@@ -78,8 +62,41 @@ BEGIN
     END IF;
 END
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_professor`(OUT result INT, IN p_id INT)
+
+-- Deletar professor
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deletar_professor`(OUT result INT, IN p_id INT)
 BEGIN
-	DELETE FROM professor p WHERE p.id = p_id;
-    SET result = 1;
+	IF p_id IS NULL THEN
+		SET result = 0;
+    ELSE
+		DELETE FROM professor p WHERE p.id = p_id;
+		SET result = 1;
+	END IF;
+END
+
+-- Cadastrar forma pagamento
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cadastrar_forma_pagamento`(OUT retId INT,
+         IN f_id INT,
+         IN f_descricao VARCHAR(100))
+BEGIN
+IF f_id IS NULL THEN
+ INSERT INTO stu.forma_pagamento (descricao) VALUES (f_descricao);
+ SET retId = LAST_INSERT_ID();
+ ELSE
+ INSERT INTO stu.forma_pagamento (id, descricao) VALUES (f_id, f_descricao)
+    ON DUPLICATE KEY UPDATE
+ descricao = VALUES(descricao);
+ SET retId = f_id;
+    END IF;
+END
+
+-- Deletar forma pagamento
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deletar_forma_pagamento`(OUT result INT, IN f_id INT)
+BEGIN
+	IF f_id IS NULL THEN
+		SET result = 0;
+    ELSE
+		DELETE FROM forma_pagamento f WHERE f.id = f_id;
+		SET result = 1;
+	END IF;
 END

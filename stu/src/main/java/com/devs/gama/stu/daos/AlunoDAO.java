@@ -19,14 +19,14 @@ import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.SqlUtils;
 
 public class AlunoDAO {
-	
+
 	private static String tableName = "aluno";
 
 	public static void edit(Aluno t) throws SQLException, EntityNotFoundException {
 		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
-			
-			//TODO cadastro, atualização e delete serão por procedures
-			
+
+			// TODO cadastro, atualização e delete serão por procedures
+
 			String sql = "UPDATE " + tableName + " SET nome = ?, email = ?, senha = ? WHERE id = ?";
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
@@ -79,7 +79,7 @@ public class AlunoDAO {
 		return returnList;
 	}
 
-	public static Aluno findById(int id) throws SQLException {
+	public static Aluno findById(int id) throws SQLException, EntityNotFoundException {
 		Aluno aluno = null;
 		String sql = "SELECT * FROM" + tableName + " WHERE id = ?";
 		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
@@ -89,6 +89,8 @@ public class AlunoDAO {
 			ResultSet rs = preparedStatement.executeQuery();
 			if (rs.next()) {
 				aluno = fetch(rs);
+			} else {
+				throw new EntityNotFoundException("Nenhum aluno encontrado");
 			}
 		}
 		return aluno;
@@ -96,12 +98,12 @@ public class AlunoDAO {
 
 	public static Aluno fetch(ResultSet res) throws SQLException {
 		Aluno aluno = new Aluno();
-		
+
 		aluno.setId(res.getInt("id"));
 		aluno.setNome(res.getString("nome"));
 		aluno.setEmail(res.getString("email"));
 		aluno.setCelular(res.getString("celular"));
-		
+
 		return aluno;
 	}
 
@@ -119,32 +121,6 @@ public class AlunoDAO {
 			callableStatement.setDouble(parametro++, valorCobrado);
 			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
 			callableStatement.setDate(parametro++, Date.valueOf(LocalDate.now())); // verificar uso
-			int linhasAfetadas = callableStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();
-				if (chavesGeradas.next()) {
-					int novoId = chavesGeradas.getInt(1);
-					System.out.println(novoId);
-					// registro inserido
-				} else {
-					// nenhum registro inserido
-				}
-			}
-		}
-	}
-
-	public static void saveFree(Professor professor, Aluno aluno) throws SQLException {
-		try (Connection conn = App.getInstance().getDataSource().getConnection()) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.add(Calendar.MONTH, 1);
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO_FREE.getValue(), 4, 0));
-			int parametro = 1;
-			callableStatement.setString(parametro++, aluno.getNome());
-			callableStatement.setString(parametro++, aluno.getEmail());
-			callableStatement.setString(parametro++, aluno.getCelular());
-			callableStatement.setInt(parametro++, professor.getId());
-			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
 			int linhasAfetadas = callableStatement.executeUpdate();
 			if (linhasAfetadas > 0) {
 				ResultSet chavesGeradas = callableStatement.getGeneratedKeys();

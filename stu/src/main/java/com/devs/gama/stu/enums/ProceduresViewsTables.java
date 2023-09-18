@@ -17,12 +17,12 @@ public enum ProceduresViewsTables {
 	TABELA_MENSALIDADE_COBRADA("MENSALIDADE_COBRADA"),
 
 	PROCEDURE_CADASTRAR_PROFESSOR("CADASTRAR_PROFESSOR"),
-	
+
 	PROCEDURE_DELETE_PROFESSOR("DELETE_PROFESSOR"),
-	
+
 	PROCEDURE_CADASTRAR_ALUNO("CADASTRAR_ALUNO"),
-	
-	PROCEDURE_CADASTRAR_ALUNO_FREE("CADASTRAR_ALUNO_FREE"),
+
+	PROCEDURE_CADASTRAR_FORMA_PAGAMENTO("CADASTRAR_FORMA_PAGAMENTO"),
 
 	VIEW_PROFESSOR("VIEW_PROFESSOR"),
 
@@ -46,6 +46,7 @@ public enum ProceduresViewsTables {
 
 	public static ProceduresViewsTables valueOfProceduresViews(String value) {
 		return Arrays.asList(ProceduresViewsTables.values()).stream().filter(s -> s.getValue().equalsIgnoreCase(value))
-				.findFirst().orElseThrow(() -> new CallNotFoundException("Procedure or View not found: " + value));
+				.findFirst()
+				.orElseThrow(() -> new CallNotFoundException("Procedure, View or Table not found: " + value));
 	}
 }
