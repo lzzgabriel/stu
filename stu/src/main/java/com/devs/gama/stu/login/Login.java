@@ -53,6 +53,19 @@ public class Login implements Serializable {
 		}
 	}
 	
+	public void testeCadastro() {
+		try {
+			Professor professor = new Professor();
+			professor.setNome("PROF_TESTE");
+			professor.setEmail(email);
+			professor.setSenha(senha);
+			ProfessorDAO.save(professor);
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+			MessageUtils.addErrorMessage("Falha no cadastro");
+		}
+	}
+	
 	public void logout() {
 		try {
 			HttpSession session = SessionUtils.getSession();

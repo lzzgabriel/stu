@@ -1,5 +1,7 @@
 package com.devs.gama.stu.utils;
 
+import org.primefaces.PrimeFaces;
+
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.application.FacesMessage.Severity;
 import jakarta.faces.context.FacesContext;
@@ -48,6 +50,11 @@ public class MessageUtils {
 
 	private static void addMessage(Severity severity, String summary, String detail, String clientId) {
 		FacesMessage message = new FacesMessage(severity, summary, detail);
+		
+		if (clientId != null && !clientId.isEmpty() && !clientId.isBlank()) {
+			PrimeFaces.current().ajax().update(clientId);
+		}
+		
 		FacesContext.getCurrentInstance().addMessage(clientId, message);
 	}
 

@@ -44,7 +44,14 @@
 					<p:commandButton value="Entrar" action="#{stLogin.login()}" />
 					<div />
 				</p:panelGrid>
-
+				
+				<p:panelGrid layout="flex" styleClass="ui-fluid" columns="3"
+					columnClasses="col-3, col-6, col-3">
+					<div />
+					<p:commandButton value="Cadastrar prof de teste" action="#{stLogin.testeCadastro()}" update="messages" />
+					<div />
+				</p:panelGrid>
+				
 			</p:panelGrid>
 
 		</h:form>
