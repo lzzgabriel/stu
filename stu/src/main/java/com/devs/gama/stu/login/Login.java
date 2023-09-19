@@ -15,7 +15,6 @@ import com.devs.gama.stu.utils.MessageUtils;
 import com.devs.gama.stu.utils.NavigationUtils;
 import com.devs.gama.stu.utils.SessionUtils;
 
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpSession;
