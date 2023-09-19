@@ -4,7 +4,20 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:p="http://primefaces.org/ui">
 <f:view>
-	<p:menubar model="#{stSession.menuModel}">
+	<p:menubar autoDisplay="false">
+
+		<p:menuitem value="Home" icon="pi pi-home" />
+
+		<p:menuitem value="Meus dados" icon="pi pi-user" />
+
+		<p:menuitem value="Meus alunos" icon="pi pi-book" />
+
+		<p:menuitem value="Mensalidades" icon="pi pi-money-bill" />
+
+		<p:submenu label="Opções" icon="pi pi-cog">
+			<p:menuitem value="Logout" icon="pi pi-sign-out"
+				action="#{stLogin.logout}" />
+		</p:submenu>
 	</p:menubar>
 </f:view>
 </html>

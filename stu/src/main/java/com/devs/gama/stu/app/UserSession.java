@@ -14,20 +14,7 @@ public class UserSession implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private MenuModel menuModel;
-
 	public UserSession() {
-	}
-
-	public MenuModel getMenuModel() {
-		if (menuModel == null) {
-			menuModel = HeaderMenu.get();
-		}
-		return menuModel;
-	}
-
-	public void setMenuModel(DefaultMenuModel menuModel) {
-		this.menuModel = menuModel;
 	}
 
 }

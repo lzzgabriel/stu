@@ -16,11 +16,12 @@ import com.devs.gama.stu.utils.NavigationUtils;
 import com.devs.gama.stu.utils.SessionUtils;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpSession;
 
 @Named("stLogin")
-@RequestScoped
+@SessionScoped
 public class Login implements Serializable {
 
 	private static final long serialVersionUID = 1L;
