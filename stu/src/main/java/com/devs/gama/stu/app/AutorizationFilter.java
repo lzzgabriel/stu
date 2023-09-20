@@ -60,7 +60,7 @@ public class AutorizationFilter implements Filter {
 			chain.doFilter(request, response);
 			
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error(e.getMessage(), e);
 		}
 	}
 

@@ -1,5 +1,7 @@
 package com.devs.gama.stu.app;
 
+import java.io.Serializable;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -8,13 +10,20 @@ import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class App {
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
-	private static App instance = new App();
+@Named("stApplication")
+@ApplicationScoped
+public class Application implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	
-	private Logger logger = LogManager.getLogger();
+	private Logger logger = LogManager.getRootLogger();
+	
+	private DataSource dataSource;
 
-	private App() {
+	public Application() {
 		try {
 			Context c = InitialContext.doLookup("java:comp/env");
 			dataSource = (DataSource) c.lookup("jdbc/StuDB");
@@ -23,14 +32,12 @@ public class App {
 		}
 	}
 
-	private DataSource dataSource;
+	public Logger getLogger() {
+		return logger;
+	}
 
 	public DataSource getDataSource() {
 		return dataSource;
 	}
-
-	public static App getInstance() {
-		return instance;
-	}
-
+	
 }
