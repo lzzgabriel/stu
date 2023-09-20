@@ -12,7 +12,8 @@
 
 		<p:menuitem value="Home" icon="pi pi-home" />
 
-		<p:menuitem value="Meus dados" icon="pi pi-user" />
+		<p:menuitem value="Meus dados" icon="pi pi-user"
+			actionListener="#{stMenu.goToMeusDados()}" />
 
 		<p:menuitem value="Meus alunos" icon="pi pi-book" />
 
@@ -20,7 +21,7 @@
 
 		<p:submenu label="Opções" icon="pi pi-cog">
 			<p:menuitem value="Logout" icon="pi pi-sign-out"
-				actionListener="#{stLogin.logout}" />
+				actionListener="#{stMenu.logout()}" />
 		</p:submenu>
 	</p:menubar>
 	

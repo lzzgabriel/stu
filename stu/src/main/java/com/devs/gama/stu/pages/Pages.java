@@ -1,8 +1,10 @@
 package com.devs.gama.stu.pages;
 
 public enum Pages {
-	INDEX("index.xhtml"),
-	LOGIN("login.xhtml");
+	home("home.xhtml"),
+	login("login.xhtml"),
+	meusDados("meus_dados.xhtml")
+	;
 
 	public String url;
 
