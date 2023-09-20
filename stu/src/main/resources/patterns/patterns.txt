@@ -1,0 +1,51 @@
+JAVA CLASSES PATTERN:
+
+public class <nome> implements <interfaces> {
+
+
+
+	*** STATIC AND FINAL FIELDS ***
+	public static final long serialVersionUID = 1l;
+
+
+
+	*** DEPENDENCIES ***
+	@Inject
+	private <dependencia> dependencia;
+	
+	
+	
+	*** LOCAL PROPERTIES ***
+	private Aluno aluno;
+	private boolean mostrarTela;
+	
+	
+	
+	*** CONSTRUCTOR E INIT ***
+	public <nome>() {}
+	
+	@PostConstruct
+	public void init() {
+		...
+	}
+	
+	
+	
+	*** METHODS ***
+	public void save() {
+		...
+	}
+	
+	
+	
+	*** GETTERS/SETTERS ***
+	public Aluno getAluno() {
+		return aluno;
+	}
+	
+	public void setAluno(Aluno aluno) {
+		this.aluno = aluno;
+	}
+	
+
+} 
