@@ -15,7 +15,7 @@
 	</servlet-mapping>
 	<welcome-file-list>
 		<!-- Por favor lembra de usar o .xhtml para acessar, mesmo do servlet -->
-		<welcome-file>index.xhtml</welcome-file>
+		<welcome-file>home.xhtml</welcome-file>
 	</welcome-file-list>
 	<context-param>
 		<param-name>primefaces.THEME</param-name>
