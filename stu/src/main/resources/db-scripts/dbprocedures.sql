@@ -22,17 +22,22 @@ ELSE
 END IF;
 END
 
--- Deletar Aluno
-CREATE DEFINER=`stustd`@`localhost` PROCEDURE `delete_aluno`(OUT retId INT, IN a_id INT)
+CREATE DEFINER=`stustd`@`localhost` PROCEDURE `DELETE_PROFESSOR`(OUT result INT, IN p_id INT)
 BEGIN
-IF a_id IS NULL THEN
-	SET retId = 0;
+/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	ROLLBACK;
+    SELECT 'An error ocurred' as msgError;
+END;*/
+
+IF p_id IS NULL THEN
+	SET result = 0;
 ELSE
-	SET retId = 0;
-	IF EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
-		DELETE FROM aluno a WHERE a.id = a_id;
-		SET retId = 1;
-	END IF;
+	SET result = 0;
+	 IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id) THEN
+		DELETE FROM professor p WHERE p.id = p_id;
+		 SET result = 1;
+	 END IF;
 END IF;
 END
 
@@ -81,6 +86,17 @@ IF id_professor IS NOT NULL THEN
 		UPDATE stu.professor p SET p.senha = senhaDestino WHERE p.id = id_professor;
 		SET retId = 1;
 	END IF;
+END IF;
+END
+
+-- Associar aluno a professor
+CREATE DEFINER=`stustd`@`localhost` PROCEDURE `ASSOCIAR_ALUNO_PROFESSOR`(IN id_p INT, IN id_a INT)
+BEGIN
+IF id_p IS NOT NULL AND id_a IS NOT NULL THEN
+	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_p) AND EXISTS
+	(SELECT 1 FROM view_aluno va WHERE va.id = id_a) THEN
+		INSERT INTO aluno_de_professor(id_aluno, id_professor) VALUES (id_a, id_p);
+    END IF;
 END IF;
 END
 
