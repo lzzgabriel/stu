@@ -13,6 +13,7 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
+import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.inject.Model;
@@ -20,7 +21,7 @@ import jakarta.inject.Inject;
 
 @Model
 public class FormaPagamentoDAO {
-	
+
 	@Inject
 	private Application application;
 
@@ -32,18 +33,13 @@ public class FormaPagamentoDAO {
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setNull(parametro++, Types.INTEGER); // Deve ser passado null para registrar
 			callableStatement.setString(parametro++, formaPagamento.getDescricao());
-			int linhasAfetadas = callableStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				int novoId = callableStatement.getInt(1);
-				if (novoId > 0) {
-					System.out.println(novoId);
-					// registro inserido
-				}
-			}
+			callableStatement.execute();
+
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
 		}
 	}
 
-	public void edit(FormaPagamento formaPagamento) throws SQLException, EntityNotFoundException {
+	public void edit(FormaPagamento formaPagamento) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(SqlUtils
 					.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_FORMA_PAGAMENTO.getValue(), 2, 1));
@@ -51,32 +47,23 @@ public class FormaPagamentoDAO {
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, formaPagamento.getId()); // Deve ser passado o id para atualizar
 			callableStatement.setString(parametro++, formaPagamento.getDescricao());
-			int linhasAfetadas = callableStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				int idRegistroAtualizado = callableStatement.getInt(1);
-				if (idRegistroAtualizado > 0) {
-					System.out.println(idRegistroAtualizado);
-					// registro atualizado
-				}
-			} else {
-				throw new EntityNotFoundException("Forma de pagamento não encontrada: nenhum registro atualizado");
-			}
+			callableStatement.execute();
+
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
 		}
 	}
 
-	public void delete(FormaPagamento formaPagamento) throws SQLException, EntityNotFoundException {
+	public void delete(FormaPagamento formaPagamento) throws SQLException {
 
 		try (Connection conn = application.getDataSource().getConnection()) {
-			String sql = "DELETE FROM " + ProceduresViewsTables.TABELA_FORMA_PAGAMENTO + " WHERE id = ?";
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			CallableStatement callableStatement = conn
+					.prepareCall(SqlUtils.montarProcedure("deletar_forma_pagamento", 1, 1));
 			int parametro = 1;
-			preparedStatement.setInt(parametro++, formaPagamento.getId());
-			int linhasAfetadas = preparedStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				// registro excluido
-			} else {
-				throw new EntityNotFoundException("Forma de pagamento não encontrada: nenhum registro excluído");
-			}
+			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
+			callableStatement.setInt(parametro++, formaPagamento.getId());
+			callableStatement.execute();
+
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
 		}
 
 	}

@@ -17,6 +17,7 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
+import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.inject.Model;
@@ -24,7 +25,7 @@ import jakarta.inject.Inject;
 
 @Model
 public class ProfessorDAO {
-	
+
 	@Inject
 	private Application application;
 
@@ -40,16 +41,9 @@ public class ProfessorDAO {
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
 			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
-
-			int linhasAfetadas = callableStatement.executeUpdate();
-
-			if (linhasAfetadas > 0) {
-				int novoId = callableStatement.getInt(1);
-				if (novoId > 0) {
-					System.out.println(novoId);
-					// registro inserido
-				}
-			}
+			callableStatement.execute();
+			
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
 		}
 	}
 
@@ -63,14 +57,9 @@ public class ProfessorDAO {
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
 			callableStatement.setString(parametro++, professor.getSenha());
-			int linhasAfetadas = callableStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				int idRegistroAtualizado = callableStatement.getInt(1);
-				if (idRegistroAtualizado > 0) {
-					System.out.println(idRegistroAtualizado);
-					// registro atualizado
-				}
-			}
+			callableStatement.execute();
+
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
 		}
 	}
 
@@ -81,16 +70,9 @@ public class ProfessorDAO {
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, professor.getId());
-			int linhasAfetadas = callableStatement.executeUpdate();
-			if (linhasAfetadas > 0) {
-				int result = callableStatement.getInt(1);
-				if (result > 0) { // 1 -> deu certo
-					System.out.println(result);
-					// excluido
-				}
-			} else {
-				throw new EntityNotFoundException("Professor não encotrado: nenhum dado deletado ");
-			}
+			callableStatement.execute();
+
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
 		}
 
 	}
@@ -116,7 +98,7 @@ public class ProfessorDAO {
 
 	public Professor findById(int id) throws SQLException, EntityNotFoundException {
 		Professor professor = null;
-		String sql = "SELECT * FROM" + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE id = ?";
+		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE id = ?";
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
@@ -148,15 +130,13 @@ public class ProfessorDAO {
 			String sql = "SELECT id, nome, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue()
 					+ " WHERE email = ? AND senha = ? ";
 
-			// TODO hash aqui ou no bean?
-
-			PreparedStatement statement = connection.prepareStatement(sql);
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
 			int parametro = 1;
-			statement.setString(parametro++, email);
-			statement.setString(parametro++, hashSenha(senha));
+			preparedStatement.setString(parametro++, email);
+			preparedStatement.setString(parametro++, hashSenha(senha));
 
-			ResultSet res = statement.executeQuery();
+			ResultSet res = preparedStatement.executeQuery();
 
 			if (res.next()) {
 				Professor professor = new Professor();
