@@ -1,5 +1,7 @@
 package com.devs.gama.stu.entities;
 
+import java.util.Objects;
+
 public class Aluno {
 	private Integer id;
 	private String nome;
@@ -36,6 +38,23 @@ public class Aluno {
 
 	public void setCelular(String celular) {
 		this.celular = celular;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(celular);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Aluno other = (Aluno) obj;
+		return Objects.equals(celular, other.celular);
 	}
 
 }
