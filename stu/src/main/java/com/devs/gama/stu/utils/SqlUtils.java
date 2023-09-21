@@ -18,5 +18,20 @@ public class SqlUtils {
 		procedure.append(")}");
 		return procedure.toString();
 	}
-	
+
+	/**
+	 * Método para montar a estrutura de uma páginação
+	 * 
+	 * @param nomeView        String Texto que será colocado no nome da procedure
+	 * @param pagina          Pagina em que a paginacao se encontra
+	 * @param padraoPaginacao Padrao de paginacao a ser seguido (10 em 10, 20 em
+	 *                        20...)
+	 * @return String o texto em String
+	 */
+	public static String montarPaginacao(String nomeViewTable, int pagina, int padraoPaginacao) {
+		StringBuilder paginacao = new StringBuilder("SELECT * FROM " + nomeViewTable);
+		paginacao.append(" LIMIT " + ((pagina - 1) * padraoPaginacao) + ", " + padraoPaginacao);
+		return paginacao.toString();
+	}
+
 }
