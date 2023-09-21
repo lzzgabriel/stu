@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import com.devs.gama.stu.app.Application;
@@ -32,10 +31,8 @@ public class AlunoDAO {
 
 	public void save(Professor professor, Aluno aluno) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.add(Calendar.MONTH, 1);
 			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO.getValue(), 5, 1));
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO.getValue(), 4, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setNull(parametro++, Types.INTEGER);
@@ -43,7 +40,6 @@ public class AlunoDAO {
 			callableStatement.setString(parametro++, aluno.getEmail());
 			callableStatement.setString(parametro++, aluno.getCelular().substring(0, 10)); // -> limitado no banco para
 																							// varchar(11)
-			callableStatement.setInt(parametro++, professor.getId());
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
@@ -52,7 +48,7 @@ public class AlunoDAO {
 
 	public void edit(Professor professor, Aluno aluno) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(SqlUtils.montarProcedure("cadastrar_aluno", 5, 1));
+			CallableStatement callableStatement = conn.prepareCall(SqlUtils.montarProcedure("cadastrar_aluno", 4, 1));
 
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
@@ -60,7 +56,6 @@ public class AlunoDAO {
 			callableStatement.setString(parametro++, aluno.getNome());
 			callableStatement.setString(parametro++, aluno.getEmail());
 			callableStatement.setString(parametro++, aluno.getCelular());
-			callableStatement.setInt(parametro++, professor.getId());
 
 			callableStatement.execute();
 
@@ -92,6 +87,9 @@ public class AlunoDAO {
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
 			}
+
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
 		}
 		return returnList;
 	}
@@ -111,6 +109,9 @@ public class AlunoDAO {
 			if (resultSet.next()) {
 				totalRegistros = resultSet.getInt("totalRegistros");
 			}
+
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
 		}
 		return totalRegistros;
 	}
@@ -118,12 +119,15 @@ public class AlunoDAO {
 	public List<Aluno> pagination(int pagina) throws SQLException {
 		List<Aluno> listaRetorno = new ArrayList<Aluno>();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(
-					SqlUtils.montarPaginacao("VIEW_PROFESSOR", pagina, PadraoPaginacaoViews.VIEW_RESULT_10.getValue()));
+			PreparedStatement preparedStatement = conn
+					.prepareStatement(SqlUtils.montarPaginacao(ProceduresViewsTables.VIEW_ALUNO.getValue(), pagina,
+							PadraoPaginacaoViews.VIEW_RESULT_10.getValue()));
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));
 			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
 		}
 		return listaRetorno;
 	}
@@ -135,10 +139,13 @@ public class AlunoDAO {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
-			ResultSet rs = preparedStatement.executeQuery();
-			if (rs.next()) {
-				aluno = fetch(rs);
-			} else {
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				aluno = fetch(resultSet);
+			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			if (aluno == null) {
 				throw new EntityNotFoundException("Nenhum aluno encontrado");
 			}
 		}

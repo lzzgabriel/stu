@@ -2,6 +2,7 @@ package com.devs.gama.stu.utils;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.devs.gama.stu.exceptions.CallFailedException;
@@ -27,6 +28,18 @@ public class ProcessamentoProcedure {
 			}
 		} catch (SQLException e) {
 			callableStatement = null;
+			throw e;
+		}
+	}
+
+	public static void closeResultSet(ResultSet resultSet) throws SQLException {
+
+		try {
+			if (resultSet != null && !resultSet.isClosed()) {
+				resultSet.close();
+			}
+		} catch (SQLException e) {
+			resultSet = null;
 			throw e;
 		}
 	}

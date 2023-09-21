@@ -5,9 +5,10 @@ CREATE TABLE `aluno` (
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
   `celular` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ativo` tinyint NOT NULL DEFAULT '1',
   `momento_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=220 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=319 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 
 -- stu.forma_pagamento definition
@@ -26,13 +27,16 @@ CREATE TABLE `professor` (
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `senha` varchar(100) NOT NULL,
+  `ativo` tinyint NOT NULL DEFAULT '1',
   `momento_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `professor_un` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 
 -- stu.aluno_de_professor definition
+
+
 
 CREATE TABLE `aluno_de_professor` (
   `id_aluno` int NOT NULL,

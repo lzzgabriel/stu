@@ -1,47 +1,25 @@
 -- Cadastrar Aluno
-CREATE DEFINER=`stustd`@`localhost` PROCEDURE `cadastrar_aluno`(
+CREATE DEFINER=`stustd`@`localhost` PROCEDURE `CADASTRAR_ALUNO`(
 OUT retId INT,
 IN a_id INT,
 IN a_nome varchar(100),
 IN a_email varchar(100),
-IN a_celular varchar(11),
-IN a_id_professor int
-/*IN a_valor_cobrar decimal(10,2),
-IN a_proximo_vencimento date,
-IN a_mensalidade date*/)
+IN a_celular varchar(11))
 BEGIN
 DECLARE novo_id INT;
 IF a_id IS NULL THEN
-	IF EXISTS(SELECT 1 FROM view_professor vp WHERE vp.id = a_id_professor) THEN
-		INSERT INTO stu.aluno(nome, email, celular, id_professor)
-		VALUES (a_nome, a_email, a_celular, a_id_professor); -- inserir tabela aluno
-        SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
-        SET retId = novo_id;
-	ELSE
-		INSERT INTO stu.aluno(nome, email, celular, id_professor) -- Para professor que não existir será passado nulo
-		VALUES (a_nome, a_email, a_celular, NULL);
-        SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
-        SET retId = novo_id;
-	END IF;
+	INSERT INTO stu.aluno(nome, email, celular)
+	VALUES (a_nome, a_email, a_celular); -- inserir tabela aluno
+	SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
+	SET retId = novo_id;
 ELSE
 	SET retId = 0;
 	IF EXISTS(SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
-		IF EXISTS(SELECT 1 FROM view_professor vp WHERE vp.id = a_id_professor) THEN
-			UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular, a.id_professor = a_id_professor 
-            WHERE a.id = a_id;
-            SET retId = 1;
-		ELSE
-			UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular, a.id_professor = NULL 
-            WHERE a.id = a_id; -- Para professor que não existir será passado nulo
-			SET retId = 1;
-        END IF;
+		UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
+		WHERE a.id = a_id; 
+		SET retId = 1;
 	END IF;
-END IF;    
-	/*INSERT INTO stu.aluno_de_professor (id_aluno , id_professor) -- Retirado por hora, provavelmente será separado.
-	VALUES (novo_id, p_id_professor); -- associar aluno com professor
-    
-	INSERT INTO mensalidade_aberta(id_aluno, valor_cobrar, proximo_vencimento, mensalidade)
-		VALUES (novo_id, p_valor_cobrar, p_proximo_vencimento, p_mensalidade); -- inserir tabela mensalidade aberta*/
+END IF;
 END
 
 -- Deletar Aluno

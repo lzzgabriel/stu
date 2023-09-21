@@ -17,7 +17,6 @@ import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Model;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
@@ -80,6 +79,8 @@ public class FormaPagamentoDAO {
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
 			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
 		}
 		return returnList;
 	}
@@ -97,10 +98,13 @@ public class FormaPagamentoDAO {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
-			ResultSet rs = preparedStatement.executeQuery();
-			if (rs.next()) {
-				formaPagamento = fetch(rs);
-			} else {
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				formaPagamento = fetch(resultSet);
+			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			if (formaPagamento == null) {
 				throw new EntityNotFoundException("Forma de pagamento não encontrada");
 			}
 		}

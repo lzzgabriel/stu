@@ -112,6 +112,9 @@ public class ProfessorDAO {
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
 			}
+
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
 		}
 		return returnList;
 	}
@@ -129,12 +132,16 @@ public class ProfessorDAO {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
-			ResultSet rs = preparedStatement.executeQuery();
-			if (rs.next()) {
-				professor = fetch(rs);
-			} else {
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				professor = fetch(resultSet);
+			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			if (professor == null) {
 				throw new EntityNotFoundException("Professor não encontrado");
 			}
+
 		}
 		return professor;
 	}
@@ -154,7 +161,7 @@ public class ProfessorDAO {
 		try (Connection connection = application.getDataSource().getConnection()) {
 
 			String sql = "SELECT id, nome, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue()
-					+ " WHERE email = ? AND senha = ? ";
+					+ " WHERE email = ? AND senha = ?";
 
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
