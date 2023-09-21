@@ -9,15 +9,38 @@
 	<ui:composition template="/composites/template.xhtml">
 		<ui:define name="content">
 
-			<p:panelGrid columns="1">
+			<h:form>
+			
+				<p:growl id="messages"/>
 
-				<p:outputLabel value="Nome:" />
-				<p:inputText value="#{stMeusDados.professor.nome}" disabled="true" />
+				<div class="mx-8 pt-4">
+				
+				<p:panelGrid layout="grid" columns="1" styleClass="ui-fluid">
 
-				<p:outputLabel value="E-mail:" />
-				<p:inputText value="#{stMeusDados.professor.email}" disabled="true" />
+					<p:outputLabel value="Nome:" />
+					<p:inputText value="#{stMeusDados.professor.nome}"
+						disabled="#{not stMeusDados.editMode}" />
 
-			</p:panelGrid>
+					<p:outputLabel value="E-mail:" />
+					<p:inputText value="#{stMeusDados.professor.email}"
+						disabled="#{not stMeusDados.editMode}" />
+
+				</p:panelGrid>
+				
+				</div>
+
+				<div class="flex justify-content-center flex-wrap py-4">
+
+					<p:commandButton value="Editar dados"
+						rendered="#{not stMeusDados.editMode}"
+						actionListener="#{stMeusDados.enterEditMode()}" update="@form" />
+					<p:commandButton value="Salvar alterações"
+						rendered="#{stMeusDados.editMode}"
+						actionListener="#{stMeusDados.edit()}" update="@form" />
+
+				</div>
+
+			</h:form>
 
 		</ui:define>
 	</ui:composition>

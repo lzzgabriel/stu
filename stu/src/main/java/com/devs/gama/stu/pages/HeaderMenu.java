@@ -22,14 +22,6 @@ public class HeaderMenu implements Serializable {
 	@Inject
 	private Application application;
 	
-	public void goToMeusDados() {
-		try {
-			NavigationUtils.redirect(Pages.meusDados.url);
-		} catch (IOException e) {
-			application.getLogger().error(e.getMessage(), e);
-		}
-	}
-
 	public void logout() {
 		try {
 			HttpSession session = SessionUtils.getSession();

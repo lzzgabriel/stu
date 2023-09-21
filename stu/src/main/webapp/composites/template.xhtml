@@ -11,7 +11,8 @@
 		name="primeflex/3.3.1/primeflex.min.css" />
 </h:head>
 
-<f:view>
+<h:body styleClass="bg-bluegray-200 m-0">
+
 	<ui:debug hotkey="x"
 		rendered="#{initParam['jakarta.faces.FACELETS_DEVELOPMENT']}" />
 
@@ -21,12 +22,11 @@
 		</ui:insert>
 	</div>
 
-
-	<div id="content">
+	<div id="content" class="mx-8 px-8 bg-white border-round">
 		<ui:insert name="content">
 		</ui:insert>
 	</div>
 
-</f:view>
+</h:body>
 
 </html>
