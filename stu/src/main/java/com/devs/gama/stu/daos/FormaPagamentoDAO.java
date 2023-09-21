@@ -16,10 +16,13 @@ import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Model;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
-@Model
+@Named
+@ApplicationScoped
 public class FormaPagamentoDAO {
 
 	@Inject

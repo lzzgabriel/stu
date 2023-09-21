@@ -20,10 +20,13 @@ import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Model;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
-@Model
+@Named
+@ApplicationScoped
 public class ProfessorDAO {
 
 	@Inject
@@ -36,14 +39,16 @@ public class ProfessorDAO {
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
 
 			int parametro = 1;
+
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setNull(parametro++, Types.INTEGER); // Deve ser passado null para registrar
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
 			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
 			callableStatement.execute();
-			
+
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -51,7 +56,9 @@ public class ProfessorDAO {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
+
 			int parametro = 1;
+
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, professor.getId()); // Deve ser passado o id para atualizar
 			callableStatement.setString(parametro++, professor.getNome());
@@ -60,10 +67,11 @@ public class ProfessorDAO {
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
 
-	public void delete(Professor professor) throws SQLException, EntityNotFoundException {
+	public void delete(Professor professor) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_DELETE_PROFESSOR.getValue(), 1, 1));
@@ -73,6 +81,7 @@ public class ProfessorDAO {
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 
 	}

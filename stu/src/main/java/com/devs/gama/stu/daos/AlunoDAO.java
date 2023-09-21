@@ -13,15 +13,18 @@ import java.util.List;
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Professor;
+import com.devs.gama.stu.enums.PadraoPaginacaoViews;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
-import jakarta.enterprise.inject.Model;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
-@Model
+@Named
+@ApplicationScoped
 public class AlunoDAO {
 
 	@Inject
@@ -100,6 +103,32 @@ public class AlunoDAO {
 		List<Aluno> returnList = findAll();
 		returnList.removeIf(p -> !p.equals(aluno));
 		return returnList;
+	}
+
+	public int findCount() throws SQLException {
+		int totalRegistros = 0;
+		String sql = "SELECT COUNT(id) as totalRegistros FROM " + ProceduresViewsTables.VIEW_ALUNO.getValue();
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				totalRegistros = resultSet.getInt("totalRegistros");
+			}
+		}
+		return totalRegistros;
+	}
+
+	public List<Aluno> pagination(int pagina) throws SQLException {
+		List<Aluno> listaRetorno = new ArrayList<Aluno>();
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn.prepareStatement(
+					SqlUtils.montarPaginacao("VIEW_PROFESSOR", pagina, PadraoPaginacaoViews.VIEW_RESULT_10.getValue()));
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				listaRetorno.add(fetch(resultSet));
+			}
+		}
+		return listaRetorno;
 	}
 
 	public Aluno findById(int id) throws SQLException, EntityNotFoundException {

@@ -8,18 +8,18 @@ import com.devs.gama.stu.exceptions.CallFailedException;
 
 public class ProcessamentoProcedure {
 
-	public static void closePreparedStatement(PreparedStatement preparedStatement) {
+	public static void closePreparedStatement(PreparedStatement preparedStatement) throws SQLException {
 		try {
 			if (preparedStatement != null && !preparedStatement.isClosed()) {
 				preparedStatement.close();
 			}
 		} catch (SQLException e) {
 			preparedStatement = null;
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
-	public static void closeCallableStatement(CallableStatement callableStatement) {
+	public static void closeCallableStatement(CallableStatement callableStatement) throws SQLException {
 
 		try {
 			if (callableStatement != null && !callableStatement.isClosed()) {
@@ -27,7 +27,7 @@ public class ProcessamentoProcedure {
 			}
 		} catch (SQLException e) {
 			callableStatement = null;
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
