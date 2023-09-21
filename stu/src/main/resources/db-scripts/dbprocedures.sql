@@ -72,7 +72,7 @@ IF p_id IS NULL THEN
 ELSE
 	SET retId = 0;
 	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id) THEN
-		UPDATE stu.professor p SET p.nome = _nome, p.email = p_email WHERE p.id = p_id;
+		UPDATE stu.professor p SET p.nome = p_nome, p.email = p_email WHERE p.id = p_id;
 		SET retId = 1;
     END IF;
 END IF;
