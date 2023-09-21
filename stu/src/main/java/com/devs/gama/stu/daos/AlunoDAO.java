@@ -44,9 +44,6 @@ public class AlunoDAO {
 			callableStatement.setString(parametro++, aluno.getCelular().substring(0, 10)); // -> limitado no banco para
 																							// varchar(11)
 			callableStatement.setInt(parametro++, professor.getId());
-//			callableStatement.setDouble(parametro++, valorCobrado);
-//			callableStatement.setDate(parametro++, Date.valueOf(calendar.getTime().toString()));
-//			callableStatement.setDate(parametro++, Date.valueOf(LocalDate.now())); // retirado por hora
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);

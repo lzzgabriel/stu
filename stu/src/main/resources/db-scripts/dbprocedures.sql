@@ -93,6 +93,19 @@ ELSE
 END IF;
 END
 
+-- Alterar senha professor
+CREATE DEFINER=`root`@`localhost` PROCEDURE `alterar_senha_professor`(OUT retId INT, IN id_professor INT, 
+	IN senhaAtual VARCHAR(100), IN senhaDestino VARCHAR(100))
+BEGIN
+SET retId = 0;
+IF id_professor IS NOT NULL THEN 
+	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_professor AND vp.senha = senhaAtual) THEN
+		UPDATE stu.professor p SET p.senha = senhaDestino WHERE p.id = id_professor;
+		SET retId = 1;
+	END IF;
+END IF;
+END
+
 -- Cadastrar forma pagamento
 CREATE DEFINER=`stustd`@`localhost` PROCEDURE `cadastrar_forma_pagamento`(OUT retId INT,
          IN f_id INT,

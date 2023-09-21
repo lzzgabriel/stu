@@ -21,7 +21,6 @@ import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Model;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
@@ -63,7 +62,25 @@ public class ProfessorDAO {
 			callableStatement.setInt(parametro++, professor.getId()); // Deve ser passado o id para atualizar
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
-			callableStatement.setString(parametro++, professor.getSenha());
+			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
+			callableStatement.execute();
+
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+		}
+	}
+
+	public void changePassword(Professor professor, String novaSenha) throws SQLException {
+		try (Connection conn = application.getDataSource().getConnection()) {
+			CallableStatement callableStatement = conn.prepareCall(
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_ALTERAR_SENHA_PROFESSOR.getValue(), 3, 1));
+
+			int parametro = 1;
+
+			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
+			callableStatement.setInt(parametro++, professor.getId());
+			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
+			callableStatement.setString(parametro++, hashSenha(novaSenha));
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
