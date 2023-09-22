@@ -2,15 +2,18 @@ package com.devs.gama.stu.daos;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
+import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
@@ -63,18 +66,52 @@ public class AlunoDAO {
 		}
 	}
 
-	public void delete(Aluno aluno) throws SQLException {
-
+	public void generateMensalidadeAberta(Aluno aluno, Double valorCobrado, LocalDate mensalidadeVigente)
+			throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(SqlUtils.montarProcedure("delete_aluno", 1, 1));
+			CallableStatement callableStatement = conn.prepareCall(SqlUtils
+					.montarProcedure(ProceduresViewsTables.PROCEDURE_GERAR_MENSALIDADE_ABERTA.getValue(), 3, 1));
+
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, aluno.getId());
+			callableStatement.setDouble(parametro++, valorCobrado);
+			callableStatement.setDate(parametro++, Date.valueOf(mensalidadeVigente));
+
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-
 		}
+	}
+
+	public void confirmPay(Aluno aluno, FormaPagamento formaPagameto) throws SQLException {
+		try (Connection conn = application.getDataSource().getConnection()) {
+			CallableStatement callableStatement = conn.prepareCall(SqlUtils
+					.montarProcedure(ProceduresViewsTables.PROCEDURE_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3, 0));
+
+			int parametro = 1;
+			callableStatement.setInt(parametro++, aluno.getId());
+			callableStatement.setDate(parametro++, Date.valueOf(LocalDate.now()));
+			callableStatement.setInt(parametro++, formaPagameto.getId());
+
+			callableStatement.execute();
+
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+		}
+	}
+
+	public void delete(Aluno aluno) throws SQLException {
+
+//		try (Connection conn = application.getDataSource().getConnection()) {
+//			CallableStatement callableStatement = conn.prepareCall(SqlUtils.montarProcedure("delete_aluno", 1, 1));
+//			int parametro = 1;
+//			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
+//			callableStatement.setInt(parametro++, aluno.getId());
+//			callableStatement.execute();
+//
+//			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+//
+//		} -> Retirado até o momento, posteriormente será feito o controle através da coluna "ativo"
 
 	}
 

@@ -180,3 +180,15 @@ begin
 	mensalidade = adddate(@mensalidade, interval 1 month)
 	where id_aluno = p_id_aluno;
 END;
+
+-- Gerar mensalidade em aberto (necessário confirmar o processo)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GERAR_MENSALIDADE_ABERTA`(OUT retId INT, IN id_aluno INT, 
+IN valor_cobrar DECIMAL, IN mensalidade DATE)
+BEGIN
+SET retId = 0;
+IF id_aluno IS NOT NULL AND EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = id_aluno) THEN
+	INSERT INTO mensalidade_aberta(id_aluno, proximo_vencimento, valor_cobrar) 
+    VALUES (id_aluno, adddate(mensalidade, interval 1 month), valor_cobrar);
+    SET retId = 1;
+END IF;
+END
