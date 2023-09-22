@@ -1,7 +1,6 @@
 -- Cadastrar Aluno
 CREATE DEFINER=`root`@`localhost` PROCEDURE `CADASTRAR_ALUNO`(
 OUT retId INT,
-IN a_id INT,
 IN a_nome varchar(100),
 IN a_email varchar(100),
 IN a_celular varchar(11),
@@ -9,24 +8,29 @@ IN p_id INT)
 BEGIN
 DECLARE novo_id INT;
 DECLARE resultAssoc INT;
-SET resultAssoc = 0;
-IF a_id IS NULL THEN 
-	INSERT INTO stu.aluno(nome, email, celular)
-	VALUES (a_nome, a_email, a_celular); -- inserir tabela aluno
-	SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
-    CALL stu.ASSOCIAR_ALUNO_PROFESSOR(resultAssoc, p_id, novo_id); -- chamar procedure de associação
-    IF resultAssoc = 1 THEN
-		SET retId = novo_id;
-	ELSE
-		SET retId = 0;
-	END IF;
-ELSE
-	SET retId = 0;
-	IF EXISTS(SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
-		UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
-		WHERE a.id = a_id; 
-		SET retId = 1;
-	END IF;
+SET resultAssoc = 0, retId = 0;
+INSERT INTO stu.aluno(nome, email, celular)
+VALUES (a_nome, a_email, a_celular); -- inserir tabela aluno
+SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
+CALL ASSOCIAR_ALUNO_PROFESSOR(resultAssoc, p_id, novo_id);
+IF resultAssoc = 1 THEN
+	SET retId = novo_id;
+END IF;
+END
+
+-- Editar aluno
+CREATE DEFINER=`root`@`localhost` PROCEDURE `EDITAR_ALUNO`(
+OUT retId INT,
+IN a_id INT,
+IN a_nome varchar(100),
+IN a_email varchar(100),
+IN a_celular varchar(11))
+BEGIN
+SET retId = 0;
+IF EXISTS(SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
+	UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
+	WHERE a.id = a_id; 
+	SET retId = 1;
 END IF;
 END
 
@@ -64,12 +68,14 @@ END IF;
 END
 
 -- Associar aluno a professor
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ASSOCIAR_ALUNO_PROFESSOR`(IN id_p INT, IN id_a INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ASSOCIAR_ALUNO_PROFESSOR`(OUT retId INT, IN id_p INT, IN id_a INT)
 BEGIN
+SET retId = 0;
 IF id_p IS NOT NULL AND id_a IS NOT NULL THEN
 	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_p) AND EXISTS
 	(SELECT 1 FROM view_aluno va WHERE va.id = id_a) THEN
 		INSERT INTO aluno_de_professor(id_aluno, id_professor) VALUES (id_a, id_p);
+        SET retId = 1;
     END IF;
 END IF;
 END
