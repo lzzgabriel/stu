@@ -144,3 +144,39 @@ ELSE
 	 END IF;
 END IF;
 END
+
+-- Confirmar Pagamento
+CREATE PROCEDURE stu.confirmar_pagamento(in p_id_aluno int, in p_momento_pagamento timestamp, in p_id_forma_pagamento int)
+begin
+	select 
+	ma.id_aluno,
+	ma.valor_cobrar,
+	ma.proximo_vencimento,
+	ma.mensalidade 
+	
+	into
+	@id,
+	@valor,
+	@vencimento,
+	@mensalidade
+	
+	from stu.mensalidade_aberta ma
+	where ma.id_aluno = p_id_aluno;
+
+	insert into mensalidade_cobrada
+	(id_aluno,
+	mensalidade,
+	valor_cobrado,
+	data_vencimento,
+	id_forma_pagamento,
+	momento_pagamento)
+	
+	values (@id, @mensalidade, @valor, @vencimento,
+			p_id_forma_pagamento, p_momento_pagamento);
+		
+	update mensalidade_aberta
+	set
+	proximo_vencimento = adddate(@vencimento, interval 1 month),
+	mensalidade = adddate(@mensalidade, interval 1 month)
+	where id_aluno = p_id_aluno;
+END;
