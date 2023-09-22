@@ -16,8 +16,6 @@
 
 <h:body styleClass="bg-bluegray-200">
 
-	<p:growl id="messages"/>
-
 	<div class="block h-6rem" />
 
 	<div class="grid">
@@ -25,6 +23,8 @@
 		<div class="col" />
 
 		<h:form styleClass="col bg-white shadow-6 border-round-md p-2">
+
+			<p:growl id="messages" />
 
 			<p:panelGrid columns="1" styleClass="ui-fluid">
 
@@ -41,17 +41,18 @@
 				<p:panelGrid layout="flex" styleClass="ui-fluid" columns="3"
 					columnClasses="col-3, col-6, col-3">
 					<div />
-					<p:commandButton value="Entrar" action="#{stLogin.login()}" />
+					<p:commandButton value="Entrar" action="#{stLogin.login()}" update="messages" />
 					<div />
 				</p:panelGrid>
-				
+
 				<p:panelGrid layout="flex" styleClass="ui-fluid" columns="3"
 					columnClasses="col-3, col-6, col-3">
 					<div />
-					<p:commandButton value="Cadastrar prof de teste" action="#{stLogin.testeCadastro()}" update="messages" />
+					<p:commandButton value="Cadastrar prof de teste"
+						action="#{stLogin.testeCadastro()}" update="messages" />
 					<div />
 				</p:panelGrid>
-				
+
 			</p:panelGrid>
 
 		</h:form>

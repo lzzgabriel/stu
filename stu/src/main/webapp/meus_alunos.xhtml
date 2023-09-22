@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<f:view>
+	<ui:composition template="/composites/template.xhtml">
+		<ui:define name="content">
+
+			<h:form>
+
+				<p:growl id="messages" />
+
+				<div class="mx-4 pt-4">
+
+					<p:outputPanel>
+						<h2>Meus alunos</h2>
+					</p:outputPanel>				
+
+					<p:dataTable id="dataTable" paginator="true" lazy="true"
+						value="#{stMeusAlunos.lazyDataModel}" var="aluno"
+						paginatorPosition="bottom" rows="10"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+						
+						<f:facet name="header">
+							<div class="flex justify-content-end">
+								<p:commandButton value="Cadastrar aluno" action="cadastrar_aluno" icon="pi pi-user-plus"/>
+							</div>
+						</f:facet>
+						
+						<p:column headerText="Nome">
+							<h:outputText value="#{aluno.nome}" />
+						</p:column>
+
+						<p:column headerText="E-mail">
+							<h:outputText value="#{aluno.email}"/>
+						</p:column>
+
+						<p:column headerText="Celular">
+							<h:outputText value="#{aluno.celular}" />
+						</p:column>
+
+					</p:dataTable>
+
+				</div>
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</f:view>
+
+</html>

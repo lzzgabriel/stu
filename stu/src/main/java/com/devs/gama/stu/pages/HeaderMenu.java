@@ -22,6 +22,8 @@ public class HeaderMenu implements Serializable {
 	@Inject
 	private Application application;
 	
+	private int menuItemIndex = 0;
+	
 	public void logout() {
 		try {
 			HttpSession session = SessionUtils.getSession();
@@ -31,6 +33,14 @@ public class HeaderMenu implements Serializable {
 			application.getLogger().error(e.getMessage());
 			MessageUtils.addErrorMessage("Erro ao redirecionar a página", null, e.getMessage());
 		}
+	}
+
+	public int getMenuItemIndex() {
+		return menuItemIndex;
+	}
+
+	public void setMenuItemIndex(int menuItemIndex) {
+		this.menuItemIndex = menuItemIndex;
 	}
 
 }

@@ -15,7 +15,7 @@
 
 				<div class="mx-4 pt-4">
 					<p:outputPanel>
-						<h2>Meus dados</h2>
+						<h2>Inserir aluno</h2>
 					</p:outputPanel>
 				</div>
 
@@ -24,12 +24,13 @@
 					<p:panelGrid layout="grid" columns="1" styleClass="ui-fluid">
 
 						<p:outputLabel value="Nome:" />
-						<p:inputText value="#{stMeusDados.professor.nome}"
-							disabled="#{not stMeusDados.editMode}" />
+						<p:inputText value="#{stCadastrarAluno.aluno.nome}"/>
 
 						<p:outputLabel value="E-mail:" />
-						<p:inputText value="#{stMeusDados.professor.email}"
-							disabled="#{not stMeusDados.editMode}" />
+						<p:inputText value="#{stCadastrarAluno.aluno.email}"/>
+							
+						<p:outputLabel value="Celular:" />
+						<p:inputMask mask="(99) 99999-999?9" value="#{stCadastrarAluno.aluno.email}"/>
 
 					</p:panelGrid>
 
