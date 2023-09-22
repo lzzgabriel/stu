@@ -12,7 +12,6 @@ import java.util.List;
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Professor;
-import com.devs.gama.stu.enums.PadraoPaginacaoViews;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
@@ -35,11 +34,11 @@ public class AlunoDAO {
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO.getValue(), 4, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setNull(parametro++, Types.INTEGER);
 			callableStatement.setString(parametro++, aluno.getNome());
 			callableStatement.setString(parametro++, aluno.getEmail());
 			callableStatement.setString(parametro++, aluno.getCelular().substring(0, 10)); // -> limitado no banco para
-																							// varchar(11)
+			callableStatement.setInt(parametro++, professor.getId());
+
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
@@ -48,7 +47,8 @@ public class AlunoDAO {
 
 	public void edit(Professor professor, Aluno aluno) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(SqlUtils.montarProcedure("cadastrar_aluno", 4, 1));
+			CallableStatement callableStatement = conn.prepareCall(
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_EDITAR_ALUNO.getValue(), 4, 1));
 
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
@@ -116,12 +116,11 @@ public class AlunoDAO {
 		return totalRegistros;
 	}
 
-	public List<Aluno> pagination(int pagina) throws SQLException {
+	public List<Aluno> pagination(int pagina, int padraoPaginacao) throws SQLException {
 		List<Aluno> listaRetorno = new ArrayList<Aluno>();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn
-					.prepareStatement(SqlUtils.montarPaginacao(ProceduresViewsTables.VIEW_ALUNO.getValue(), pagina,
-							PadraoPaginacaoViews.VIEW_RESULT_10.getValue()));
+			PreparedStatement preparedStatement = conn.prepareStatement(
+					SqlUtils.montarPaginacao(ProceduresViewsTables.VIEW_ALUNO.getValue(), pagina, padraoPaginacao));
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));

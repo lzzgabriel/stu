@@ -30,7 +30,7 @@ public class SqlUtils {
 	 */
 	public static String montarPaginacao(String nomeViewTable, int pagina, int padraoPaginacao) {
 		StringBuilder paginacao = new StringBuilder("SELECT * FROM " + nomeViewTable);
-		paginacao.append(" LIMIT " + ((pagina - 1) * padraoPaginacao) + ", " + padraoPaginacao);
+		paginacao.append(" LIMIT " + (pagina * padraoPaginacao) + ", " + padraoPaginacao);
 		return paginacao.toString();
 	}
 
