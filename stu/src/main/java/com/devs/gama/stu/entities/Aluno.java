@@ -35,6 +35,10 @@ public class Aluno {
 	public String getCelular() {
 		return celular;
 	}
+	
+	public String getCelularUnmasked() {
+		return celular == null ? null : celular.replace("(", "").replace(")", "").replace("-", "");
+	}
 
 	public void setCelular(String celular) {
 		this.celular = celular;

@@ -5,13 +5,17 @@
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:p="http://primefaces.org/ui">
 
+<h:head>
+	<h:outputScript library="js" name="utils.js" />
+</h:head>
+
 <f:view>
 	<ui:composition template="/composites/template.xhtml">
 		<ui:define name="content">
 
 			<h:form>
 
-				<p:growl id="messages" />
+				<p:growl id="messages" globalOnly="true" />
 
 				<div class="mx-4 pt-4">
 					<p:outputPanel>
@@ -21,29 +25,37 @@
 
 				<div class="mx-8">
 
-					<p:panelGrid layout="grid" columns="1" styleClass="ui-fluid">
+					<div class="grid py-4">
 
-						<p:outputLabel value="Nome:" />
-						<p:inputText value="#{stCadastrarAluno.aluno.nome}"/>
+						<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
+						<p:inputText id="nome" styleClass="col-7"
+							value="#{stCadastrarAluno.aluno.nome}" required="true"
+							requiredMessage="Obrigatório" />
+						<p:message for="nome" styleClass="col-2" />
 
-						<p:outputLabel value="E-mail:" />
-						<p:inputText value="#{stCadastrarAluno.aluno.email}"/>
-							
-						<p:outputLabel value="Celular:" />
-						<p:inputMask mask="(99) 99999-999?9" value="#{stCadastrarAluno.aluno.email}"/>
+					</div>
+					
+					<div class="grid py-4">
+						<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
+						<p:inputText styleClass="col-7"
+							value="#{stCadastrarAluno.aluno.email}" />
+					</div>
+					
+					<div class="grid py-4">
+						<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
+						<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular" required="true"
+							requiredMessage="Obrigatório" validateMask="false"
+							value="#{stCadastrarAluno.aluno.celular}" />
+						<p:message styleClass="col-2" for="celular" />
 
-					</p:panelGrid>
+					</div>
 
 				</div>
 
 				<div class="flex justify-content-center flex-wrap py-4">
 
-					<p:commandButton value="Editar dados"
-						rendered="#{not stMeusDados.editMode}"
-						actionListener="#{stMeusDados.enterEditMode()}" update="@form" />
 					<p:commandButton value="Salvar alterações"
-						rendered="#{stMeusDados.editMode}"
-						actionListener="#{stMeusDados.edit()}" update="@form" />
+						actionListener="#{stCadastrarAluno.save()}" update="@form" />
 
 				</div>
 

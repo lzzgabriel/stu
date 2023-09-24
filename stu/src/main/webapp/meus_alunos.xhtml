@@ -11,7 +11,7 @@
 
 			<h:form>
 
-				<p:growl id="messages" />
+				<p:growl id="messages" globalOnly="true" />
 
 				<div class="mx-4 pt-4">
 
@@ -39,7 +39,8 @@
 						</p:column>
 
 						<p:column headerText="Celular">
-							<h:outputText value="#{aluno.celular}" />
+							<h:outputText value="#{aluno.celular}">
+							</h:outputText>
 						</p:column>
 
 					</p:dataTable>

@@ -61,6 +61,7 @@ public class MeusDados implements Serializable {
 			
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
+			MessageUtils.addErrorMessage("Erro no banco de dados", "messages", e.getMessage());
 		}
 	}
 	

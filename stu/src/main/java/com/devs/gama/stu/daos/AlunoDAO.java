@@ -39,7 +39,7 @@ public class AlunoDAO {
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setString(parametro++, aluno.getNome());
 			callableStatement.setString(parametro++, aluno.getEmail());
-			callableStatement.setString(parametro++, aluno.getCelular().substring(0, 10)); // -> limitado no banco para
+			callableStatement.setString(parametro++, aluno.getCelularUnmasked());
 			callableStatement.setInt(parametro++, professor.getId());
 
 			callableStatement.execute();
@@ -58,7 +58,7 @@ public class AlunoDAO {
 			callableStatement.setInt(parametro++, aluno.getId());
 			callableStatement.setString(parametro++, aluno.getNome());
 			callableStatement.setString(parametro++, aluno.getEmail());
-			callableStatement.setString(parametro++, aluno.getCelular());
+			callableStatement.setString(parametro++, aluno.getCelularUnmasked());
 
 			callableStatement.execute();
 
@@ -170,7 +170,7 @@ public class AlunoDAO {
 
 	public Aluno findById(int id) throws SQLException, EntityNotFoundException {
 		Aluno aluno = null;
-		String sql = "SELECT * FROM" + ProceduresViewsTables.VIEW_ALUNO + " WHERE id = ?";
+		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO + " WHERE id = ?";
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;

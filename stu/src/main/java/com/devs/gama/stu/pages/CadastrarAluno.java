@@ -8,12 +8,12 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.daos.AlunoDAO;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Professor;
-import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.MessageUtils;
 import com.devs.gama.stu.utils.NavigationUtils;
 import com.devs.gama.stu.utils.SessionUtils;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -34,32 +34,18 @@ public class CadastrarAluno implements Serializable {
 	
 	@PostConstruct
 	public void init() {
-		load();
-	}
-
-	private void load() {
-		try {
-			String id = SessionUtils.getLoggedProfessorId();
-			aluno = alunoDAO.findById(Integer.valueOf(id));
-		} catch (SQLException e) {
-			application.getLogger().error(e.getMessage(), e);
-			MessageUtils.addErrorMessage("Erro no banco!", "messages", "O banco de dados retornou erro, favor contatar o suporte");
-		} catch (EntityNotFoundException e) {
-			// Não deveria dar esse erro, já que o user já logou
-			application.getLogger().error(e.getMessage(), e);
-		}
+		aluno = new Aluno();
 	}
 	
-	public void edit() {
+	public void save() {
 		try {
 			Professor professor = new Professor();
 			professor.setId(Integer.valueOf(SessionUtils.getLoggedProfessorId()));
-			alunoDAO.edit(professor, aluno);
+			alunoDAO.save(professor, aluno);
+			
+			MessageUtils.addExternalMessage(FacesMessage.SEVERITY_INFO, "Aluno cadastrado com sucesso", null);
 
 			NavigationUtils.redirect(Pages.meusAlunos.url);
-			
-			MessageUtils.addInfoMessage("Dados atualizados com sucesso", "messages");
-			
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			MessageUtils.addErrorMessage("Erro ao cadastrar aluno", "messages", e.getMessage());
