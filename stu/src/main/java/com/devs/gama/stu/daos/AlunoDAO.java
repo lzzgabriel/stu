@@ -137,12 +137,24 @@ public class AlunoDAO {
 		return returnList;
 	}
 
-	public int findCount() throws SQLException {
+	public int findCount(Professor professor) throws SQLException {
 		int totalRegistros = 0;
 		String sql = "SELECT COUNT(id) as totalRegistros FROM " + ProceduresViewsTables.VIEW_ALUNO.getValue();
+		sql += " inner join view_aluno_de_professor vadp on id = vadp.id_aluno ";
+		if (professor != null) {
+			sql += " where id_professor = ? ";
+		}
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			
+			int parametro = 1;
+
+			if (professor != null) {
+				preparedStatement.setInt(parametro, professor.getId());
+			}
+			
 			ResultSet resultSet = preparedStatement.executeQuery();
+			
 			if (resultSet.next()) {
 				totalRegistros = resultSet.getInt("totalRegistros");
 			}
