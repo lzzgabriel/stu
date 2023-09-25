@@ -22,15 +22,20 @@ public class SqlUtils {
 	/**
 	 * Método para montar a estrutura de uma páginação
 	 * 
+	 * @param campos          Campos que serão buscados no select
 	 * @param nomeView        String Texto que será colocado no nome da procedure
+	 * @param camposWhere     Campos que serão utilizados na chave where
 	 * @param pagina          Pagina em que a paginacao se encontra
 	 * @param padraoPaginacao Padrao de paginacao a ser seguido (10 em 10, 20 em
 	 *                        20...)
 	 * @return String o texto em String
 	 */
-	public static String montarPaginacao(String nomeViewTable, int pagina, int padraoPaginacao) {
-		StringBuilder paginacao = new StringBuilder("SELECT * FROM " + nomeViewTable);
-		paginacao.append(" LIMIT " + (pagina * padraoPaginacao) + ", " + padraoPaginacao);
+	public static String montarPaginacao(String campos, String nomeViewTable, String camposWhere, int pagina,
+			int padraoPaginacao) {
+		StringBuilder paginacao = new StringBuilder(
+				"select " + campos != null && !campos.isEmpty() ? campos : "*" + " from " + nomeViewTable);
+		paginacao.append(camposWhere != null && !camposWhere.isEmpty() ? camposWhere : "");
+		paginacao.append(" LIMIT " + pagina + ", " + padraoPaginacao);
 		return paginacao.toString();
 	}
 

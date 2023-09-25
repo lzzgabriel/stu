@@ -165,11 +165,13 @@ public class AlunoDAO {
 		return totalRegistros;
 	}
 
-	public List<Aluno> pagination(int pagina, int padraoPaginacao) throws SQLException {
+	public List<Aluno> pagination(Professor professor, int pagina, int padraoPaginacao) throws SQLException {
 		List<Aluno> listaRetorno = new ArrayList<Aluno>();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(
-					SqlUtils.montarPaginacao(ProceduresViewsTables.VIEW_ALUNO.getValue(), pagina, padraoPaginacao));
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(
+					"adp.id_professor, adp.id_aluno , va.nome , va.email , va.celular , va.momento_cadastro",
+					"view_aluno va inner join aluno_de_professor adp on va.id = adp.id_aluno",
+					"adp.id_professor = " + professor.getId(), pagina, padraoPaginacao));
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));
