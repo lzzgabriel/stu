@@ -1,5 +1,7 @@
 package com.devs.gama.stu.utils;
 
+import com.devs.gama.stu.entities.Professor;
+
 import jakarta.faces.context.FacesContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +30,16 @@ public class SessionUtils {
 	
 	public static String getLoggedProfessorEmail() {
 		return getSession().getAttribute("stuprofessoremail").toString();
+	}
+	
+	public static Professor getLoggedProfessor() {
+		Professor professor = new Professor();
+		
+		professor.setId(Integer.valueOf(getLoggedProfessorId()));
+		professor.setNome(getLoggedProfessorName());
+		professor.setEmail(getLoggedProfessorEmail());
+		
+		return professor;
 	}
 
 }

@@ -33,8 +33,8 @@ public class SqlUtils {
 	public static String montarPaginacao(String campos, String nomeViewTable, String camposWhere, int pagina,
 			int padraoPaginacao) {
 		StringBuilder paginacao = new StringBuilder(
-				"select " + campos != null && !campos.isEmpty() ? campos : "*" + " from " + nomeViewTable);
-		paginacao.append(camposWhere != null && !camposWhere.isEmpty() ? camposWhere : "");
+				"select " + (campos != null && !campos.isEmpty() ? campos : "*" ) + " from " + nomeViewTable);
+		paginacao.append(camposWhere != null && !camposWhere.isEmpty() ? (" where " + camposWhere) : "");
 		paginacao.append(" LIMIT " + pagina + ", " + padraoPaginacao);
 		return paginacao.toString();
 	}

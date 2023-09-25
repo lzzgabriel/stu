@@ -117,7 +117,7 @@ public class AlunoDAO {
 
 	public List<Aluno> findAll() throws SQLException {
 		List<Aluno> returnList = new ArrayList<>();
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO.getValue();
+		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue();
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -139,8 +139,7 @@ public class AlunoDAO {
 
 	public int findCount(Professor professor) throws SQLException {
 		int totalRegistros = 0;
-		String sql = "SELECT COUNT(id) as totalRegistros FROM " + ProceduresViewsTables.VIEW_ALUNO.getValue();
-		sql += " inner join view_aluno_de_professor vadp on id = vadp.id_aluno ";
+		String sql = "SELECT COUNT(id_aluno) as totalRegistros FROM " + ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue();
 		if (professor != null) {
 			sql += " where id_professor = ? ";
 		}
@@ -172,7 +171,9 @@ public class AlunoDAO {
 					"adp.id_professor, adp.id_aluno , va.nome , va.email , va.celular , va.momento_cadastro",
 					"view_aluno va inner join aluno_de_professor adp on va.id = adp.id_aluno",
 					"adp.id_professor = " + professor.getId(), pagina, padraoPaginacao));
+			
 			ResultSet resultSet = preparedStatement.executeQuery();
+			
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));
 			}
@@ -184,7 +185,7 @@ public class AlunoDAO {
 
 	public Aluno findById(int id) throws SQLException, EntityNotFoundException {
 		Aluno aluno = null;
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO + " WHERE id = ?";
+		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR + " WHERE id = ?";
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			int parametro = 1;
@@ -205,7 +206,7 @@ public class AlunoDAO {
 	public Aluno fetch(ResultSet res) throws SQLException {
 		Aluno aluno = new Aluno();
 
-		aluno.setId(res.getInt("id"));
+		aluno.setId(res.getInt("id_aluno"));
 		aluno.setNome(res.getString("nome"));
 		aluno.setEmail(res.getString("email"));
 		aluno.setCelular(res.getString("celular"));

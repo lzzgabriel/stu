@@ -11,7 +11,10 @@ import org.primefaces.model.SortMeta;
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.daos.AlunoDAO;
 import com.devs.gama.stu.entities.Aluno;
+import com.devs.gama.stu.entities.Professor;
+import com.devs.gama.stu.utils.SessionUtils;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.inject.Model;
 import jakarta.inject.Inject;
 
@@ -25,13 +28,20 @@ public class LazyAlunoDataModel extends LazyDataModel<Aluno> {
 	
 	@Inject
 	private AlunoDAO alunoDAO;
+	
+	private Professor professor;
+	
+	@PostConstruct
+	public void init() {
+		professor = SessionUtils.getLoggedProfessor();
+	}
 
 	@Override
 	public int count(Map<String, FilterMeta> filterBy) {
 		
 		try {
 			// TODO fazer filtragem de alunos
-			return alunoDAO.findCount();
+			return alunoDAO.findCount(professor);
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			return 0;
@@ -44,11 +54,19 @@ public class LazyAlunoDataModel extends LazyDataModel<Aluno> {
 		
 		try {
 			// TODO fazer filtragem de alunos
-			return alunoDAO.pagination(first, pageSize);
+			return alunoDAO.pagination(professor, first, pageSize);
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			return null;
 		}
+	}
+
+	public Professor getProfessor() {
+		return professor;
+	}
+
+	public void setProfessor(Professor professor) {
+		this.professor = professor;
 	}
 
 }
