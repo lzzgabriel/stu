@@ -68,17 +68,17 @@ END IF;
 END
 
 -- Associar aluno a professor
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ASSOCIAR_ALUNO_PROFESSOR`(OUT retId INT, IN id_p INT, IN id_a INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stu`.`ASSOCIAR_ALUNO_PROFESSOR`(OUT retId INT, IN id_p INT, IN id_a INT)
 BEGIN
 SET retId = 0;
 IF id_p IS NOT NULL AND id_a IS NOT NULL THEN
 	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_p) AND EXISTS
-	(SELECT 1 FROM view_aluno va WHERE va.id = id_a) THEN
+	(SELECT 1 FROM aluno a WHERE a.id = id_a) THEN
 		INSERT INTO aluno_de_professor(id_aluno, id_professor) VALUES (id_a, id_p);
         SET retId = 1;
     END IF;
 END IF;
-END
+end
 
 -- Cadastrar forma pagamento
 CREATE DEFINER=`root`@`localhost` PROCEDURE `CADASTRAR_FORMA_PAGAMENTO`(OUT retId INT,

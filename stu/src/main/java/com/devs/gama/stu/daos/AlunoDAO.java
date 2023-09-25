@@ -168,8 +168,8 @@ public class AlunoDAO {
 		List<Aluno> listaRetorno = new ArrayList<Aluno>();
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(
-					"adp.id_professor, adp.id_aluno , va.nome , va.email , va.celular , va.momento_cadastro",
-					"view_aluno va inner join aluno_de_professor adp on va.id = adp.id_aluno",
+					"adp.id_professor, adp.id_aluno , adp.nome , adp.email , adp.celular , adp.momento_cadastro",
+					"view_aluno_de_professor adp",
 					"adp.id_professor = " + professor.getId(), pagina, padraoPaginacao));
 			
 			ResultSet resultSet = preparedStatement.executeQuery();

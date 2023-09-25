@@ -2,6 +2,8 @@ package com.devs.gama.stu.entities;
 
 import java.util.Objects;
 
+import com.devs.gama.stu.utils.StringUtils;
+
 public class Aluno {
 	private Integer id;
 	private String nome;
@@ -38,6 +40,10 @@ public class Aluno {
 	
 	public String getCelularUnmasked() {
 		return celular == null ? null : celular.replace("(", "").replace(")", "").replace("-", "");
+	}
+	
+	public String getCelularMasked() {
+		return StringUtils.formattedTelephone(celular);
 	}
 
 	public void setCelular(String celular) {
