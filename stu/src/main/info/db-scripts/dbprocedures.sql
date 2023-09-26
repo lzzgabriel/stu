@@ -62,7 +62,7 @@ INSERT INTO stu.aluno(nome, email, celular)
 VALUES (a_nome, a_email, a_celular); -- inserir tabela aluno
 SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
 CALL ASSOCIAR_ALUNO_PROFESSOR(resultAssociacao, p_id, novo_id);
--- CALL GERAR_MENSALIDADE_ABERTA(resultGerarMensalidade, novo_id, 400.0, '2023-09-20');
+CALL GERAR_MENSALIDADE_ABERTA(resultGerarMensalidade, novo_id, 400.0, '2023-09-20');
 IF resultAssociacao = 1 AND resultGerarMensalidade = 1 THEN
 	SET retId = novo_id;
 END IF;
