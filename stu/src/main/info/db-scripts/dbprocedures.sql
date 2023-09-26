@@ -148,8 +148,7 @@ END;
 		
 	update mensalidade_aberta
 	set
-	proximo_vencimento = adddate(@vencimento, interval 1 month),
-	mensalidade = adddate(@mensalidade, interval 1 month)
+	proximo_vencimento = adddate(@vencimento, interval 1 month)
 	where id_aluno = p_id_aluno;
 END$$
 DELIMITER ;

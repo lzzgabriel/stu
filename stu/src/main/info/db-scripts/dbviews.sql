@@ -67,8 +67,12 @@ select
     `a`.`email` as `email`,
     `a`.`celular` as `celular`,
     `a`.`ativo` as `ativo`,
-    `a`.`momento_cadastro` as `momento_cadastro`
+    `a`.`momento_cadastro` as `momento_cadastro`,
+    `ma`.`valor_cobrar` as `valor_cobrar`,
+    `ma`.`status` as `status`
 from
-    (`aluno_de_professor` `adp`
+    ((`aluno_de_professor` `adp`
 left join `aluno` `a` on
-    ((`adp`.`id_aluno` = `a`.`id`)));
+    ((`adp`.`id_aluno` = `a`.`id`)))
+left join `mensalidade_aberta` `ma` on
+    ((`adp`.`id_aluno` = `ma`.`id_aluno`)));

@@ -42,7 +42,7 @@ public enum ProceduresViewsTables {
 
 	VIEW_ALUNO_MENSALIDADE_ABERTA("VIEW_ALUNO_MENSALIDADE_ABERTA");
 
-	private final String value;
+	public final String value;
 
 	ProceduresViewsTables(String value) {
 		this.value = value;
