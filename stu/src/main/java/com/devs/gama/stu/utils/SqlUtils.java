@@ -1,8 +1,10 @@
 package com.devs.gama.stu.utils;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.TimeZone;
 
 public class SqlUtils {
@@ -52,6 +54,16 @@ public class SqlUtils {
 		String horaUTC = formatoData.format(date);
 
 		return Date.valueOf(LocalDate.parse(horaUTC));
+	}
+	
+	public static Timestamp transformarTimeUTC(LocalDateTime date) {
+		SimpleDateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		formatoData.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		String horaUTC = formatoData.format(date);
+
+		return Timestamp.valueOf(LocalDateTime.parse(horaUTC));
 	}
 
 }

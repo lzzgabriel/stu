@@ -7,7 +7,9 @@ import java.sql.SQLException;
 
 import com.devs.gama.stu.exceptions.CallFailedException;
 
-public class ProcessamentoProcedure {
+public final class ProcessamentoProcedure {
+	
+	private ProcessamentoProcedure() {}
 
 	public static void closePreparedStatement(PreparedStatement preparedStatement) throws SQLException {
 		try {
