@@ -1,5 +1,10 @@
 package com.devs.gama.stu.utils;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.TimeZone;
+
 public class SqlUtils {
 
 	/**
@@ -33,10 +38,20 @@ public class SqlUtils {
 	public static String montarPaginacao(String campos, String nomeViewTable, String camposWhere, int pagina,
 			int padraoPaginacao) {
 		StringBuilder paginacao = new StringBuilder(
-				"select " + (campos != null && !campos.isEmpty() ? campos : "*" ) + " from " + nomeViewTable);
+				"select " + (campos != null && !campos.isEmpty() ? campos : "*") + " from " + nomeViewTable);
 		paginacao.append(camposWhere != null && !camposWhere.isEmpty() ? (" where " + camposWhere) : "");
 		paginacao.append(" LIMIT " + pagina + ", " + padraoPaginacao);
 		return paginacao.toString();
+	}
+
+	public static Date transformarDataUTC(LocalDate date) {
+		SimpleDateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+
+		formatoData.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		String horaUTC = formatoData.format(date);
+
+		return Date.valueOf(LocalDate.parse(horaUTC));
 	}
 
 }

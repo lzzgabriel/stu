@@ -76,7 +76,7 @@ public class AlunoDAO {
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, aluno.getId());
 			callableStatement.setDouble(parametro++, valorCobrado);
-			callableStatement.setDate(parametro++, Date.valueOf(mensalidadeVigente));
+			callableStatement.setDate(parametro++, SqlUtils.transformarDataUTC(mensalidadeVigente));
 
 			callableStatement.execute();
 
@@ -139,21 +139,22 @@ public class AlunoDAO {
 
 	public int findCount(Professor professor) throws SQLException {
 		int totalRegistros = 0;
-		String sql = "SELECT COUNT(id_aluno) as totalRegistros FROM " + ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue();
+		String sql = "SELECT COUNT(id_aluno) as totalRegistros FROM "
+				+ ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue();
 		if (professor != null) {
 			sql += " where id_professor = ? ";
 		}
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
-			
+
 			int parametro = 1;
 
 			if (professor != null) {
 				preparedStatement.setInt(parametro, professor.getId());
 			}
-			
+
 			ResultSet resultSet = preparedStatement.executeQuery();
-			
+
 			if (resultSet.next()) {
 				totalRegistros = resultSet.getInt("totalRegistros");
 			}
@@ -169,11 +170,10 @@ public class AlunoDAO {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(
 					"adp.id_professor, adp.id_aluno , adp.nome , adp.email , adp.celular , adp.momento_cadastro",
-					"view_aluno_de_professor adp",
-					"adp.id_professor = " + professor.getId(), pagina, padraoPaginacao));
-			
+					"view_aluno_de_professor adp", "adp.id_professor = " + professor.getId(), pagina, padraoPaginacao));
+
 			ResultSet resultSet = preparedStatement.executeQuery();
-			
+
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));
 			}
