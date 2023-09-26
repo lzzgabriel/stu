@@ -35,12 +35,11 @@ public class ProfessorDAO {
 		try (Connection conn = application.getDataSource().getConnection()) {
 
 			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 3, 1));
 
 			int parametro = 1;
 
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setNull(parametro++, Types.INTEGER); // Deve ser passado null para registrar
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
 			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
