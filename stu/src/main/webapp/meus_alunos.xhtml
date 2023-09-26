@@ -9,45 +9,161 @@
 	<ui:composition template="/composites/template.xhtml">
 		<ui:define name="content">
 
-			<h:form>
+			<h:panelGroup id="main">
 
-				<p:growl id="messages" globalOnly="true" />
+				<h:form id="tableForm" rendered="#{!stMeusAlunos.editMode and !stMeusAlunos.insertMode}">
 
-				<div class="mx-4 pt-4">
+					<p:growl id="messages" globalOnly="true" />
 
-					<p:outputPanel>
-						<h2>Meus alunos</h2>
-					</p:outputPanel>				
+					<div class="mx-4 pt-4">
 
-					<p:dataTable id="dataTable" paginator="true" lazy="true"
-						value="#{stMeusAlunos.lazyDataModel}" var="aluno"
-						paginatorPosition="bottom" rows="10"
-						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
-						
-						<f:facet name="header">
-							<div class="flex justify-content-end">
-								<p:commandButton value="Cadastrar aluno" action="cadastrar_aluno" icon="pi pi-user-plus"/>
-							</div>
-						</f:facet>
-						
-						<p:column headerText="Nome">
-							<h:outputText value="#{aluno.nome}" />
-						</p:column>
+						<p:outputPanel>
+							<h2>Meus alunos</h2>
+						</p:outputPanel>
 
-						<p:column headerText="E-mail">
-							<h:outputText value="#{aluno.email}"/>
-						</p:column>
+						<p:dataTable id="dataTable" paginator="true" lazy="true"
+							value="#{stMeusAlunos.lazyDataModel}" var="aluno"
+							paginatorPosition="bottom" rows="10"
+							paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
-						<p:column headerText="Celular">
-							<h:outputText value="#{aluno.celularMasked}">
-							</h:outputText>
-						</p:column>
+							<f:facet name="header">
+								<div class="flex justify-content-end">
+									<p:commandButton value="Cadastrar aluno"
+										actionListener="#{stMeusAlunos.enableInsertMode()}" partialSubmit="true"
+										process="@this" update="main" icon="pi pi-user-plus" />
+								</div>
+							</f:facet>
 
-					</p:dataTable>
+							<p:column headerText="Nome">
+								<h:outputText value="#{aluno.nome}" />
+							</p:column>
 
-				</div>
+							<p:column headerText="E-mail">
+								<h:outputText value="#{aluno.email}" />
+							</p:column>
 
-			</h:form>
+							<p:column headerText="Celular">
+								<h:outputText value="#{aluno.celularMasked}">
+								</h:outputText>
+							</p:column>
+
+							<p:column>
+								<p:commandButton icon="pi-pencil"
+									actionListener="#{stMeusAlunos.enableEditMode(aluno)}" partialSubmit="true"
+									process="@this" update="main" />
+							</p:column>
+
+						</p:dataTable>
+
+					</div>
+
+				</h:form>
+
+				<h:form id="saveForm" rendered="#{stMeusAlunos.insertMode}">
+
+					<p:growl id="messages" globalOnly="true" />
+
+					<div class="mx-4 pt-4">
+						<p:outputPanel>
+							<h2>Inserir aluno</h2>
+						</p:outputPanel>
+					</div>
+					
+					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main"/>
+
+					<div class="mx-8">
+
+						<div class="grid py-4">
+
+							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
+							<p:inputText id="nome" styleClass="col-7"
+								value="#{stCadastrarAluno.aluno.nome}" required="true"
+								requiredMessage="Obrigatório" />
+							<p:message for="nome" styleClass="col-2" />
+
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
+							<p:inputText id="email" styleClass="col-7"
+								validator="emailValidator" validatorMessage="Inválido"
+								value="#{stCadastrarAluno.aluno.email}" />
+							<p:message styleClass="col-2" for="email" />
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
+							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
+								required="true" requiredMessage="Obrigatório"
+								validateMask="false" value="#{stCadastrarAluno.aluno.celular}" />
+							<p:message styleClass="col-2" for="celular" />
+
+						</div>
+
+					</div>
+
+					<div class="flex justify-content-center flex-wrap py-4">
+
+						<p:commandButton value="Salvar alterações"
+							actionListener="#{stCadastrarAluno.save()}" update="main" />
+
+					</div>
+
+				</h:form>
+
+				<h:form id="editForm" rendered="#{stMeusAlunos.editMode}">
+
+					<p:growl id="messages" globalOnly="true" />
+
+					<div class="mx-4 pt-4">
+						<p:outputPanel>
+							<h2>Inserir aluno</h2>
+						</p:outputPanel>
+					</div>
+					
+					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main"/>
+
+					<div class="mx-8">
+
+						<div class="grid py-4">
+
+							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
+							<p:inputText id="nome" styleClass="col-7"
+								value="#{stMeusAlunos.aluno.nome}" required="true"
+								requiredMessage="Obrigatório" />
+							<p:message for="nome" styleClass="col-2" />
+
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
+							<p:inputText id="email" styleClass="col-7"
+								validator="emailValidator" validatorMessage="Inválido"
+								value="#{stMeusAlunos.aluno.email}" />
+							<p:message styleClass="col-2" for="email" />
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
+							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
+								required="true" requiredMessage="Obrigatório"
+								validateMask="false" value="#{stMeusAlunos.aluno.celular}" />
+							<p:message styleClass="col-2" for="celular" />
+
+						</div>
+
+					</div>
+
+					<div class="flex justify-content-center flex-wrap py-4">
+
+						<p:commandButton value="Salvar alterações"
+							actionListener="#{stMeusAlunos.edit()}" update="main" />
+
+					</div>
+
+				</h:form>
+
+			</h:panelGroup>
 
 		</ui:define>
 	</ui:composition>

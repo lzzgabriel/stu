@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.devs.gama.stu.utils.StringUtils;
 
 public class Aluno {
+	
 	private Integer id;
 	private String nome;
 	private String email;

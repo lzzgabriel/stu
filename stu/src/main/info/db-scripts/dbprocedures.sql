@@ -27,7 +27,7 @@ IN a_email varchar(100),
 IN a_celular varchar(11))
 BEGIN
 SET retId = 0;
-IF EXISTS(SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
+IF EXISTS(SELECT 1 FROM stu.aluno a WHERE a.id = a_id) THEN
 	UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
 	WHERE a.id = a_id; 
 	SET retId = 1;
