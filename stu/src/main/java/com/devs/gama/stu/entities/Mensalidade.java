@@ -3,6 +3,7 @@ package com.devs.gama.stu.entities;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class Mensalidade {
 
@@ -71,6 +72,13 @@ public class Mensalidade {
 	}
 
 	public static enum Status {
-		EM_ABERTO, ATRASADA
+		EM_ABERTO, ATRASADA;
+		public static Status parse(String s) {
+			return Arrays.asList(Status.values())
+					.stream()
+					.filter(status -> s.equalsIgnoreCase(status.name()))
+					.findFirst()
+					.orElseThrow();
+		}
 	}
 }

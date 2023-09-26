@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,6 +133,7 @@ public class AlunoDAO {
 		return returnList;
 	}
 
+	//TODO vamos filtrar no banco
 	public List<Aluno> findAllFiltered(Aluno aluno) throws SQLException {
 		List<Aluno> returnList = findAll();
 		returnList.removeIf(p -> !p.equals(aluno));
@@ -210,6 +213,7 @@ public class AlunoDAO {
 		aluno.setNome(res.getString("nome"));
 		aluno.setEmail(res.getString("email"));
 		aluno.setCelular(res.getString("celular"));
+		aluno.setMomentoCadastro(LocalDateTime.ofInstant(res.getTimestamp("momento_cadastro").toInstant(), ZoneId.systemDefault()));
 
 		return aluno;
 	}

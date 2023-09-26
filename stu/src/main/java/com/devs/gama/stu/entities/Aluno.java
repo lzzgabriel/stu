@@ -1,5 +1,6 @@
 package com.devs.gama.stu.entities;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import com.devs.gama.stu.utils.StringUtils;
@@ -10,6 +11,8 @@ public class Aluno {
 	private String nome;
 	private String email;
 	private String celular;
+	
+	private LocalDateTime momentoCadastro;
 
 	public Integer getId() {
 		return id;
@@ -49,6 +52,14 @@ public class Aluno {
 
 	public void setCelular(String celular) {
 		this.celular = celular;
+	}
+
+	public LocalDateTime getMomentoCadastro() {
+		return momentoCadastro;
+	}
+
+	public void setMomentoCadastro(LocalDateTime momentoCadastro) {
+		this.momentoCadastro = momentoCadastro;
 	}
 
 	@Override
