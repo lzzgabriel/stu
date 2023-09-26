@@ -1,17 +1,3 @@
--- stu.view_aluno source
-
-create or replace
-algorithm = UNDEFINED view `view_aluno` as
-select
-    `a`.`id` as `id`,
-    `a`.`nome` as `nome`,
-    `a`.`email` as `email`,
-    `a`.`celular` as `celular`,
-    `a`.`momento_cadastro` as `momento_cadastro`
-from
-    `aluno` `a`;
-
-
 -- stu.view_aluno_mensalidade_aberta source
 
 create or replace
@@ -69,3 +55,20 @@ select
     `p`.`momento_cadastro` as `momento_cadastro`
 from
     `professor` `p`;
+	
+-- stu.view_aluno_de_professor`
+
+create or replace
+algorithm = UNDEFINED view `view_aluno_de_professor` as
+select
+    `adp`.`id_aluno` as `id_aluno`,
+    `adp`.`id_professor` as `id_professor`,
+    `a`.`nome` as `nome`,
+    `a`.`email` as `email`,
+    `a`.`celular` as `celular`,
+    `a`.`ativo` as `ativo`,
+    `a`.`momento_cadastro` as `momento_cadastro`
+from
+    (`aluno_de_professor` `adp`
+left join `aluno` `a` on
+    ((`adp`.`id_aluno` = `a`.`id`)));

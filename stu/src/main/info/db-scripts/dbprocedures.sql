@@ -1,63 +1,13 @@
--- Cadastrar Aluno
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CADASTRAR_ALUNO`(
-OUT retId INT,
-IN a_nome varchar(100),
-IN a_email varchar(100),
-IN a_celular varchar(11),
-IN p_id INT)
-BEGIN
-DECLARE novo_id INT;
-DECLARE resultAssoc INT;
-SET resultAssoc = 0, retId = 0;
-INSERT INTO stu.aluno(nome, email, celular)
-VALUES (a_nome, a_email, a_celular); -- inserir tabela aluno
-SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
-CALL ASSOCIAR_ALUNO_PROFESSOR(resultAssoc, p_id, novo_id);
-IF resultAssoc = 1 THEN
-	SET retId = novo_id;
-END IF;
-END
-
--- Editar aluno
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EDITAR_ALUNO`(
-OUT retId INT,
-IN a_id INT,
-IN a_nome varchar(100),
-IN a_email varchar(100),
-IN a_celular varchar(11))
-BEGIN
-SET retId = 0;
-IF EXISTS(SELECT 1 FROM stu.aluno a WHERE a.id = a_id) THEN
-	UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
-	WHERE a.id = a_id; 
-	SET retId = 1;
-END IF;
-END
-
--- Cadastrar professor
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CADASTRAR_PROFESSOR`(OUT retId INT,
-         IN p_id INT,
-         IN p_nome VARCHAR(100),
-         IN p_email VARCHAR(100),
-         IN p_senha VARCHAR(100))
-BEGIN
-IF p_id IS NULL THEN
-	INSERT INTO stu.professor (nome, email, senha) 
-    VALUES (p_nome, p_email, p_senha);
-	SET retId = LAST_INSERT_ID();
-ELSE
-	SET retId = 0;
-	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id AND vp.ativo = 1) THEN
-		UPDATE stu.professor p SET p.nome = p_nome, p.email = p_email WHERE p.id = p_id;
-		SET retId = 1;
-    END IF;
-END IF;
-END
-
--- Alterar senha professor
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ALTERAR_SENHA_PROFESSOR`(OUT retId INT, IN id_professor INT, 
+-- ALTERAR_SENHA_PROFESSOR
+DROP PROCEDURE IF EXISTS `ALTERAR_SENHA_PROFESSOR`;
+DELIMITER $$
+CREATE PROCEDURE `ALTERAR_SENHA_PROFESSOR`(OUT retId INT, IN id_professor INT, 
 	IN senhaAtual VARCHAR(100), IN senhaDestino VARCHAR(100))
 BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
 SET retId = 0;
 IF id_professor IS NOT NULL THEN 
 	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_professor AND vp.senha = senhaAtual) THEN
@@ -65,11 +15,18 @@ IF id_professor IS NOT NULL THEN
 		SET retId = 1;
 	END IF;
 END IF;
-END
+END$$
+DELIMITER ;
 
--- Associar aluno a professor
-CREATE DEFINER=`root`@`localhost` PROCEDURE `stu`.`ASSOCIAR_ALUNO_PROFESSOR`(OUT retId INT, IN id_p INT, IN id_a INT)
+-- ASSOCIAR_ALUNO_PROFESSOR
+DROP PROCEDURE IF EXISTS `ASSOCIAR_ALUNO_PROFESSOR`;
+DELIMITER $$
+CREATE PROCEDURE `ASSOCIAR_ALUNO_PROFESSOR`(OUT retId INT, IN id_p INT, IN id_a INT)
 BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
 SET retId = 0;
 IF id_p IS NOT NULL AND id_a IS NOT NULL THEN
 	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_p) AND EXISTS
@@ -78,13 +35,51 @@ IF id_p IS NOT NULL AND id_a IS NOT NULL THEN
         SET retId = 1;
     END IF;
 END IF;
-end
+end$$
+DELIMITER ;
 
--- Cadastrar forma pagamento
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CADASTRAR_FORMA_PAGAMENTO`(OUT retId INT,
+-- CADASTRAR_ALUNO
+DROP PROCEDURE IF EXISTS `CADASTRAR_ALUNO`;
+DELIMITER $$
+CREATE PROCEDURE `CADASTRAR_ALUNO`(
+OUT retId INT,
+IN a_nome varchar(100),
+IN a_email varchar(100),
+IN a_celular varchar(11),
+IN p_id INT)
+BEGIN
+DECLARE novo_id INT;
+DECLARE resultAssociacao INT;
+DECLARE resultGerarMensalidade INT;
+
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
+
+SET resultAssociacao = 0, retId = 0, resultGerarMensalidade = 0;
+INSERT INTO stu.aluno(nome, email, celular)
+VALUES (a_nome, a_email, a_celular); -- inserir tabela aluno
+SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
+CALL ASSOCIAR_ALUNO_PROFESSOR(resultAssociacao, p_id, novo_id);
+-- CALL GERAR_MENSALIDADE_ABERTA(resultGerarMensalidade, novo_id, 400.0, '2023-09-20');
+IF resultAssociacao = 1 AND resultGerarMensalidade = 1 THEN
+	SET retId = novo_id;
+END IF;
+END$$
+DELIMITER ;
+
+-- CADASTRAR_FORMA_PAGAMENTO
+DROP PROCEDURE IF EXISTS `CADASTRAR_FORMA_PAGAMENTO`;
+DELIMITER $$
+CREATE PROCEDURE `CADASTRAR_FORMA_PAGAMENTO`(OUT retId INT,
          IN f_id INT,
          IN f_descricao VARCHAR(100))
 BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
 IF f_id IS NULL THEN
 	INSERT INTO stu.forma_pagamento (descricao) VALUES (f_descricao);
 	SET retId = LAST_INSERT_ID();
@@ -95,59 +90,36 @@ ELSE
 		SET retId = f_id;
     END IF;
 END IF;
-END
+END$$
+DELIMITER ;
 
--- Deletar forma pagamento (pode lançar exceção, não corrigido)
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DELETAR_FORMA_PAGAMENTO`(OUT result INT, IN f_id INT)
+-- CADASTRAR_PROFESSOR
+DROP PROCEDURE IF EXISTS `CADASTRAR_PROFESSOR`;
+DELIMITER $$
+CREATE PROCEDURE `CADASTRAR_PROFESSOR`(OUT retId INT,
+         IN p_nome VARCHAR(100),
+         IN p_email VARCHAR(100),
+         IN p_senha VARCHAR(100))
 BEGIN
-IF f_id IS NULL THEN
-	SET result = 0;
-ELSE
-	SET result = 0;
-	IF EXISTS (SELECT 1 FROM view_formas_pagamento vf WHERE vf.id = f_id) THEN
-		DELETE FROM forma_pagamento f WHERE f.id = f_id;
-		SET result = 1;
-	END IF;
-END IF;
-END
-
--- Deletar aluno (pode lançar exceção, não corrigido)
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DELETE_ALUNO`(OUT retId INT, IN a_id INT)
 BEGIN
-IF a_id IS NULL THEN
-	SET retId = 0;
-ELSE
-	SET retId = 0;
-	IF EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
-		DELETE FROM aluno a WHERE a.id = a_id;
-		SET retId = 1;
-	END IF;
-END IF;
-END
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK;
+END;
+	INSERT INTO stu.professor (nome, email, senha) 
+    VALUES (p_nome, p_email, p_senha);
+	SET retId = LAST_INSERT_ID();
+END$$
+DELIMITER ;
 
--- Deletar professor (pode lançar exceção, não corrigido)
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DELETE_PROFESSOR`(OUT result INT, IN p_id INT)
-BEGIN
-/*DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	ROLLBACK;
-    SELECT 'An error ocurred' as msgError;
-END;*/
-
-IF p_id IS NULL THEN
-	SET result = 0;
-ELSE
-	SET result = 0;
-	 IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id) THEN
-		DELETE FROM professor p WHERE p.id = p_id;
-		 SET result = 1;
-	 END IF;
-END IF;
-END
-
--- Confirmar Pagamento
-CREATE PROCEDURE stu.confirmar_pagamento(in p_id_aluno int, in p_momento_pagamento timestamp, in p_id_forma_pagamento int)
+-- CONFIRMAR_PAGAMENTO
+DROP PROCEDURE IF EXISTS `CONFIRMAR_PAGAMENTO`;
+DELIMITER $$
+CREATE PROCEDURE `CONFIRMAR_PAGAMENTO`(in p_id_aluno int, in p_momento_pagamento timestamp, in p_id_forma_pagamento int)
 begin
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
 	select 
 	ma.id_aluno,
 	ma.valor_cobrar,
@@ -179,16 +151,132 @@ begin
 	proximo_vencimento = adddate(@vencimento, interval 1 month),
 	mensalidade = adddate(@mensalidade, interval 1 month)
 	where id_aluno = p_id_aluno;
+END$$
+DELIMITER ;
+
+-- DELETE_FORMA_PAGAMENTO
+DROP PROCEDURE IF EXISTS `DELETAR_FORMA_PAGAMENTO`;
+DELIMITER $$
+CREATE PROCEDURE `DELETAR_FORMA_PAGAMENTO`(OUT result INT, IN f_id INT)
+BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
+IF f_id IS NULL THEN
+	SET result = 0;
+ELSE
+	SET result = 0;
+	IF EXISTS (SELECT 1 FROM view_formas_pagamento vf WHERE vf.id = f_id) THEN
+		DELETE FROM forma_pagamento f WHERE f.id = f_id;
+		SET result = 1;
+	END IF;
+END IF;
+END$$
+DELIMITER ;
+
+-- DELETE_ALUNO
+DROP PROCEDURE IF EXISTS `DELETE_ALUNO`;
+DELIMITER $$
+CREATE PROCEDURE `DELETE_ALUNO`(OUT retId INT, IN a_id INT)
+BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
+IF a_id IS NULL THEN
+	SET retId = 0;
+ELSE
+	SET retId = 0;
+	IF EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
+		DELETE FROM aluno a WHERE a.id = a_id;
+		SET retId = 1;
+	END IF;
+END IF;
+END$$
+DELIMITER ;
+
+-- DELETE_PROFESSOR
+DROP PROCEDURE IF EXISTS `DELETE_PROFESSOR`;
+DELIMITER $$
+CREATE PROCEDURE `DELETE_PROFESSOR`(OUT result INT, IN p_id INT)
+BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
 END;
 
--- Gerar mensalidade em aberto (necessário confirmar o processo)
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GERAR_MENSALIDADE_ABERTA`(OUT retId INT, IN id_aluno INT, 
+IF p_id IS NULL THEN
+	SET result = 0;
+ELSE
+	SET result = 0;
+	 IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id) THEN
+		DELETE FROM professor p WHERE p.id = p_id;
+		 SET result = 1;
+	 END IF;
+END IF;
+END$$
+DELIMITER ;
+
+-- EDITAR_ALUNO
+DROP PROCEDURE IF EXISTS `EDITAR_ALUNO`;
+DELIMITER $$
+CREATE PROCEDURE `EDITAR_ALUNO`(
+OUT retId INT,
+IN a_id INT,
+IN a_nome varchar(100),
+IN a_email varchar(100),
+IN a_celular varchar(11))
+BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
+SET retId = 0;
+IF EXISTS(SELECT 1 FROM stu.aluno a WHERE a.id = a_id) THEN
+	UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
+	WHERE a.id = a_id; 
+	SET retId = 1;
+END IF;
+END$$
+DELIMITER ;
+
+-- EDITAR_PROFESSOR
+DROP PROCEDURE IF EXISTS `EDITAR_PROFESSOR`;
+DELIMITER $$
+CREATE PROCEDURE `EDITAR_PROFESSOR`(OUT retId INT,
+         IN p_id INT,
+         IN p_nome VARCHAR(100),
+         IN p_email VARCHAR(100),
+         IN p_senha VARCHAR(100))
+BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
+SET retId = 0;
+IF EXISTS (SELECT 1 FROM professor p WHERE p.id = p_id AND p.ativo = 1) THEN
+	UPDATE stu.professor p SET p.nome = p_nome, p.email = p_email WHERE p.id = p_id;
+	SET retId = 1;
+END IF;
+END$$
+DELIMITER ;
+
+-- GERAR_MENSALIDADE_ABERTA
+DROP PROCEDURE IF EXISTS `GERAR_MENSALIDADE_ABERTA`;
+DELIMITER $$
+CREATE PROCEDURE `GERAR_MENSALIDADE_ABERTA`(OUT retId INT, IN id_aluno INT, 
 IN valor_cobrar DECIMAL, IN mensalidade DATE)
 BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
 SET retId = 0;
-IF id_aluno IS NOT NULL AND EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = id_aluno) THEN
+IF id_aluno IS NOT NULL AND EXISTS (SELECT 1 FROM stu.aluno a WHERE a.id = id_aluno) THEN
 	INSERT INTO mensalidade_aberta(id_aluno, proximo_vencimento, valor_cobrar) 
-    VALUES (id_aluno, adddate(mensalidade, interval 1 month), valor_cobrar);
+    VALUES (id_aluno, mensalidade, valor_cobrar);
     SET retId = 1;
 END IF;
-END
+END$$
+DELIMITER ;
