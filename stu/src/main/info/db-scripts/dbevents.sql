@@ -4,6 +4,6 @@ STARTS timestamp(current_date())
 ON COMPLETION NOT PRESERVE
 DISABLE ON SLAVE
 DO begin 
-update mensalidade_aberta set status = 'atrasado'
+update mensalidade_aberta set status = 'atrasada'
 where proximo_vencimento < current_date();
 end;
