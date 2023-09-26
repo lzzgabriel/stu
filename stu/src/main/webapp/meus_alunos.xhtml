@@ -77,7 +77,7 @@
 
 							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
 							<p:inputText id="nome" styleClass="col-7"
-								value="#{stCadastrarAluno.aluno.nome}" required="true"
+								value="#{stMeusAlunos.aluno.nome}" required="true"
 								requiredMessage="Obrigatório" />
 							<p:message for="nome" styleClass="col-2" />
 
@@ -87,7 +87,7 @@
 							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
 							<p:inputText id="email" styleClass="col-7"
 								validator="emailValidator" validatorMessage="Inválido"
-								value="#{stCadastrarAluno.aluno.email}" />
+								value="#{stMeusAlunos.aluno.email}" />
 							<p:message styleClass="col-2" for="email" />
 						</div>
 
@@ -95,7 +95,7 @@
 							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
 							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
 								required="true" requiredMessage="Obrigatório"
-								validateMask="false" value="#{stCadastrarAluno.aluno.celular}" />
+								validateMask="false" value="#{stMeusAlunos.aluno.celular}" />
 							<p:message styleClass="col-2" for="celular" />
 
 						</div>
@@ -105,7 +105,7 @@
 					<div class="flex justify-content-center flex-wrap py-4">
 
 						<p:commandButton value="Salvar alterações"
-							actionListener="#{stCadastrarAluno.save()}" update="main" />
+							actionListener="#{stMeusAlunos.save()}" update="main" />
 
 					</div>
 
