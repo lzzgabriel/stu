@@ -14,7 +14,6 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-@WebListener
 public class StuContextListener implements ServletContextListener {
 	
 	private Logger logger = LogManager.getLogger();

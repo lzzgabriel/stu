@@ -25,8 +25,8 @@ public class Application implements Serializable {
 
 	public Application() {
 		try {
-			Context c = InitialContext.doLookup("java:comp/env");
-			dataSource = (DataSource) c.lookup("jdbc/StuDB");
+			Context c = InitialContext.doLookup("java:");
+			dataSource = (DataSource) c.lookup("/StuDB");
 		} catch (NamingException e) {
 			logger.error(e.getMessage(), e);
 		}
