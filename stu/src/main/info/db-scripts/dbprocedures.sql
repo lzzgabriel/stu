@@ -240,6 +240,24 @@ END IF;
 END$$
 DELIMITER ;
 
+-- EDITAR_MENSALIDADE_ABERTA
+DELIMITER $$
+CREATE PROCEDURE `EDITAR_MENSALIDADE_ABERTA`(OUT retId INT, IN a_id INT, IN valor_atualizado DECIMAL,
+IN nova_data DATE)
+BEGIN
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    ROLLBACK; 
+END;
+SET retId = 0;
+IF a_id IS NOT NULL AND EXISTS (SELECT 1 FROM stu.mensalidade_aberta ma WHERE ma.id_aluno = a_id) THEN
+	UPDATE stu.mensalidade_aberta ma SET ma.valor_cobrar = valor_atualizado, 
+	ma.proximo_vencimento = nova_data WHERE ma.id_aluno = a_id; 
+	SET retId = 1;
+END IF;
+END$$
+DELIMITER ;
+
 -- EDITAR_PROFESSOR
 DROP PROCEDURE IF EXISTS `EDITAR_PROFESSOR`;
 DELIMITER $$
