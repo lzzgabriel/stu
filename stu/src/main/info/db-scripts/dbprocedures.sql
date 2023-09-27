@@ -279,6 +279,16 @@ END IF;
 END$$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE `FILTRAR_ALUNOS`(in id_aluno INT, in nome_aluno VARCHAR(100),
+ in ativo TINYINT, in momento_cadastro TIMESTAMP)
+BEGIN
+SELECT * FROM stu.aluno a WHERE (id_aluno IS NULL OR a.id =  id_aluno) 
+AND (nome_aluno IS NULL OR a.nome =  nome_aluno) AND (ativo IS NULL OR a.ativo =  ativo) 
+AND (momento_cadastro IS NULL OR a.momento_cadastro =  momento_cadastro);
+END$$
+DELIMITER ;
+
 -- GERAR_MENSALIDADE_ABERTA
 DROP PROCEDURE IF EXISTS `GERAR_MENSALIDADE_ABERTA`;
 DELIMITER $$

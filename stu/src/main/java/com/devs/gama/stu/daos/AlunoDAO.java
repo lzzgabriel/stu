@@ -127,10 +127,46 @@ public class AlunoDAO {
 		return returnList;
 	}
 
-	// TODO vamos filtrar no banco
-	public List<Aluno> findAllFiltered(Aluno aluno) throws SQLException {
-		List<Aluno> returnList = findAll();
-		returnList.removeIf(p -> !p.equals(aluno));
+	public List<Aluno> findAllFiltered(Aluno aluno) throws SQLException, EntityNotFoundException {
+		List<Aluno> returnList = new ArrayList<>();
+		try (Connection conn = application.getDataSource().getConnection()) {
+			CallableStatement callableStatement = conn.prepareCall(
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_FILTRAR_ALUNOS.getValue(), 4, 0));
+			int parametro = 1;
+			if (Objects.isNull(aluno.getId())) {
+				callableStatement.setNull(parametro++, Types.INTEGER);
+			} else {
+				callableStatement.setInt(parametro++, aluno.getId());
+			}
+			if (Objects.isNull(aluno.getNome())) {
+				callableStatement.setNull(parametro++, Types.VARCHAR);
+			} else {
+				callableStatement.setString(parametro++, aluno.getNome());
+			}
+			if (Objects.isNull(aluno.getAtivo())) {
+				callableStatement.setNull(parametro++, Types.TINYINT);
+			} else {
+				callableStatement.setBoolean(parametro++, aluno.getAtivo());
+			}
+			if (Objects.isNull(aluno.getMomentoCadastro())) {
+				callableStatement.setNull(parametro++, Types.TIMESTAMP);
+			} else {
+				callableStatement.setTimestamp(parametro++,
+						SqlUtils.localDateTimeToTimestampUTC(aluno.getMomentoCadastro()));
+			}
+
+			ResultSet resultSet = callableStatement.executeQuery();
+
+			while (resultSet.next()) {
+				returnList.add(fetch(resultSet));
+			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			if (returnList.isEmpty()) {
+				throw new EntityNotFoundException("Aluno(s) não encontrado(s)");
+			}
+		}
+
 		return returnList;
 	}
 
@@ -138,7 +174,7 @@ public class AlunoDAO {
 		int totalRegistros = 0;
 		String sql = "SELECT COUNT(id_aluno) as totalRegistros FROM "
 				+ ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue();
-		if (professor != null) {
+		if (Objects.nonNull(professor)) {
 			sql += " where id_professor = ? ";
 		}
 		try (Connection conn = application.getDataSource().getConnection()) {
@@ -146,7 +182,7 @@ public class AlunoDAO {
 
 			int parametro = 1;
 
-			if (professor != null) {
+			if (Objects.nonNull(professor)) {
 				preparedStatement.setInt(parametro, professor.getId());
 			}
 
@@ -162,12 +198,13 @@ public class AlunoDAO {
 		return totalRegistros;
 	}
 
-	public List<Aluno> pagination(Professor professor, int pagina, int padraoPaginacao) throws SQLException {
+	public List<Aluno> pagination(Professor professor, int posicao, int padraoPaginacao) throws SQLException {
 		List<Aluno> listaRetorno = new ArrayList<Aluno>();
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(
 					"adp.id_professor, adp.id_aluno , adp.nome , adp.email , adp.celular , adp.momento_cadastro",
-					"view_aluno_de_professor adp", "adp.id_professor = " + professor.getId(), pagina, padraoPaginacao));
+					"view_aluno_de_professor adp", "adp.id_professor = " + professor.getId(), posicao,
+					padraoPaginacao));
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 

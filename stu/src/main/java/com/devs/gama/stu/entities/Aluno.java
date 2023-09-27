@@ -6,12 +6,13 @@ import java.util.Objects;
 import com.devs.gama.stu.utils.StringUtils;
 
 public class Aluno {
-	
+
 	private Integer id;
 	private String nome;
 	private String email;
 	private String celular;
-	
+	private Boolean ativo;
+
 	private LocalDateTime momentoCadastro;
 
 	public Integer getId() {
@@ -41,11 +42,11 @@ public class Aluno {
 	public String getCelular() {
 		return celular;
 	}
-	
+
 	public String getCelularUnmasked() {
 		return celular == null ? null : celular.replace("(", "").replace(")", "").replace("-", "");
 	}
-	
+
 	public String getCelularMasked() {
 		return StringUtils.formattedTelephone(celular);
 	}
@@ -60,6 +61,14 @@ public class Aluno {
 
 	public void setMomentoCadastro(LocalDateTime momentoCadastro) {
 		this.momentoCadastro = momentoCadastro;
+	}
+
+	public Boolean getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(Boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	@Override
