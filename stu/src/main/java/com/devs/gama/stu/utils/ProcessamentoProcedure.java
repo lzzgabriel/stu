@@ -8,8 +8,9 @@ import java.sql.SQLException;
 import com.devs.gama.stu.exceptions.CallFailedException;
 
 public final class ProcessamentoProcedure {
-	
-	private ProcessamentoProcedure() {}
+
+	private ProcessamentoProcedure() {
+	}
 
 	public static void closePreparedStatement(PreparedStatement preparedStatement) throws SQLException {
 		try {
@@ -56,19 +57,5 @@ public final class ProcessamentoProcedure {
 			}
 		}
 	}
-
-//	public void finalizarProcedure(CallableStatement callableStatement, int posicaoResult, String posicaoMsg)
-//			throws SQLException {
-//		if (callableStatement != null && !callableStatement.isClosed()) {
-//			callableStatement.getInt(posicaoResult);
-//		}
-//	}
-
-//	public void finalizarProcedure(CallableStatement callableStatement, int posicaoResult, int posicaoMsg,
-//			int posicaoTimestamp) throws SQLException {
-//		if (callableStatement != null && !callableStatement.isClosed()) {
-//			callableStatement.getInt(posicaoResult);
-//		}
-//	}
 
 }

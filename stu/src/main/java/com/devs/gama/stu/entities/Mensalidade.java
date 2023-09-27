@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import com.devs.gama.stu.exceptions.CallNotFoundException;
+
 public class Mensalidade {
 
 	private Aluno aluno;
@@ -73,12 +75,11 @@ public class Mensalidade {
 
 	public static enum Status {
 		EM_ABERTO, ATRASADA;
+
 		public static Status parse(String s) {
-			return Arrays.asList(Status.values())
-					.stream()
-					.filter(status -> s.equalsIgnoreCase(status.name()))
+			return Arrays.asList(Status.values()).stream().filter(status -> s.equalsIgnoreCase(status.name()))
 					.findFirst()
-					.orElseThrow();
+					.orElseThrow(() -> new CallNotFoundException("Status da mensalidade não encontrado: " + s));
 		}
 	}
 }

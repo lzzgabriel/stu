@@ -15,12 +15,14 @@ public enum PadraoPaginacaoViews {
 	}
 
 	public int getValue() {
+		
 		return this.value;
 	}
+	
 
-	public static PadraoPaginacaoViews valueOfProceduresViews(int value) {
+	public static PadraoPaginacaoViews parse(int value) {
 		return Arrays.asList(PadraoPaginacaoViews.values()).stream().filter(s -> s.getValue() == value).findFirst()
-				.orElseThrow(() -> new CallNotFoundException("Pattern of pagination view not found: " + value));
+				.orElseThrow(() -> new CallNotFoundException("Pattern of pagination view/table not found: " + value));
 	}
 
 }

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Professor;
@@ -53,7 +54,7 @@ public class ProfessorDAO {
 	public void edit(Professor professor) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 4, 1));
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_EDITAR_PROFESSOR.getValue(), 4, 1));
 
 			int parametro = 1;
 
@@ -137,7 +138,7 @@ public class ProfessorDAO {
 			}
 			ProcessamentoProcedure.closeResultSet(resultSet);
 			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
-			if (professor == null) {
+			if (Objects.isNull(professor)) {
 				throw new EntityNotFoundException("Professor não encontrado");
 			}
 
@@ -157,6 +158,7 @@ public class ProfessorDAO {
 	}
 
 	public Professor validateLogin(String email, String senha) throws SQLException, EntityNotFoundException {
+		Professor professor = null;
 		try (Connection connection = application.getDataSource().getConnection()) {
 
 			String sql = "SELECT id, nome, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue()
@@ -168,23 +170,22 @@ public class ProfessorDAO {
 			preparedStatement.setString(parametro++, email);
 			preparedStatement.setString(parametro++, hashSenha(senha));
 
-			ResultSet res = preparedStatement.executeQuery();
+			ResultSet resultSet = preparedStatement.executeQuery();
 
-			if (res.next()) {
-				Professor professor = new Professor();
-
-				professor.setId(res.getInt("id"));
-				professor.setNome(res.getString("nome"));
-				professor.setEmail(res.getString("email"));
-
-				return professor;
-			} else {
+			if (resultSet.next()) {
+				professor = new Professor();
+				professor.setId(resultSet.getInt("id"));
+				professor.setNome(resultSet.getString("nome"));
+				professor.setEmail(resultSet.getString("email"));
+			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			if (Objects.isNull(professor)) {
 				throw new EntityNotFoundException("Professor não encontrado");
 			}
 
-		} catch (SQLException e) {
-			throw e;
 		}
+		return professor;
 	}
 
 	private String hashSenha(String senha) {

@@ -3,9 +3,11 @@ package com.devs.gama.stu.utils;
 import java.util.Objects;
 
 public final class StringUtils {
-	
-	//No no no
-	private StringUtils() {}
+
+	// No no no
+	private StringUtils() {
+		
+	}
 
 	/**
 	 * Método para repetir a String de acordo com a quantidade
@@ -25,7 +27,7 @@ public final class StringUtils {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String formattedTelephone(String s) {
 		if (!containsOnlyDigits(s))
 			throw new IllegalArgumentException();
@@ -44,19 +46,21 @@ public final class StringUtils {
 	 * @return Boolean
 	 */
 	public static boolean isNullOrEmpty(String text) {
-		return text == null || text.isBlank() || text.isEmpty();
+		return Objects.isNull(text) || text.isBlank() || text.isEmpty();
 	}
-	
+
 	/**
-	 * Retorna {@code true} se a {@code String} inserida tiver somente números,
-	 * e {@code false} se não.
+	 * Retorna {@code true} se a {@code String} inserida tiver somente números, e
+	 * {@code false} se não.
 	 * 
 	 * @param text
 	 * @return um booleano dizendo se há somente números ou não
 	 */
 	public static boolean containsOnlyDigits(String text) {
-		if (Objects.isNull(text)) return false;
-		if (text.isEmpty() || text.isBlank()) return false;
+		if (Objects.isNull(text))
+			return false;
+		if (text.isEmpty() || text.isBlank())
+			return false;
 		try {
 			Long.valueOf(text);
 			return true;
@@ -64,4 +68,5 @@ public final class StringUtils {
 			return false;
 		}
 	}
+
 }

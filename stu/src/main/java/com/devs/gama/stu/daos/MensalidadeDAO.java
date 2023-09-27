@@ -6,16 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
 import com.devs.gama.stu.entities.Mensalidade.Status;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
+import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
@@ -26,67 +26,112 @@ import jakarta.inject.Named;
 @Named
 @ApplicationScoped
 public class MensalidadeDAO {
-	
+
 	@Inject
 	private Application application;
-	
-	//TODO edit, findallfiltered, findbyid
+
+	// TODO findallfiltered, findbyid
 
 	public void save(Mensalidade mensalidade) throws SQLException {
 		try (Connection connection = application.getDataSource().getConnection()) {
-			
-			CallableStatement callableStatement = connection.prepareCall(SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_GERAR_MENSALIDADE_ABERTA.getValue(), 3, 1));
-			
+
+			CallableStatement callableStatement = connection.prepareCall(SqlUtils
+					.montarProcedure(ProceduresViewsTables.PROCEDURE_GERAR_MENSALIDADE_ABERTA.getValue(), 3, 1));
+
 			int param = 1;
-			
+
 			callableStatement.registerOutParameter(param++, Types.INTEGER);
-			
+
 			callableStatement.setInt(param++, mensalidade.getAluno().getId());
 			callableStatement.setDouble(param++, param);
-			callableStatement.setDate(param++, SqlUtils.transformarDataUTC(mensalidade.getMensalidade()));
-			
+			callableStatement.setDate(param++, SqlUtils.localDateToDateUTC(mensalidade.getMensalidade()));
+
 			callableStatement.execute();
-			
+
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
 			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
-	
-	public List<Mensalidade> findAll() throws SQLException {
-		List<Mensalidade> returnList = new ArrayList<>();
-		
+
+	public void edit(Mensalidade mensalidade) throws SQLException {
+		try (Connection conn = application.getDataSource().getConnection()) {
+			CallableStatement callableStatement = conn.prepareCall(SqlUtils
+					.montarProcedure(ProceduresViewsTables.PROCEDURE_EDITAR_MENSALIDADE_ABERTA.getValue(), 3, 1));
+
+			int parametro = 1;
+			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
+			callableStatement.setInt(parametro++, mensalidade.getAluno().getId());
+			callableStatement.setDouble(parametro++, mensalidade.getValor().doubleValue());
+			callableStatement.setDate(parametro++, SqlUtils.localDateToDateUTC(mensalidade.getMensalidade()));
+
+			callableStatement.execute();
+
+			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+		}
+	}
+
+	public Mensalidade findById(int id) throws SQLException, EntityNotFoundException {
+
 		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue();
-		
+
+		Mensalidade mensalidade = null;
+
 		try (Connection connection = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			
+
+			int parametro = 1;
+			preparedStatement.setInt(parametro++, id);
+
 			ResultSet resultSet = preparedStatement.executeQuery();
-			
-			while(resultSet.next()) {
-				returnList.add(fetch(resultSet));
+			if (resultSet.next()) {
+				mensalidade = fetch(resultSet);
 			}
-			
+
 			ProcessamentoProcedure.closeResultSet(resultSet);
 			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
-			
+
+			if (Objects.isNull(mensalidade)) {
+				throw new EntityNotFoundException("Nenhuma mensalidade encontrada");
+			}
+		}
+		return mensalidade;
+	}
+
+	public List<Mensalidade> findAll() throws SQLException {
+		List<Mensalidade> returnList = new ArrayList<>();
+
+		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue();
+
+		try (Connection connection = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				returnList.add(fetch(resultSet));
+			}
+
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+
 			return returnList;
 		}
 	}
-	
+
 	public Mensalidade fetch(ResultSet res) throws SQLException {
 		Mensalidade mensalidade = new Mensalidade();
-		
+
 		Aluno aluno = new Aluno();
 		aluno.setId(res.getInt("id_aluno"));
 		aluno.setNome(res.getString("aluno_nome"));
-		
+
 		mensalidade.setAluno(aluno);
-		
+
 		mensalidade.setValor(res.getBigDecimal("valor_cobrar"));
 		mensalidade.setStatus(Status.parse(res.getString("status")));
-		//TODO change esse jeito feio de conversão
-		mensalidade.setProximoVencimento(LocalDate.ofInstant(res.getDate("proximo_vencimento").toInstant(), ZoneId.systemDefault()));
-		
+		mensalidade.setProximoVencimento(SqlUtils.dateToLocalDate(res.getDate("proximo_vencimento")));
+
 		return mensalidade;
 	}
 

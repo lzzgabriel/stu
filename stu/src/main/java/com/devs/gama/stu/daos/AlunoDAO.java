@@ -8,10 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
@@ -47,6 +46,7 @@ public class AlunoDAO {
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -65,6 +65,7 @@ public class AlunoDAO {
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -78,11 +79,12 @@ public class AlunoDAO {
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, aluno.getId());
 			callableStatement.setDouble(parametro++, valorCobrado);
-			callableStatement.setDate(parametro++, SqlUtils.transformarDataUTC(mensalidadeVigente));
+			callableStatement.setDate(parametro++, SqlUtils.localDateToDateUTC(mensalidadeVigente));
 
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -104,16 +106,8 @@ public class AlunoDAO {
 
 	public void delete(Aluno aluno) throws SQLException {
 
-//		try (Connection conn = application.getDataSource().getConnection()) {
-//			CallableStatement callableStatement = conn.prepareCall(SqlUtils.montarProcedure("delete_aluno", 1, 1));
-//			int parametro = 1;
-//			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-//			callableStatement.setInt(parametro++, aluno.getId());
-//			callableStatement.execute();
-//
-//			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-//
-//		} -> Retirado até o momento, posteriormente será feito o controle através da coluna "ativo"
+		// -> Retirado até o momento, posteriormente será feito o controle através da
+		// coluna "ativo"
 
 	}
 
@@ -133,7 +127,7 @@ public class AlunoDAO {
 		return returnList;
 	}
 
-	//TODO vamos filtrar no banco
+	// TODO vamos filtrar no banco
 	public List<Aluno> findAllFiltered(Aluno aluno) throws SQLException {
 		List<Aluno> returnList = findAll();
 		returnList.removeIf(p -> !p.equals(aluno));
@@ -199,7 +193,7 @@ public class AlunoDAO {
 			}
 			ProcessamentoProcedure.closeResultSet(resultSet);
 			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
-			if (aluno == null) {
+			if (Objects.isNull(aluno)) {
 				throw new EntityNotFoundException("Nenhum aluno encontrado");
 			}
 		}
@@ -213,7 +207,7 @@ public class AlunoDAO {
 		aluno.setNome(res.getString("nome"));
 		aluno.setEmail(res.getString("email"));
 		aluno.setCelular(res.getString("celular"));
-		aluno.setMomentoCadastro(LocalDateTime.ofInstant(res.getTimestamp("momento_cadastro").toInstant(), ZoneId.systemDefault()));
+		aluno.setMomentoCadastro(SqlUtils.timestampToLocalDateTime(res.getTimestamp("momento_cadastro")));
 
 		return aluno;
 	}
