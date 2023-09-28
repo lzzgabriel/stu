@@ -30,21 +30,21 @@ public class FormaPagamentoDAO {
 	public void save(FormaPagamento formaPagamento) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			CallableStatement callableStatement = conn.prepareCall(SqlUtils
-					.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_FORMA_PAGAMENTO.getValue(), 2, 1));
+					.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_FORMA_PAGAMENTO.getValue(), 1, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setNull(parametro++, Types.INTEGER);
 			callableStatement.setString(parametro++, formaPagamento.getDescricao());
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
 
 	public void edit(FormaPagamento formaPagamento) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(SqlUtils
-					.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_FORMA_PAGAMENTO.getValue(), 2, 1));
+			CallableStatement callableStatement = conn.prepareCall(
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_EDITAR_FORMA_PAGAMENTO.getValue(), 2, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, formaPagamento.getId());
@@ -52,6 +52,7 @@ public class FormaPagamentoDAO {
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -66,6 +67,7 @@ public class FormaPagamentoDAO {
 			callableStatement.execute();
 
 			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
+			ProcessamentoProcedure.closeCallableStatement(callableStatement);
 		}
 
 	}
