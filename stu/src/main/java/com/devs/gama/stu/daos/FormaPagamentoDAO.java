@@ -88,9 +88,8 @@ public class FormaPagamentoDAO {
 	}
 
 	public List<FormaPagamento> findAllFiltered(FormaPagamento formaPagamento) throws SQLException {
-		List<FormaPagamento> returnList = findAll();
-		returnList.removeIf(p -> !p.equals(formaPagamento));
-		return returnList;
+		// -> procedure de filtragem
+		return null;
 	}
 
 	public FormaPagamento findById(int id) throws SQLException, EntityNotFoundException {

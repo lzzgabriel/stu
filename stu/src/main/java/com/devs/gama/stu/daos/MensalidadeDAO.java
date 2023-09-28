@@ -30,8 +30,6 @@ public class MensalidadeDAO {
 	@Inject
 	private Application application;
 
-	// TODO findallfiltered, findbyid
-
 	public void save(Mensalidade mensalidade) throws SQLException {
 		try (Connection connection = application.getDataSource().getConnection()) {
 
@@ -71,13 +69,18 @@ public class MensalidadeDAO {
 		}
 	}
 
+	public List<Mensalidade> findAllFiltered(Mensalidade mensalidade) throws SQLException {
+		// -> procedure de filtragem
+		return null;
+	}
+
 	public Mensalidade findById(int id) throws SQLException, EntityNotFoundException {
 
 		Mensalidade mensalidade = null;
 
 		try (Connection connection = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement(SqlUtils.montarViewTable(null,
-					ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(), null));
+					ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(), new String[] { "id" }));
 
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);

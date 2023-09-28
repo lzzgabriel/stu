@@ -2,7 +2,6 @@ package com.devs.gama.stu.daos;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -95,7 +94,7 @@ public class AlunoDAO {
 
 			int parametro = 1;
 			callableStatement.setInt(parametro++, aluno.getId());
-			callableStatement.setDate(parametro++, Date.valueOf(LocalDate.now()));
+			callableStatement.setDate(parametro++, SqlUtils.localDateToDateUTC(LocalDate.now()));
 			callableStatement.setInt(parametro++, formaPagameto.getId());
 
 			callableStatement.execute();

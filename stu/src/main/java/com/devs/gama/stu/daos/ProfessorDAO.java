@@ -89,17 +89,9 @@ public class ProfessorDAO {
 	}
 
 	public void delete(Professor professor) throws SQLException {
-		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_DELETE_PROFESSOR.getValue(), 1, 1));
-			int parametro = 1;
-			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, professor.getId());
-			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
-		}
+		// -> Retirado até o momento, posteriormente será feito o controle através da
+		// coluna "ativo"
 
 	}
 
@@ -120,9 +112,8 @@ public class ProfessorDAO {
 	}
 
 	public List<Professor> findAllFiltered(Professor professor) throws SQLException {
-		List<Professor> returnList = findAll();
-		returnList.removeIf(p -> !p.equals(professor));
-		return returnList;
+		// -> procedure de filtragem
+		return null;
 	}
 
 	public Professor findById(int id) throws SQLException, EntityNotFoundException {
