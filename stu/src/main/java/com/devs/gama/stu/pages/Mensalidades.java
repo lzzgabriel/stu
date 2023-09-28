@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.primefaces.model.LazyDataModel;
 
 import com.devs.gama.stu.app.Application;
-import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
 
 import jakarta.inject.Inject;
@@ -22,20 +21,26 @@ public class Mensalidades implements Serializable {
 	@Inject
 	private LazyDataModel<Mensalidade> lazyDataModel;
 	
-	private Aluno aluno;
+	private boolean logMode = false;
 	
-	public void load() {
-		//TODO
+	public void enableLogMode() {
+		logMode = true;
 	}
 
-	public Aluno getAluno() {
-		return aluno;
+	public LazyDataModel<Mensalidade> getLazyDataModel() {
+		return lazyDataModel;
 	}
 
-	public void setAluno(Aluno aluno) {
-		this.aluno = aluno;
+	public void setLazyDataModel(LazyDataModel<Mensalidade> lazyDataModel) {
+		this.lazyDataModel = lazyDataModel;
+	}
+
+	public boolean isLogMode() {
+		return logMode;
+	}
+
+	public void setLogMode(boolean logMode) {
+		this.logMode = logMode;
 	}
 	
-	
-		
 }

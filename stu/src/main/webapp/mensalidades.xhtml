@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<f:view>
+	<ui:composition template="/composites/template.xhtml">
+		<ui:define name="content">
+
+			<h:panelGroup id="main">
+
+				<h:form id="tableForm" rendered="true">
+
+					<p:growl id="messages" globalOnly="true" />
+
+					<h:panelGroup rendered="#{!stMensalidades.logMode}">
+
+						<div class="mx-4 pt-4">
+
+							<p:outputPanel>
+								<h2>Mensalidades</h2>
+							</p:outputPanel>
+
+							<p:dataTable id="dataTable" paginator="true" lazy="true"
+								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
+								paginatorPosition="bottom" rows="10"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+
+								<p:column headerText="Nome">
+									<h:outputText value="#{mensalidade.aluno.nome}" />
+								</p:column>
+
+								<p:column headerText="Valor cobrado atualmente">
+									<h:outputText value="#{mensalidade.aluno.email}" />
+								</p:column>
+
+								<p:column>
+									<p:commandButton icon="pi pi-history"
+										actionListener="#{stMensalidades.enableLogMode()}"
+										partialSubmit="true" process="@this" update="@form" />
+								</p:column>
+
+							</p:dataTable>
+
+						</div>
+
+					</h:panelGroup>
+
+					<h:panelGroup rendered="#{stMensalidades.logMode}">
+
+						<div class="mx-4 pt-4">
+
+							<p:outputPanel>
+								<h2>Mensalidades</h2>
+							</p:outputPanel>
+
+							<p:dataTable id="dataTable" paginator="true" lazy="true"
+								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
+								paginatorPosition="bottom" rows="10"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+
+								<p:column headerText="Valor cobrado">
+									<h:outputText value="#{mensalidade.aluno.email}" />
+								</p:column>
+
+								<p:column headerText="Valor cobrado">
+									<h:outputText value="#{mensalidade.aluno.email}" />
+								</p:column>
+
+								<p:column>
+									<p:commandButton icon="pi pi-history"
+										actionListener="#{stMensalidades.enableEditMode(aluno)}"
+										partialSubmit="true" process="@this" update="main" />
+								</p:column>
+
+							</p:dataTable>
+
+						</div>
+
+					</h:panelGroup>
+
+				</h:form>
+
+				<h:form id="saveForm" rendered="false">
+
+					<p:growl id="messages" globalOnly="true" />
+
+					<div class="mx-4 pt-4">
+						<p:outputPanel>
+							<h2>Inserir aluno</h2>
+						</p:outputPanel>
+					</div>
+
+					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true"
+						process="@this" actionListener="#{stMensalidades.normalMode()}"
+						update="main" />
+
+					<div class="mx-8">
+
+						<div class="grid py-4">
+
+							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
+							<p:inputText id="nome" styleClass="col-7"
+								value="#{stMensalidades.aluno.nome}" required="true"
+								requiredMessage="Obrigatório" />
+							<p:message for="nome" styleClass="col-2" />
+
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
+							<p:inputText id="email" styleClass="col-7"
+								validator="emailValidator" validatorMessage="Inválido"
+								value="#{stMensalidades.aluno.email}" />
+							<p:message styleClass="col-2" for="email" />
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
+							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
+								required="true" requiredMessage="Obrigatório"
+								validateMask="false" value="#{stMensalidades.aluno.celular}" />
+							<p:message styleClass="col-2" for="celular" />
+
+						</div>
+
+					</div>
+
+					<div class="flex justify-content-center flex-wrap py-4">
+
+						<p:commandButton value="Salvar alterações"
+							actionListener="#{stMensalidades.save()}" update="main" />
+
+					</div>
+
+				</h:form>
+
+				<h:form id="editForm" rendered="false">
+
+					<p:growl id="messages" globalOnly="true" />
+
+					<div class="mx-4 pt-4">
+						<p:outputPanel>
+							<h2>Inserir aluno</h2>
+						</p:outputPanel>
+					</div>
+
+					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true"
+						process="@this" actionListener="#{stMensalidades.normalMode()}"
+						update="main" />
+
+					<div class="mx-8">
+
+						<div class="grid py-4">
+
+							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
+							<p:inputText id="nome" styleClass="col-7"
+								value="#{stMensalidades.aluno.nome}" required="true"
+								requiredMessage="Obrigatório" />
+							<p:message for="nome" styleClass="col-2" />
+
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
+							<p:inputText id="email" styleClass="col-7"
+								validator="emailValidator" validatorMessage="Inválido"
+								value="#{stMensalidades.aluno.email}" />
+							<p:message styleClass="col-2" for="email" />
+						</div>
+
+						<div class="grid py-4">
+							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
+							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
+								required="true" requiredMessage="Obrigatório"
+								validateMask="false" value="#{stMensalidades.aluno.celular}" />
+							<p:message styleClass="col-2" for="celular" />
+
+						</div>
+
+					</div>
+
+					<div class="flex justify-content-center flex-wrap py-4">
+
+						<p:commandButton value="Salvar alterações"
+							actionListener="#{stMensalidades.edit()}" update="main" />
+
+					</div>
+
+				</h:form>
+
+			</h:panelGroup>
+
+		</ui:define>
+	</ui:composition>
+</f:view>
+
+</html>
