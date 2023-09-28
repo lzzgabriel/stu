@@ -33,7 +33,7 @@ public class FormaPagamentoDAO {
 					.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_FORMA_PAGAMENTO.getValue(), 2, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setNull(parametro++, Types.INTEGER); // Deve ser passado null para registrar
+			callableStatement.setNull(parametro++, Types.INTEGER);
 			callableStatement.setString(parametro++, formaPagamento.getDescricao());
 			callableStatement.execute();
 
@@ -47,7 +47,7 @@ public class FormaPagamentoDAO {
 					.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_FORMA_PAGAMENTO.getValue(), 2, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, formaPagamento.getId()); // Deve ser passado o id para atualizar
+			callableStatement.setInt(parametro++, formaPagamento.getId());
 			callableStatement.setString(parametro++, formaPagamento.getDescricao());
 			callableStatement.execute();
 
@@ -58,8 +58,8 @@ public class FormaPagamentoDAO {
 	public void delete(FormaPagamento formaPagamento) throws SQLException {
 
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn
-					.prepareCall(SqlUtils.montarProcedure("deletar_forma_pagamento", 1, 1));
+			CallableStatement callableStatement = conn.prepareCall(
+					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_DELETE_FORMA_PAGAMENTO.getValue(), 1, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
 			callableStatement.setInt(parametro++, formaPagamento.getId());
@@ -72,9 +72,9 @@ public class FormaPagamentoDAO {
 
 	public List<FormaPagamento> findAll() throws SQLException {
 		List<FormaPagamento> returnList = new ArrayList<>();
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			PreparedStatement preparedStatement = conn.prepareStatement(
+					SqlUtils.montarViewTable(null, ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue(), null));
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
@@ -93,9 +93,9 @@ public class FormaPagamentoDAO {
 
 	public FormaPagamento findById(int id) throws SQLException, EntityNotFoundException {
 		FormaPagamento formaPagamento = null;
-		String sql = "SELECT * FROM" + ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue() + " WHERE id = ?";
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(null,
+					ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue(), new String[] { "id" }));
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
 			ResultSet resultSet = preparedStatement.executeQuery();

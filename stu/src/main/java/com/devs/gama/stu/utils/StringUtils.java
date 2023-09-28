@@ -1,12 +1,14 @@
 package com.devs.gama.stu.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public final class StringUtils {
 
 	// No no no
 	private StringUtils() {
-		
+
 	}
 
 	/**
@@ -67,6 +69,23 @@ public final class StringUtils {
 		} catch (NumberFormatException e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Retorna o array de Strings no formato de lista.
+	 * 
+	 * @param arraysStrings array de String que será transformado em lista
+	 * @return lista de strings
+	 */
+	public static List<String> arrayToList(String[] arraysStrings) {
+		if (Objects.isNull(arraysStrings)) {
+			return null;
+		}
+		List<String> listReturn = new ArrayList<String>();
+		for (String string : arraysStrings) {
+			listReturn.add(string);
+		}
+		return listReturn;
 	}
 
 }

@@ -73,12 +73,11 @@ public class MensalidadeDAO {
 
 	public Mensalidade findById(int id) throws SQLException, EntityNotFoundException {
 
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue();
-
 		Mensalidade mensalidade = null;
 
 		try (Connection connection = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			PreparedStatement preparedStatement = connection.prepareStatement(SqlUtils.montarViewTable(null,
+					ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(), null));
 
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
@@ -101,10 +100,9 @@ public class MensalidadeDAO {
 	public List<Mensalidade> findAll() throws SQLException {
 		List<Mensalidade> returnList = new ArrayList<>();
 
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue();
-
 		try (Connection connection = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			PreparedStatement preparedStatement = connection.prepareStatement(SqlUtils.montarViewTable(null,
+					ProceduresViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(), null));
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 

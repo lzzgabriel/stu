@@ -59,7 +59,7 @@ public class ProfessorDAO {
 			int parametro = 1;
 
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, professor.getId()); // Deve ser passado o id para atualizar
+			callableStatement.setInt(parametro++, professor.getId());
 			callableStatement.setString(parametro++, professor.getNome());
 			callableStatement.setString(parametro++, professor.getEmail());
 			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
@@ -105,9 +105,9 @@ public class ProfessorDAO {
 
 	public List<Professor> findAll() throws SQLException {
 		List<Professor> returnList = new ArrayList<>();
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			PreparedStatement preparedStatement = conn.prepareStatement(
+					SqlUtils.montarViewTable(null, ProceduresViewsTables.VIEW_PROFESSOR.getValue(), null));
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
@@ -127,9 +127,9 @@ public class ProfessorDAO {
 
 	public Professor findById(int id) throws SQLException, EntityNotFoundException {
 		Professor professor = null;
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue() + " WHERE id = ?";
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(null,
+					ProceduresViewsTables.VIEW_PROFESSOR.getValue(), new String[] { "id" }));
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -161,10 +161,9 @@ public class ProfessorDAO {
 		Professor professor = null;
 		try (Connection connection = application.getDataSource().getConnection()) {
 
-			String sql = "SELECT id, nome, email, senha FROM " + ProceduresViewsTables.VIEW_PROFESSOR.getValue()
-					+ " WHERE email = ? AND senha = ?";
-
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			PreparedStatement preparedStatement = connection
+					.prepareStatement(SqlUtils.montarViewTable("id, nome, email, senha",
+							ProceduresViewsTables.VIEW_PROFESSOR.getValue(), new String[] { "email", "senha" }));
 
 			int parametro = 1;
 			preparedStatement.setString(parametro++, email);

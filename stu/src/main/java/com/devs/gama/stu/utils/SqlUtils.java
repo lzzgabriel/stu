@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class SqlUtils {
@@ -28,7 +30,7 @@ public class SqlUtils {
 	}
 
 	/**
-	 * Método para montar a estrutura de uma páginação
+	 * Método para montar a estrutura de uma query com páginação
 	 * 
 	 * @param campos          Campos que serão buscados no select
 	 * @param nomeView        String Texto que será colocado no nome da view/tabela
@@ -41,10 +43,34 @@ public class SqlUtils {
 	public static String montarPaginacao(String campos, String nomeViewTable, String camposWhere, int posicao,
 			int padraoPaginacao) {
 		StringBuilder paginacao = new StringBuilder(
-				"select " + (campos != null && !campos.isEmpty() ? campos : "*") + " from " + nomeViewTable);
-		paginacao.append(camposWhere != null && !camposWhere.isEmpty() ? (" where " + camposWhere) : "");
+				"select " + (Objects.nonNull(campos) && !campos.isEmpty() ? campos : "*") + " from " + nomeViewTable);
+		paginacao.append(Objects.nonNull(camposWhere) && !camposWhere.isEmpty() ? (" where " + camposWhere) : "");
 		paginacao.append(" LIMIT " + posicao + ", " + padraoPaginacao);
 		return paginacao.toString();
+	}
+
+	/**
+	 * Método para montar a estrutura de uma query
+	 * 
+	 * @param campos      Campos que serão buscados no select
+	 * @param nomeView    String Texto que será colocado no nome da view/tabela
+	 * @param camposWhere Campos que serão utilizados na chave where
+	 * 
+	 * @return String o select em String
+	 */
+	public static String montarViewTable(String campos, String nomeViewTable, String[] camposWhere) {
+		List<String> listWhere = StringUtils.arrayToList(camposWhere);
+		StringBuilder viewTable = new StringBuilder(
+				"select " + (Objects.nonNull(campos) && !campos.isEmpty() ? campos : "*") + " from " + nomeViewTable);
+		StringBuilder whereClause = new StringBuilder();
+		if (Objects.nonNull(listWhere) && !listWhere.isEmpty()) {
+			whereClause.append(" WHERE ");
+			for (int i = 0; i < listWhere.size(); i++) {
+				whereClause.append((i > 0 ? " AND " : "") + listWhere.get(i) + " = ?");
+			}
+		}
+		viewTable.append(whereClause.toString());
+		return viewTable.toString();
 	}
 
 	/**

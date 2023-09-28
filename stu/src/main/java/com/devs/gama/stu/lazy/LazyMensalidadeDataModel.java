@@ -12,12 +12,9 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.daos.MensalidadeDAO;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
-import com.devs.gama.stu.entities.Professor;
-import com.devs.gama.stu.utils.SessionUtils;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.inject.Model;
-import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 
 @Model

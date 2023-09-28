@@ -113,9 +113,9 @@ public class AlunoDAO {
 
 	public List<Aluno> findAll() throws SQLException {
 		List<Aluno> returnList = new ArrayList<>();
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			PreparedStatement preparedStatement = conn.prepareStatement(
+					SqlUtils.montarViewTable(null, ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), null));
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
@@ -181,7 +181,6 @@ public class AlunoDAO {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
 			int parametro = 1;
-
 			if (Objects.nonNull(professor)) {
 				preparedStatement.setInt(parametro, professor.getId());
 			}
@@ -219,9 +218,9 @@ public class AlunoDAO {
 
 	public Aluno findById(int id) throws SQLException, EntityNotFoundException {
 		Aluno aluno = null;
-		String sql = "SELECT * FROM " + ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR + " WHERE id = ?";
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(null,
+					ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id" }));
 			int parametro = 1;
 			preparedStatement.setInt(parametro++, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
