@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<f:view>
+	<ui:composition template="/composites/template.xhtml">
+		<ui:define name="content">
+
+			<h:form>
+			
+			<p:growl id="messages"/>
+			
+				<p:datePicker value="#{stDebugPage.localDateTime}" showButtonBar="true" timeInput="true" showHour="true" showMinute="true" showSecond="true" />
+				
+				<p:inputText type="hidden" widgetVar="tmzTextVar"/>
+
+				<p:commandButton value="BVAI" actionListener="#{stDebugPage.displaytime()}" update="messages">
+					<f:setPropertyActionListener value="getUsrTmz()" target="#{stDebugPage.timeZone}"/>
+				</p:commandButton>
+				
+				<p:button value="DADA" onclick="alert(getUsrTmz())"/>
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</f:view>
+
+</html>

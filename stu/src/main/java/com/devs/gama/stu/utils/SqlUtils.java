@@ -3,6 +3,7 @@ package com.devs.gama.stu.utils;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -115,7 +116,7 @@ public class SqlUtils {
 	 * @return LocalDate da API java.time.LocalDate
 	 */
 	public static LocalDate dateToLocalDate(Date date) {
-		return LocalDate.ofInstant(date.toInstant(), ZoneId.systemDefault());
+		return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.of("UTC")).toLocalDate();
 	}
 
 	/**
@@ -126,7 +127,7 @@ public class SqlUtils {
 	 * @return LocalDateTime da API java.time.LocalDateTime
 	 */
 	public static LocalDateTime timestampToLocalDateTime(Timestamp timestamp) {
-		return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+		return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
 	}
 
 }

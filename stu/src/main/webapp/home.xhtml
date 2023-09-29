@@ -9,6 +9,10 @@
 	<ui:composition template="/composites/template.xhtml">
 		<ui:define name="content">
 		
+		<p:card title="DEBUG MEE" rendered="#{initParam['jakarta.faces.FACELETS_DEVELOPMENT']}">
+			<p:button value="Debug bug bug" href="debug.xhtml?faces-redirect=true"/>
+		</p:card>
+		
 		</ui:define>
 	</ui:composition>
 </f:view>

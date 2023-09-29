@@ -65,14 +65,6 @@
 				<artifactId>wildfly-maven-plugin</artifactId>
 				<version>4.2.0.Final</version>
 				<configuration>
-					<addUser>
-						<users>
-							<user>
-								<username>admin</username>
-								<password>gamaDevsStuAppAdmin123456789</password>
-							</user>
-						</users>
-					</addUser>
 					<debug>true</debug>
 					<debugPort>5005</debugPort>
 					<debugSuspend>true</debugSuspend>

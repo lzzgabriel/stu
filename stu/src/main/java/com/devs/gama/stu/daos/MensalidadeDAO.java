@@ -87,7 +87,7 @@ public class MensalidadeDAO {
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
-				mensalidade = fetch(resultSet);
+				mensalidade = fetchAtiva(resultSet);
 			}
 
 			ProcessamentoProcedure.closeResultSet(resultSet);
@@ -110,7 +110,7 @@ public class MensalidadeDAO {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
-				returnList.add(fetch(resultSet));
+				returnList.add(fetchAtiva(resultSet));
 			}
 
 			ProcessamentoProcedure.closeResultSet(resultSet);
@@ -120,9 +120,9 @@ public class MensalidadeDAO {
 		}
 	}
 
-	public Mensalidade fetch(ResultSet res) throws SQLException {
+	public Mensalidade fetchAtiva(ResultSet res) throws SQLException {
 		Mensalidade mensalidade = new Mensalidade();
-
+		
 		Aluno aluno = new Aluno();
 		aluno.setId(res.getInt("id_aluno"));
 		aluno.setNome(res.getString("aluno_nome"));

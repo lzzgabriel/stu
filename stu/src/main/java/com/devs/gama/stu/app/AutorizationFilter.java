@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.devs.gama.stu.pages.Pages;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -49,11 +51,11 @@ public class AutorizationFilter implements Filter {
 			}
 			
 			if (userLogged && reqUri.indexOf("/login.xhtml") >= 0) {
-				resp.sendRedirect(req.getContextPath() + "/index.xhtml");
+				resp.sendRedirect(req.getContextPath() + "/" + Pages.home.url);
 				return;
 			}
 			if (!userLogged && reqUri.indexOf("/login.xhtml") < 0) {
-				resp.sendRedirect(req.getContextPath() + "/login.xhtml");
+				resp.sendRedirect(req.getContextPath() + "/" + Pages.login.url);
 				return;
 			}
 			

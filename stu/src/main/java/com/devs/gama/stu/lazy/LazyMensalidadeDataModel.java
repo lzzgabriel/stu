@@ -26,7 +26,7 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 	private Application application;
 	
 	@Inject
-	private MensalidadeDAO MensalidadeDAO;
+	private MensalidadeDAO mensalidadeDAO;
 	
 	private Aluno aluno;
 	
@@ -45,7 +45,7 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 		try {
 			// TODO fazer filtragem de Mensalidades
 			// TODO pagination
-			return MensalidadeDAO.findAll();
+			return mensalidadeDAO.findAll();
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			return null;

@@ -7,10 +7,12 @@ import org.primefaces.model.LazyDataModel;
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Mensalidade;
 
+import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 @Named("stMensalidades")
+@ViewScoped
 public class Mensalidades implements Serializable {
 
 	private static final long serialVersionUID = 1L;

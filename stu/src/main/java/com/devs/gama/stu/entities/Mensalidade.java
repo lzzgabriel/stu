@@ -1,9 +1,12 @@
 package com.devs.gama.stu.entities;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Date;
 
 import com.devs.gama.stu.exceptions.CallNotFoundException;
 
@@ -15,7 +18,7 @@ public class Mensalidade {
 	private Status status;
 	private BigDecimal valor;
 	private FormaPagamento formaPagamento;
-	private LocalDateTime momentoPagamento;
+	private ZonedDateTime momentoPagamento;
 
 	public Aluno getAluno() {
 		return aluno;
@@ -31,6 +34,10 @@ public class Mensalidade {
 
 	public void setMensalidade(LocalDate mensalidade) {
 		this.mensalidade = mensalidade;
+	}
+	
+	public Date getProximoVencimentoAsDate() {
+		return Date.from(proximoVencimento.atStartOfDay(ZoneId.of("UTC")).toInstant());
 	}
 
 	public LocalDate getProximoVencimento() {
@@ -65,11 +72,11 @@ public class Mensalidade {
 		this.formaPagamento = formaPagamento;
 	}
 
-	public LocalDateTime getMomentoPagamento() {
+	public ZonedDateTime getMomentoPagamento() {
 		return momentoPagamento;
 	}
 
-	public void setMomentoPagamento(LocalDateTime momentoPagamento) {
+	public void setMomentoPagamento(ZonedDateTime momentoPagamento) {
 		this.momentoPagamento = momentoPagamento;
 	}
 
@@ -77,7 +84,9 @@ public class Mensalidade {
 		EM_ABERTO, ATRASADA;
 
 		public static Status parse(String s) {
-			return Arrays.asList(Status.values()).stream().filter(status -> s.equalsIgnoreCase(status.name()))
+			return Arrays.asList(Status.values())
+					.stream()
+					.filter(status -> s.equalsIgnoreCase(status.name().replaceAll("_", " ")))
 					.findFirst()
 					.orElseThrow(() -> new CallNotFoundException("Status da mensalidade não encontrado: " + s));
 		}

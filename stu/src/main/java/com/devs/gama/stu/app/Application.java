@@ -1,6 +1,7 @@
 package com.devs.gama.stu.app;
 
 import java.io.Serializable;
+import java.time.ZoneId;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -10,6 +11,7 @@ import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
@@ -22,11 +24,13 @@ public class Application implements Serializable {
 	private Logger logger = LogManager.getRootLogger();
 	
 	private DataSource dataSource;
-
-	public Application() {
+	
+	@PostConstruct
+	public void init() {
 		try {
 			Context c = InitialContext.doLookup("java:");
 			dataSource = (DataSource) c.lookup("/StuDB");
+			
 		} catch (NamingException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -39,5 +43,5 @@ public class Application implements Serializable {
 	public DataSource getDataSource() {
 		return dataSource;
 	}
-	
+
 }

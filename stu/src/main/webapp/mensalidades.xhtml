@@ -25,21 +25,48 @@
 
 							<p:dataTable id="dataTable" paginator="true" lazy="true"
 								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
-								paginatorPosition="bottom" rows="10"
+								paginatorPosition="bottom" rows="10" styleClass="grid"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
-								<p:column headerText="Nome">
-									<h:outputText value="#{mensalidade.aluno.nome}" />
+								<p:column styleClass="col-6">
+									<f:facet name="header">
+										<div class="flex justify-content-center">Nome</div>
+									</f:facet>
+									<div class="flex">
+										<h:outputText value="#{mensalidade.aluno.nome}" />
+									</div>
 								</p:column>
 
-								<p:column headerText="Valor cobrado atualmente">
-									<h:outputText value="#{mensalidade.aluno.email}" />
+								<p:column styleClass="col-2">
+									<f:facet name="header">
+										<div class="flex justify-content-center">Valor atual</div>
+									</f:facet>
+									<div class="flex justify-content-center">
+										<h:outputText value="#{mensalidade.valor}" styleClass="flex">
+											<f:convertNumber currencyCode="BRL" currencySymbol="R$"
+												type="currency" />
+										</h:outputText>
+									</div>
 								</p:column>
 
-								<p:column>
-									<p:commandButton icon="pi pi-history"
-										actionListener="#{stMensalidades.enableLogMode()}"
-										partialSubmit="true" process="@this" update="@form" />
+								<p:column styleClass="col-3">
+									<f:facet name="header">
+										<div class="flex justify-content-center">Próximo
+											vencimento</div>
+									</f:facet>
+									<div class="flex justify-content-center">
+										<h:outputText value="#{mensalidade.proximoVencimentoAsDate}">
+											<f:convertDateTime dateStyle="long" locale="pt_BR" />
+										</h:outputText>
+									</div>
+								</p:column>
+
+								<p:column styleClass="col-1">
+									<div class="flex justify-content-center">
+										<p:commandButton icon="pi pi-history"
+											actionListener="#{stMensalidades.enableLogMode()}"
+											partialSubmit="true" process="@this" update="@form" />
+									</div>
 								</p:column>
 
 							</p:dataTable>
@@ -56,23 +83,24 @@
 								<h2>Mensalidades</h2>
 							</p:outputPanel>
 
-							<p:dataTable id="dataTable" paginator="true" lazy="true"
+							<p:dataTable id="dataTable2" paginator="true" lazy="true"
 								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
 								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
-								<p:column headerText="Valor cobrado">
-									<h:outputText value="#{mensalidade.aluno.email}" />
+								<p:column headerText="Nome do aluno">
+									<h:outputText value="#{mensalidade.aluno.nome}" />
 								</p:column>
 
 								<p:column headerText="Valor cobrado">
-									<h:outputText value="#{mensalidade.aluno.email}" />
+									<h:outputText value="#{mensalidade.valor}">
+										<f:convertNumber type="currency" currencyCode="BRL" />
+									</h:outputText>
 								</p:column>
 
 								<p:column>
-									<p:commandButton icon="pi pi-history"
-										actionListener="#{stMensalidades.enableEditMode(aluno)}"
-										partialSubmit="true" process="@this" update="main" />
+									<p:commandButton icon="pi pi-history" partialSubmit="true"
+										process="@this" update="main" />
 								</p:column>
 
 							</p:dataTable>

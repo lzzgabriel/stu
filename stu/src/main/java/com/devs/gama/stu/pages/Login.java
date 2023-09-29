@@ -3,6 +3,8 @@ package com.devs.gama.stu.pages;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.util.Locale;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.daos.ProfessorDAO;
@@ -32,6 +34,10 @@ public class Login implements Serializable {
 	private String email;
 
 	private String senha;
+	
+	private ZoneId zoneId;
+	
+	private Locale locale;
 	
 	public void login() {
 		try {
@@ -83,6 +89,22 @@ public class Login implements Serializable {
 
 	public void setSenha(String senha) {
 		this.senha = senha;
+	}
+
+	public ZoneId getZoneId() {
+		return zoneId;
+	}
+
+	public void setZoneId(ZoneId zoneId) {
+		this.zoneId = zoneId;
+	}
+
+	public Locale getLocale() {
+		return locale;
+	}
+
+	public void setLocale(Locale locale) {
+		this.locale = locale;
 	}
 	
 }
