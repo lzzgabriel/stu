@@ -1,7 +1,6 @@
 package com.devs.gama.stu.app;
 
 import java.io.Serializable;
-import java.time.ZoneId;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;

@@ -30,6 +30,8 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 	
 	private Aluno aluno;
 	
+	private boolean logMode = false;
+	
 	@PostConstruct
 	public void init() {
 	}
@@ -60,5 +62,12 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 		this.aluno = aluno;
 	}
 
+	public boolean isLogMode() {
+		return logMode;
+	}
+
+	public void setLogMode(boolean logMode) {
+		this.logMode = logMode;
+	}
 	
 }

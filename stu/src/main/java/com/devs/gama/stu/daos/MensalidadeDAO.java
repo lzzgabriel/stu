@@ -13,7 +13,6 @@ import java.util.Objects;
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
-import com.devs.gama.stu.entities.Mensalidade.Status;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
@@ -130,7 +129,7 @@ public class MensalidadeDAO {
 		mensalidade.setAluno(aluno);
 
 		mensalidade.setValor(res.getBigDecimal("valor_cobrar"));
-		mensalidade.setStatus(Status.parse(res.getString("status")));
+		mensalidade.setStatus(Mensalidade.parse(res.getString("status")));
 		mensalidade.setProximoVencimento(SqlUtils.dateToLocalDate(res.getDate("proximo_vencimento")));
 
 		return mensalidade;

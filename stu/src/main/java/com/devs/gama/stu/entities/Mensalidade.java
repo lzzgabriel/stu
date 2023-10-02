@@ -4,17 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Date;
-
-import com.devs.gama.stu.exceptions.CallNotFoundException;
 
 public class Mensalidade {
 
 	private Aluno aluno;
 	private LocalDate mensalidade;
 	private LocalDate proximoVencimento;
-	private Status status;
+	private Boolean status;
 	private BigDecimal valor;
 	private FormaPagamento formaPagamento;
 	private ZonedDateTime momentoPagamento;
@@ -47,11 +44,11 @@ public class Mensalidade {
 		this.proximoVencimento = proximoVencimento;
 	}
 
-	public Status getStatus() {
+	public Boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(Status status) {
+	public void setStatus(Boolean status) {
 		this.status = status;
 	}
 
@@ -78,16 +75,11 @@ public class Mensalidade {
 	public void setMomentoPagamento(ZonedDateTime momentoPagamento) {
 		this.momentoPagamento = momentoPagamento;
 	}
-
-	public static enum Status {
-		EM_ABERTO, ATRASADA;
-
-		public static Status parse(String s) {
-			return Arrays.asList(Status.values())
-					.stream()
-					.filter(status -> s.equalsIgnoreCase(status.name().replaceAll("_", " ")))
-					.findFirst()
-					.orElseThrow(() -> new CallNotFoundException("Status da mensalidade não encontrado: " + s));
-		}
+	
+	public static Boolean parse(String s) {
+		if (s == null)
+			return null;
+		return (s.equalsIgnoreCase("em aberto") || s.equalsIgnoreCase("atrasada"));
 	}
+
 }

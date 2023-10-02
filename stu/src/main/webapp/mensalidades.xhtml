@@ -50,21 +50,27 @@
 									</div>
 								</p:column>
 
-								<p:column styleClass="col-3">
+								<p:column styleClass="col-2">
 									<f:facet name="header">
-										<div class="flex justify-content-center">Próximo
-											vencimento</div>
+										<div class="flex justify-content-center">Vencimento</div>
 									</f:facet>
 									<div class="flex justify-content-center">
 										<h:outputText value="#{mensalidade.proximoVencimentoAsDate}">
-											<f:convertDateTime dateStyle="long" locale="pt_BR" />
+											<f:convertDateTime dateStyle="short" locale="pt_BR" />
 										</h:outputText>
 									</div>
 								</p:column>
 
 								<p:column styleClass="col-1">
 									<div class="flex justify-content-center">
-										<p:tooltip for="@next"
+										<p:tag value="Aberta" severity="success" rendered="#{mensalidade.status}" />
+										<p:tag value="Atrasada" severity="danger" rendered="#{!mensalidade.status}" />
+									</div>
+								</p:column>
+
+								<p:column styleClass="col-1">
+									<div class="flex justify-content-center">
+										<p:tooltip for="@next" position="top"
 											value="Ver mensalidades cobradas para este aluno" />
 										<p:commandButton icon="pi pi-history"
 											styleClass="rounded-button"

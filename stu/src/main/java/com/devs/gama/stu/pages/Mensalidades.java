@@ -6,6 +6,7 @@ import org.primefaces.model.LazyDataModel;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Mensalidade;
+import com.devs.gama.stu.lazy.LazyMensalidadeDataModel;
 
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -21,19 +22,25 @@ public class Mensalidades implements Serializable {
 	private Application application;
 	
 	@Inject
-	private LazyDataModel<Mensalidade> lazyDataModel;
+	private LazyMensalidadeDataModel lazyDataModel;
 	
 	private boolean logMode = false;
 	
 	public void enableLogMode() {
 		logMode = true;
+		lazyDataModel.setLogMode(true);
+	}
+	
+	public void disableLogMode() {
+		logMode = false;
+		lazyDataModel.setLogMode(false);
 	}
 
 	public LazyDataModel<Mensalidade> getLazyDataModel() {
 		return lazyDataModel;
 	}
 
-	public void setLazyDataModel(LazyDataModel<Mensalidade> lazyDataModel) {
+	public void setLazyDataModel(LazyMensalidadeDataModel lazyDataModel) {
 		this.lazyDataModel = lazyDataModel;
 	}
 
