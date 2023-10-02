@@ -25,6 +25,7 @@
 
 							<p:dataTable id="dataTable" paginator="true" lazy="true"
 								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
+								emptyMessage="Nenhum registro encontrado"
 								paginatorPosition="bottom" rows="10" styleClass="grid"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
@@ -63,7 +64,10 @@
 
 								<p:column styleClass="col-1">
 									<div class="flex justify-content-center">
+										<p:tooltip for="@next"
+											value="Ver mensalidades cobradas para este aluno" />
 										<p:commandButton icon="pi pi-history"
+											styleClass="rounded-button"
 											actionListener="#{stMensalidades.enableLogMode()}"
 											partialSubmit="true" process="@this" update="@form" />
 									</div>
