@@ -13,8 +13,10 @@ import java.util.Objects;
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
+import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
+import com.devs.gama.stu.utils.ProcedureUtils;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
@@ -39,9 +41,9 @@ public class MensalidadeDAO {
 
 			callableStatement.registerOutParameter(param++, Types.INTEGER);
 
-			callableStatement.setInt(param++, mensalidade.getAluno().getId());
-			callableStatement.setDouble(param++, param);
-			callableStatement.setDate(param++, SqlUtils.localDateToDateUTC(mensalidade.getMensalidade()));
+			ProcedureUtils.setInt(param++, mensalidade.getAluno().getId(), callableStatement);
+			ProcedureUtils.setDouble(param++, mensalidade.getValor().doubleValue(), callableStatement);
+			ProcedureUtils.setDate(param++, mensalidade.getMensalidade(), callableStatement);
 
 			callableStatement.execute();
 
@@ -57,9 +59,9 @@ public class MensalidadeDAO {
 
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, mensalidade.getAluno().getId());
-			callableStatement.setDouble(parametro++, mensalidade.getValor().doubleValue());
-			callableStatement.setDate(parametro++, SqlUtils.localDateToDateUTC(mensalidade.getMensalidade()));
+			ProcedureUtils.setInt(parametro++, mensalidade.getAluno().getId(), callableStatement);
+			ProcedureUtils.setDouble(parametro++, mensalidade.getValor().doubleValue(), callableStatement);
+			ProcedureUtils.setDate(parametro++, mensalidade.getMensalidade(), callableStatement);
 
 			callableStatement.execute();
 
@@ -86,7 +88,7 @@ public class MensalidadeDAO {
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
-				mensalidade = fetchAtiva(resultSet);
+				mensalidade = fetch(resultSet);
 			}
 
 			ProcessamentoProcedure.closeResultSet(resultSet);
@@ -109,7 +111,7 @@ public class MensalidadeDAO {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
-				returnList.add(fetchAtiva(resultSet));
+				returnList.add(fetch(resultSet));
 			}
 
 			ProcessamentoProcedure.closeResultSet(resultSet);
@@ -119,9 +121,101 @@ public class MensalidadeDAO {
 		}
 	}
 
-	public Mensalidade fetchAtiva(ResultSet res) throws SQLException {
+	public int findCountMensalidadeAberta(Professor professor) throws SQLException {
+		int totalRegistros = 0;
+		String sql = "SELECT COUNT(ama.id_aluno) as totalRegistros FROM view_aluno_mensalidade_aberta ama JOIN view_aluno_de_professor vap ";
+		if (Objects.nonNull(professor)) {
+			sql += " where vap.id_professor = ? ";
+		}
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+
+			int parametro = 1;
+			if (Objects.nonNull(professor)) {
+				preparedStatement.setInt(parametro, professor.getId());
+			}
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (resultSet.next()) {
+				totalRegistros = resultSet.getInt("totalRegistros");
+			}
+
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+		}
+		return totalRegistros;
+	}
+
+	public List<Mensalidade> paginationMensalidadeAberta(Professor professor, int posicao, int padraoPaginacao)
+			throws SQLException {
+		List<Mensalidade> listaRetorno = new ArrayList<Mensalidade>();
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(
+					"ama.id_aluno, ama.aluno_nome, ama.valor_cobrar, ama.status, ama.proximo_vencimento, vap.id_professor",
+					"stu.view_aluno_mensalidade_aberta ama JOIN view_aluno_de_professor vap",
+					"vap.id_professor = " + professor.getId(), posicao, padraoPaginacao));
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				listaRetorno.add(fetch(resultSet));
+			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+		}
+		return listaRetorno;
+	}
+
+	public int findCountMensalidadeCobrada(Professor professor) throws SQLException {
+		int totalRegistros = 0;
+		String sql = "SELECT COUNT(ama.id_aluno) as totalRegistros FROM view_aluno_mensalidade_cobrada ama JOIN view_aluno_de_professor vap ";
+		if (Objects.nonNull(professor)) {
+			sql += " where vap.id_professor = ? ";
+		}
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+
+			int parametro = 1;
+			if (Objects.nonNull(professor)) {
+				preparedStatement.setInt(parametro, professor.getId());
+			}
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (resultSet.next()) {
+				totalRegistros = resultSet.getInt("totalRegistros");
+			}
+
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+		}
+		return totalRegistros;
+	}
+
+	public List<Mensalidade> paginationMensalidadeCobrada(Professor professor, int posicao, int padraoPaginacao)
+			throws SQLException {
+		List<Mensalidade> listaRetorno = new ArrayList<Mensalidade>();
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(
+					"amc.id_aluno, amc.aluno_nome, amc.valor_cobrar, amc.status, amc.proximo_vencimento, vap.id_professor",
+					"view_aluno_mensalidade_cobra amc JOIN view_aluno_de_professor vap",
+					"vap.id_professor = " + professor.getId(), posicao, padraoPaginacao));
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				listaRetorno.add(fetch(resultSet));
+			}
+			ProcessamentoProcedure.closeResultSet(resultSet);
+			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+		}
+		return listaRetorno;
+	}
+
+	public Mensalidade fetch(ResultSet res) throws SQLException {
 		Mensalidade mensalidade = new Mensalidade();
-		
+
 		Aluno aluno = new Aluno();
 		aluno.setId(res.getInt("id_aluno"));
 		aluno.setNome(res.getString("aluno_nome"));

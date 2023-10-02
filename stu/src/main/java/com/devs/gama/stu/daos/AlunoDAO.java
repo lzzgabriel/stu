@@ -17,6 +17,7 @@ import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
+import com.devs.gama.stu.utils.ProcedureUtils;
 import com.devs.gama.stu.utils.ProcessamentoProcedure;
 import com.devs.gama.stu.utils.SqlUtils;
 
@@ -37,10 +38,10 @@ public class AlunoDAO {
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO.getValue(), 4, 1));
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setString(parametro++, aluno.getNome());
-			callableStatement.setString(parametro++, aluno.getEmail());
-			callableStatement.setString(parametro++, aluno.getCelularUnmasked());
-			callableStatement.setInt(parametro++, professor.getId());
+			ProcedureUtils.setString(parametro++, aluno.getNome(), callableStatement);
+			ProcedureUtils.setString(parametro++, aluno.getEmail(), callableStatement);
+			ProcedureUtils.setString(parametro++, aluno.getCelularUnmasked(), callableStatement);
+			ProcedureUtils.setInt(parametro++, professor.getId(), callableStatement);
 
 			callableStatement.execute();
 
@@ -56,10 +57,10 @@ public class AlunoDAO {
 
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, aluno.getId());
-			callableStatement.setString(parametro++, aluno.getNome());
-			callableStatement.setString(parametro++, aluno.getEmail());
-			callableStatement.setString(parametro++, aluno.getCelularUnmasked());
+			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
+			ProcedureUtils.setString(parametro++, aluno.getNome(), callableStatement);
+			ProcedureUtils.setString(parametro++, aluno.getEmail(), callableStatement);
+			ProcedureUtils.setString(parametro++, aluno.getCelularUnmasked(), callableStatement);
 
 			callableStatement.execute();
 
@@ -76,9 +77,9 @@ public class AlunoDAO {
 
 			int parametro = 1;
 			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, aluno.getId());
-			callableStatement.setDouble(parametro++, valorCobrado);
-			callableStatement.setDate(parametro++, SqlUtils.localDateToDateUTC(mensalidadeVigente));
+			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
+			ProcedureUtils.setDouble(parametro++, valorCobrado, callableStatement);
+			ProcedureUtils.setDate(parametro++, mensalidadeVigente, callableStatement);
 
 			callableStatement.execute();
 
@@ -93,9 +94,9 @@ public class AlunoDAO {
 					.montarProcedure(ProceduresViewsTables.PROCEDURE_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3, 0));
 
 			int parametro = 1;
-			callableStatement.setInt(parametro++, aluno.getId());
-			callableStatement.setDate(parametro++, SqlUtils.localDateToDateUTC(LocalDate.now()));
-			callableStatement.setInt(parametro++, formaPagameto.getId());
+			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
+			ProcedureUtils.setDate(parametro++, LocalDate.now(), callableStatement);
+			ProcedureUtils.setInt(parametro++, formaPagameto.getId(), callableStatement);
 
 			callableStatement.execute();
 
@@ -132,27 +133,10 @@ public class AlunoDAO {
 			CallableStatement callableStatement = conn.prepareCall(
 					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_FILTRAR_ALUNOS.getValue(), 4, 0));
 			int parametro = 1;
-			if (Objects.isNull(aluno.getId())) {
-				callableStatement.setNull(parametro++, Types.INTEGER);
-			} else {
-				callableStatement.setInt(parametro++, aluno.getId());
-			}
-			if (Objects.isNull(aluno.getNome())) {
-				callableStatement.setNull(parametro++, Types.VARCHAR);
-			} else {
-				callableStatement.setString(parametro++, aluno.getNome());
-			}
-			if (Objects.isNull(aluno.getAtivo())) {
-				callableStatement.setNull(parametro++, Types.TINYINT);
-			} else {
-				callableStatement.setBoolean(parametro++, aluno.getAtivo());
-			}
-			if (Objects.isNull(aluno.getMomentoCadastro())) {
-				callableStatement.setNull(parametro++, Types.TIMESTAMP);
-			} else {
-				callableStatement.setTimestamp(parametro++,
-						SqlUtils.localDateTimeToTimestampUTC(aluno.getMomentoCadastro()));
-			}
+			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
+			ProcedureUtils.setString(parametro++, aluno.getNome(), callableStatement);
+			ProcedureUtils.setBoolean(parametro++, aluno.getAtivo(), callableStatement);
+			ProcedureUtils.setTimestamp(parametro++, aluno.getMomentoCadastro(), callableStatement);
 
 			ResultSet resultSet = callableStatement.executeQuery();
 

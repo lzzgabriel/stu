@@ -68,12 +68,11 @@ CREATE TABLE `mensalidade_aberta` (
 
 CREATE TABLE `mensalidade_cobrada` (
   `id_aluno` int NOT NULL,
-  `mensalidade` date NOT NULL,
   `valor_cobrado` decimal(10,0) DEFAULT NULL,
-  `data_vencimento` date DEFAULT NULL,
+  `data_vencimento` date NOT NULL,
   `id_forma_pagamento` int NOT NULL,
   `momento_pagamento` timestamp NOT NULL,
-  PRIMARY KEY (`id_aluno`,`mensalidade`),
+  PRIMARY KEY (`id_aluno`,`data_vencimento`),
   KEY `mensalidade_cobrada_FK` (`id_forma_pagamento`),
   CONSTRAINT `mensalidade_cobrada_FK` FOREIGN KEY (`id_forma_pagamento`) REFERENCES `forma_pagamento` (`id`),
   CONSTRAINT `mensalidades_cobradas_FK` FOREIGN KEY (`id_aluno`) REFERENCES `aluno` (`id`)
