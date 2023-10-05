@@ -1,317 +1,306 @@
--- ALTERAR_SENHA_PROFESSOR
-DROP PROCEDURE IF EXISTS `ALTERAR_SENHA_PROFESSOR`;
-DELIMITER $$
-CREATE PROCEDURE `ALTERAR_SENHA_PROFESSOR`(OUT retId INT, IN id_professor INT, 
-	IN senhaAtual VARCHAR(100), IN senhaDestino VARCHAR(100))
+CREATE OR REPLACE FUNCTION public.alterar_senha_professor(id_professor integer, senhaatual character varying, senhadestino character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    professor_exists BOOLEAN;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
-END;
-SET retId = 0;
-IF id_professor IS NOT NULL THEN 
-	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_professor AND vp.senha = senhaAtual) THEN
-		UPDATE stu.professor p SET p.senha = senhaDestino WHERE p.id = id_professor;
-		SET retId = 1;
-	END IF;
-END IF;
-END$$
-DELIMITER ;
-
--- ASSOCIAR_ALUNO_PROFESSOR
-DROP PROCEDURE IF EXISTS `ASSOCIAR_ALUNO_PROFESSOR`;
-DELIMITER $$
-CREATE PROCEDURE `ASSOCIAR_ALUNO_PROFESSOR`(OUT retId INT, IN id_p INT, IN id_a INT)
-BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
-END;
-SET retId = 0;
-IF id_p IS NOT NULL AND id_a IS NOT NULL THEN
-	IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_p) AND EXISTS
-	(SELECT 1 FROM aluno a WHERE a.id = id_a) THEN
-		INSERT INTO aluno_de_professor(id_aluno, id_professor) VALUES (id_a, id_p);
-        SET retId = 1;
+    SELECT EXISTS (SELECT 1 from stu.professor p WHERE p.id = id_professor AND p.senha = senhaAtual) INTO professor_exists;
+    IF professor_exists THEN
+        UPDATE stu.professor p SET p.senha = senhaDestino WHERE p.id = id_professor;
+        retId := 1;
     END IF;
-END IF;
-end$$
-DELIMITER ;
-
--- CADASTRAR_ALUNO
-DROP PROCEDURE IF EXISTS `CADASTRAR_ALUNO`;
-DELIMITER $$
-CREATE PROCEDURE `CADASTRAR_ALUNO`(
-OUT retId INT,
-IN a_nome varchar(100),
-IN a_email varchar(100),
-IN a_celular varchar(11),
-IN p_id INT)
-BEGIN
-DECLARE novo_id INT;
-DECLARE resultAssociacao INT;
-DECLARE resultGerarMensalidade INT;
-
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
+$function$
+;
 
-SET resultAssociacao = 0, retId = 0, resultGerarMensalidade = 0;
-INSERT INTO stu.aluno(nome, email, celular)
-VALUES (a_nome, a_email, a_celular); -- inserir tabela aluno
-SET novo_id = LAST_INSERT_ID(); -- recuperar novo id
-CALL ASSOCIAR_ALUNO_PROFESSOR(resultAssociacao, p_id, novo_id);
-CALL GERAR_MENSALIDADE_ABERTA(resultGerarMensalidade, novo_id, 400.0, '2023-09-20');
-IF resultAssociacao = 1 AND resultGerarMensalidade = 1 THEN
-	SET retId = novo_id;
-END IF;
-END$$
-DELIMITER ;
-
--- CADASTRAR_FORMA_PAGAMENTO
-DROP PROCEDURE IF EXISTS `CADASTRAR_FORMA_PAGAMENTO`;
-DELIMITER $$
-CREATE PROCEDURE `CADASTRAR_FORMA_PAGAMENTO`(OUT retId INT, IN f_descricao VARCHAR(100))
+CREATE OR REPLACE FUNCTION public.associar_aluno_professor(id_p integer, id_a integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    professor_exists BOOLEAN;
+    student_exists BOOLEAN;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    SELECT EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_p) INTO professor_exists;
+    SELECT EXISTS (SELECT 1 FROM aluno a WHERE a.id = id_a) INTO student_exists;
+    IF professor_exists AND student_exists THEN
+        INSERT INTO aluno_de_professor(id_aluno, id_professor) VALUES (id_a, id_p);
+        retId := 1;
+    END IF;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-INSERT INTO stu.forma_pagamento (descricao) VALUES (f_descricao);
-SET retId = LAST_INSERT_ID();
-END$$
-DELIMITER ;
+$function$
+;
 
--- CADASTRAR_PROFESSOR
-DROP PROCEDURE IF EXISTS `CADASTRAR_PROFESSOR`;
-DELIMITER $$
-CREATE PROCEDURE `CADASTRAR_PROFESSOR`(OUT retId INT,
-         IN p_nome VARCHAR(100),
-         IN p_email VARCHAR(100),
-         IN p_senha VARCHAR(100))
+CREATE OR REPLACE FUNCTION public.cadastrar_aluno(a_nome character varying, a_email character varying, a_celular character varying, p_id integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    novo_id INT;
+    resultAssociacao INT;
+    resultGerarMensalidade INT;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK;
+    INSERT INTO stu.aluno(nome, email, celular)
+    VALUES (a_nome, a_email, a_celular)
+    RETURNING id INTO novo_id;
+    PERFORM ASSOCIAR_ALUNO_PROFESSOR(resultAssociacao, p_id, novo_id);
+    PERFORM GERAR_MENSALIDADE_ABERTA(resultGerarMensalidade, novo_id, 400.0, '2023-09-20');
+    IF resultAssociacao = 1 AND resultGerarMensalidade = 1 THEN
+        retId := novo_id;
+    END IF;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-	INSERT INTO stu.professor (nome, email, senha) 
-    VALUES (p_nome, p_email, p_senha);
-	SET retId = LAST_INSERT_ID();
-END$$
-DELIMITER ;
+$function$
+;
 
--- CONFIRMAR_PAGAMENTO
-DROP PROCEDURE IF EXISTS `CONFIRMAR_PAGAMENTO`;
-DELIMITER $$
-CREATE PROCEDURE `CONFIRMAR_PAGAMENTO`(in p_id_aluno int, in p_momento_pagamento timestamp, in p_id_forma_pagamento int)
-begin
+CREATE OR REPLACE FUNCTION public.cadastrar_forma_pagamento(f_descricao character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    novo_id INT;
 BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    INSERT INTO stu.forma_pagamento (descricao)
+    VALUES (f_descricao)
+    RETURNING id INTO novo_id;
+    retId := novo_id;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-	select 
-	ma.id_aluno,
-	ma.valor_cobrar,
-	ma.proximo_vencimento,
-	ma.mensalidade 
-	
-	into
-	@id,
-	@valor,
-	@vencimento,
-	@mensalidade
-	
-	from stu.mensalidade_aberta ma
-	where ma.id_aluno = p_id_aluno;
+$function$
+;
 
-	insert into mensalidade_cobrada
-	(id_aluno,
-	mensalidade,
-	valor_cobrado,
-	data_vencimento,
-	id_forma_pagamento,
-	momento_pagamento)
-	
-	values (@id, @mensalidade, @valor, @vencimento,
-			p_id_forma_pagamento, p_momento_pagamento);
-		
-	update mensalidade_aberta
-	set
-	proximo_vencimento = adddate(@vencimento, interval 1 month)
-	where id_aluno = p_id_aluno;
-END$$
-DELIMITER ;
-
--- DELETE_FORMA_PAGAMENTO
-DROP PROCEDURE IF EXISTS `DELETE_FORMA_PAGAMENTO`;
-DELIMITER $$
-CREATE PROCEDURE `DELETE_FORMA_PAGAMENTO`(OUT result INT, IN f_id INT)
+CREATE OR REPLACE FUNCTION public.cadastrar_professor(p_nome character varying, p_email character varying, p_senha character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    novo_id INT;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    INSERT INTO stu.professor (nome, email, senha)
+    VALUES (p_nome, p_email, p_senha)
+    RETURNING id INTO novo_id;
+    retId := novo_id;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-IF f_id IS NULL THEN
-	SET result = 0;
-ELSE
-	SET result = 0;
-	IF EXISTS (SELECT 1 FROM view_formas_pagamento vf WHERE vf.id = f_id) THEN
-		DELETE FROM forma_pagamento f WHERE f.id = f_id;
-		SET result = 1;
-	END IF;
-END IF;
-END$$
-DELIMITER ;
+$function$
+;
 
--- DELETE_ALUNO
-DROP PROCEDURE IF EXISTS `DELETE_ALUNO`;
-DELIMITER $$
-CREATE PROCEDURE `DELETE_ALUNO`(OUT retId INT, IN a_id INT)
+CREATE OR REPLACE FUNCTION public.confirmar_pagamento(p_id_aluno integer, p_momento_pagamento timestamp without time zone, p_id_forma_pagamento integer)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    id INT;
+    valor DECIMAL;
+    vencimento DATE;
+    mensalidade DECIMAL;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    SELECT id_aluno, valor_cobrar, proximo_vencimento, mensalidade
+    INTO id, valor, vencimento, mensalidade
+    FROM stu.mensalidade_aberta
+    WHERE id_aluno = p_id_aluno;
+
+    INSERT INTO stu.mensalidade_cobrada (id_aluno, mensalidade, valor_cobrado, data_vencimento, id_forma_pagamento, momento_pagamento)
+    VALUES (id, mensalidade, valor, vencimento, p_id_forma_pagamento, p_momento_pagamento);
+
+    UPDATE stu.mensalidade_aberta
+    SET proximo_vencimento = vencimento + INTERVAL '1 month'
+    WHERE id_aluno = p_id_aluno;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-IF a_id IS NULL THEN
-	SET retId = 0;
-ELSE
-	SET retId = 0;
-	IF EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = a_id) THEN
-		DELETE FROM aluno a WHERE a.id = a_id;
-		SET retId = 1;
-	END IF;
-END IF;
-END$$
-DELIMITER ;
+$function$
+;
 
--- DELETE_PROFESSOR
-DROP PROCEDURE IF EXISTS `DELETE_PROFESSOR`;
-DELIMITER $$
-CREATE PROCEDURE `DELETE_PROFESSOR`(OUT result INT, IN p_id INT)
+CREATE OR REPLACE FUNCTION public.delete_aluno(a_id integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    aluno_exists BOOLEAN;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    IF a_id IS NOT NULL THEN
+        SELECT EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = a_id) INTO aluno_exists;
+        IF aluno_exists THEN
+            DELETE FROM stu.aluno a WHERE a.id = a_id;
+            retId := 1;
+        END IF;
+    END IF;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
+$function$
+;
 
-IF p_id IS NULL THEN
-	SET result = 0;
-ELSE
-	SET result = 0;
-	 IF EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id) THEN
-		DELETE FROM professor p WHERE p.id = p_id;
-		 SET result = 1;
-	 END IF;
-END IF;
-END$$
-DELIMITER ;
-
--- EDITAR_ALUNO
-DROP PROCEDURE IF EXISTS `EDITAR_ALUNO`;
-DELIMITER $$
-CREATE PROCEDURE `EDITAR_ALUNO`(
-OUT retId INT,
-IN a_id INT,
-IN a_nome varchar(100),
-IN a_email varchar(100),
-IN a_celular varchar(11))
+CREATE OR REPLACE FUNCTION public.delete_forma_pagamento(f_id integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    result INT := 0;
+    forma_pagamento_exists BOOLEAN;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    IF f_id IS NOT NULL THEN
+        SELECT EXISTS (SELECT 1 FROM view_formas_pagamento vf WHERE vf.id = f_id) INTO forma_pagamento_exists;
+        IF forma_pagamento_exists THEN
+            DELETE FROM stu.forma_pagamento f WHERE f.id = f_id;
+            result := 1;
+        END IF;
+    END IF;
+    RETURN result;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-SET retId = 0;
-IF EXISTS(SELECT 1 FROM stu.aluno a WHERE a.id = a_id) THEN
-	UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
-	WHERE a.id = a_id; 
-	SET retId = 1;
-END IF;
-END$$
-DELIMITER ;
+$function$
+;
 
--- EDITAR_FORMA_PAGAMENTO
-DROP PROCEDURE IF EXISTS `EDITAR_FORMA_PAGAMENTO`;
-DELIMITER $$
-CREATE PROCEDURE `EDITAR_FORMA_PAGAMENTO`(OUT result INT, IN f_id INT, IN f_descricao VARCHAR(50))
+CREATE OR REPLACE FUNCTION public.delete_professor(p_id integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    result INT := 0;
+    professor_exists BOOLEAN;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    IF p_id IS NOT NULL THEN
+        SELECT EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id) INTO professor_exists;
+        IF professor_exists THEN
+            DELETE FROM stu.professor p WHERE p.id = p_id;
+            result := 1;
+        END IF;
+    END IF;
+    RETURN result;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-SET result = 0;
-IF EXISTS (SELECT 1 FROM forma_pagamento fp WHERE fp.id = f_id) THEN
-	UPDATE  forma_pagamento fp SET fp.descricao = f_descricao WHERE fp.id = f_id; 
-	SET result = 1;
-END IF;
-END$$
-DELIMITER ;
+$function$
+;
 
--- EDITAR_MENSALIDADE_ABERTA
-DROP PROCEDURE IF EXISTS `EDITAR_MENSALIDADE_ABERTA`;
-DELIMITER $$
-CREATE PROCEDURE `EDITAR_MENSALIDADE_ABERTA`(OUT retId INT, IN a_id INT, IN valor_atualizado DECIMAL,
-IN nova_data DATE)
+CREATE OR REPLACE FUNCTION public.editar_aluno(a_id integer, a_nome character varying, a_email character varying, a_celular character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    aluno_exists BOOLEAN;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    SELECT EXISTS (SELECT 1 FROM stu.aluno a WHERE a.id = a_id) INTO aluno_exists;
+    IF aluno_exists THEN
+        UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
+        WHERE a.id = a_id;
+        retId := 1;
+    END IF;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-SET retId = 0;
-IF a_id IS NOT NULL AND EXISTS (SELECT 1 FROM stu.mensalidade_aberta ma WHERE ma.id_aluno = a_id) THEN
-	UPDATE stu.mensalidade_aberta ma SET ma.valor_cobrar = valor_atualizado, 
-	ma.proximo_vencimento = nova_data WHERE ma.id_aluno = a_id; 
-	SET retId = 1;
-END IF;
-END$$
-DELIMITER ;
+$function$
+;
 
--- EDITAR_PROFESSOR
-DROP PROCEDURE IF EXISTS `EDITAR_PROFESSOR`;
-DELIMITER $$
-CREATE PROCEDURE `EDITAR_PROFESSOR`(OUT retId INT,
-         IN p_id INT,
-         IN p_nome VARCHAR(100),
-         IN p_email VARCHAR(100),
-         IN p_senha VARCHAR(100))
+CREATE OR REPLACE FUNCTION public.editar_forma_pagamento(f_id integer, f_descricao character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    result INT := 0;
+    forma_pagamento_exists BOOLEAN;
 BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    SELECT EXISTS (SELECT 1 FROM stu.forma_pagamento fp WHERE fp.id = f_id) INTO forma_pagamento_exists;
+    IF forma_pagamento_exists THEN
+        UPDATE stu.forma_pagamento fp SET fp.descricao = f_descricao WHERE fp.id = f_id;
+        result := 1;
+    END IF;
+    RETURN result;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-SET retId = 0;
-IF EXISTS (SELECT 1 FROM professor p WHERE p.id = p_id AND p.ativo = 1) THEN
-	UPDATE stu.professor p SET p.nome = p_nome, p.email = p_email WHERE p.id = p_id;
-	SET retId = 1;
-END IF;
-END$$
-DELIMITER ;
+$function$
+;
 
-DELIMITER $$
-CREATE PROCEDURE `FILTRAR_ALUNOS`(in id_aluno INT, in nome_aluno VARCHAR(100),
- in ativo TINYINT, in momento_cadastro TIMESTAMP)
+CREATE OR REPLACE FUNCTION public.editar_mensalidade_aberta(a_id integer, valor_atualizado numeric, nova_data date)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    mensalidade_aberta_exists BOOLEAN;
 BEGIN
-SELECT * FROM stu.aluno a WHERE (id_aluno IS NULL OR a.id =  id_aluno) 
-AND (nome_aluno IS NULL OR a.nome =  nome_aluno) AND (ativo IS NULL OR a.ativo =  ativo) 
-AND (momento_cadastro IS NULL OR a.momento_cadastro =  momento_cadastro);
-END$$
-DELIMITER ;
-
--- GERAR_MENSALIDADE_ABERTA
-DROP PROCEDURE IF EXISTS `GERAR_MENSALIDADE_ABERTA`;
-DELIMITER $$
-CREATE PROCEDURE `GERAR_MENSALIDADE_ABERTA`(OUT retId INT, IN id_aluno INT, 
-IN valor_cobrar DECIMAL, IN mensalidade DATE)
-BEGIN
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-    ROLLBACK; 
+    IF a_id IS NOT NULL THEN
+        SELECT EXISTS (SELECT 1 FROM stu.mensalidade_aberta ma WHERE ma.id_aluno = a_id) INTO mensalidade_aberta_exists;
+        IF mensalidade_aberta_exists THEN
+            UPDATE stu.mensalidade_aberta ma SET ma.valor_cobrar = valor_atualizado, ma.proximo_vencimento = nova_data WHERE ma.id_aluno = a_id;
+            retId := 1;
+        END IF;
+    END IF;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
 END;
-SET retId = 0;
-IF id_aluno IS NOT NULL AND EXISTS (SELECT 1 FROM stu.aluno a WHERE a.id = id_aluno) THEN
-	INSERT INTO mensalidade_aberta(id_aluno, proximo_vencimento, valor_cobrar) 
-    VALUES (id_aluno, mensalidade, valor_cobrar);
-    SET retId = 1;
-END IF;
-END$$
-DELIMITER ;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.editar_professor(p_id integer, p_nome character varying, p_email character varying, p_senha character varying)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    retId INT := 0;
+    professor_exists BOOLEAN;
+BEGIN
+    SELECT EXISTS (SELECT 1 FROM stu.professor p WHERE p.id = p_id AND p.ativo = 1) INTO professor_exists;
+    IF professor_exists THEN
+        UPDATE stu.professor p SET p.nome = p_nome, p.email = p_email WHERE p.id = p_id;
+        retId := 1;
+    END IF;
+    RETURN retId;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+$function$
+;

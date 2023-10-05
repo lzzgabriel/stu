@@ -1,79 +1,98 @@
--- stu.aluno definition
+-- public.aluno definition
 
-CREATE TABLE `aluno` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(100) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `celular` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `ativo` tinyint NOT NULL DEFAULT '1',
-  `momento_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=319 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Drop table
 
+-- DROP TABLE aluno;
 
--- stu.forma_pagamento definition
-
-CREATE TABLE `forma_pagamento` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `descricao` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE aluno (
+	id bigserial NOT NULL,
+	nome text NOT NULL,
+	email text NULL,
+	celular varchar(11) NOT NULL,
+	ativo bool NULL DEFAULT true,
+	momento_cadastro timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT aluno_pk PRIMARY KEY (id),
+	CONSTRAINT aluno_un UNIQUE (email)
+);
 
 
--- stu.professor definition
+-- public.forma_pagamento definition
 
-CREATE TABLE `professor` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `senha` varchar(100) NOT NULL,
-  `ativo` tinyint NOT NULL DEFAULT '1',
-  `momento_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `professor_un` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Drop table
 
+-- DROP TABLE forma_pagamento;
 
--- stu.aluno_de_professor definition
+CREATE TABLE forma_pagamento (
+	id bigserial NOT NULL,
+	descricao text NULL,
+	CONSTRAINT forma_pagamento_pk PRIMARY KEY (id)
+);
 
 
+-- public.professor definition
 
-CREATE TABLE `aluno_de_professor` (
-  `id_aluno` int NOT NULL,
-  `id_professor` int NOT NULL,
-  PRIMARY KEY (`id_aluno`,`id_professor`),
-  KEY `aluno_de_professor_FK_1` (`id_professor`),
-  CONSTRAINT `aluno_de_professor_FK` FOREIGN KEY (`id_aluno`) REFERENCES `aluno` (`id`),
-  CONSTRAINT `aluno_de_professor_FK_1` FOREIGN KEY (`id_professor`) REFERENCES `professor` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Drop table
 
+-- DROP TABLE professor;
 
--- stu.mensalidade_aberta definition
-
-CREATE TABLE `mensalidade_aberta` (
-  `id_aluno` int NOT NULL,
-  `valor_cobrar` decimal(10,2) NOT NULL,
-  `proximo_vencimento` date NOT NULL,
-  `status` varchar(10) NOT NULL DEFAULT 'em aberto',
-  `mensalidade` date NOT NULL,
-  `momento_ultimo_pagamento` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id_aluno`),
-  CONSTRAINT `mensalidade_aluno_ativa_FK` FOREIGN KEY (`id_aluno`) REFERENCES `aluno` (`id`),
-  CONSTRAINT `check_status` CHECK ((`status` in (_utf8mb4'em aberto',_utf8mb4'atrasada')))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE professor (
+	id bigserial NOT NULL,
+	nome text NOT NULL,
+	email text NOT NULL,
+	senha text NOT NULL,
+	ativo bool NOT NULL DEFAULT true,
+	momento_cadastro timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT professor_pk PRIMARY KEY (id),
+	CONSTRAINT professor_un UNIQUE (email)
+);
 
 
--- stu.mensalidade_cobrada definition
+-- public.aluno_de_professor definition
 
-CREATE TABLE `mensalidade_cobrada` (
-  `id_aluno` int NOT NULL,
-  `valor_cobrado` decimal(10,0) DEFAULT NULL,
-  `data_vencimento` date NOT NULL,
-  `id_forma_pagamento` int NOT NULL,
-  `momento_pagamento` timestamp NOT NULL,
-  PRIMARY KEY (`id_aluno`,`data_vencimento`),
-  KEY `mensalidade_cobrada_FK` (`id_forma_pagamento`),
-  CONSTRAINT `mensalidade_cobrada_FK` FOREIGN KEY (`id_forma_pagamento`) REFERENCES `forma_pagamento` (`id`),
-  CONSTRAINT `mensalidades_cobradas_FK` FOREIGN KEY (`id_aluno`) REFERENCES `aluno` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Drop table
+
+-- DROP TABLE aluno_de_professor;
+
+CREATE TABLE aluno_de_professor (
+	id_aluno int8 NOT NULL,
+	id_professor int8 NOT NULL,
+	CONSTRAINT aluno_de_professor_pk PRIMARY KEY (id_aluno, id_professor),
+	CONSTRAINT aluno_de_professor_fk FOREIGN KEY (id_aluno) REFERENCES aluno(id),
+	CONSTRAINT aluno_de_professor_fk_1 FOREIGN KEY (id_professor) REFERENCES professor(id)
+);
+
+
+-- public.mensalidade_aberta definition
+
+-- Drop table
+
+-- DROP TABLE mensalidade_aberta;
+
+CREATE TABLE mensalidade_aberta (
+	id_aluno int8 NOT NULL,
+	valor_cobrar numeric(10, 2) NOT NULL,
+	proximo_vencimento date NOT NULL,
+	status varchar(10) NOT NULL DEFAULT 'em aberto'::character varying,
+	momento_ultimo_pagamento timestamp NULL,
+	CONSTRAINT mensalidade_aberta_check CHECK (((status)::text = ANY ((ARRAY['em aberto'::character varying, 'atrasada'::character varying])::text[]))),
+	CONSTRAINT mensalidade_aberta_pk PRIMARY KEY (id_aluno),
+	CONSTRAINT mensalidade_aberta_fk FOREIGN KEY (id_aluno) REFERENCES aluno(id)
+);
+
+
+-- public.mensalidade_cobrada definition
+
+-- Drop table
+
+-- DROP TABLE mensalidade_cobrada;
+
+CREATE TABLE mensalidade_cobrada (
+	id_aluno int8 NOT NULL,
+	valor_cobrado numeric(10, 2) NULL DEFAULT NULL::numeric,
+	data_vencimento date NOT NULL,
+	id_forma_pagamento int8 NOT NULL,
+	momento_pagamento timestamp NOT NULL,
+	CONSTRAINT mensalidade_cobrada_pk PRIMARY KEY (id_aluno, data_vencimento),
+	CONSTRAINT mensalidade_cobrada_fk FOREIGN KEY (id_forma_pagamento) REFERENCES forma_pagamento(id),
+	CONSTRAINT mensalidade_cobrada_fk_2 FOREIGN KEY (id_aluno) REFERENCES aluno(id)
+);
