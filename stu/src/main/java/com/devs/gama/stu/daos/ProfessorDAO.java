@@ -4,12 +4,10 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,7 +16,7 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
-import com.devs.gama.stu.utils.ProcessamentoProcedure;
+import com.devs.gama.stu.utils.ProcessamentoFuncoes;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -35,56 +33,53 @@ public class ProfessorDAO {
 	public void save(Professor professor) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 3, 1));
+			PreparedStatement preparedStatement = conn.prepareCall(
+					SqlUtils.montarFuncao(ProceduresViewsTables.PROCEDURE_CADASTRAR_PROFESSOR.getValue(), 3));
 
 			int parametro = 1;
 
-			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setString(parametro++, professor.getNome());
-			callableStatement.setString(parametro++, professor.getEmail());
-			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
-			callableStatement.execute();
+			preparedStatement.setString(parametro++, professor.getNome());
+			preparedStatement.setString(parametro++, professor.getEmail());
+			preparedStatement.setString(parametro++, hashSenha(professor.getSenha()));
+			preparedStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 	}
 
 	public void edit(Professor professor) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_EDITAR_PROFESSOR.getValue(), 4, 1));
+			PreparedStatement preparedStatement = conn
+					.prepareCall(SqlUtils.montarFuncao(ProceduresViewsTables.PROCEDURE_EDITAR_PROFESSOR.getValue(), 4));
 
 			int parametro = 1;
 
-			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, professor.getId());
-			callableStatement.setString(parametro++, professor.getNome());
-			callableStatement.setString(parametro++, professor.getEmail());
-			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
-			callableStatement.execute();
+			preparedStatement.setInt(parametro++, professor.getId());
+			preparedStatement.setString(parametro++, professor.getNome());
+			preparedStatement.setString(parametro++, professor.getEmail());
+			preparedStatement.setString(parametro++, hashSenha(professor.getSenha()));
+			preparedStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 	}
 
 	public void changePassword(Professor professor, String novaSenha) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_ALTERAR_SENHA_PROFESSOR.getValue(), 3, 1));
+			PreparedStatement preparedStatement = conn.prepareCall(
+					SqlUtils.montarFuncao(ProceduresViewsTables.PROCEDURE_ALTERAR_SENHA_PROFESSOR.getValue(), 3));
 
 			int parametro = 1;
 
-			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			callableStatement.setInt(parametro++, professor.getId());
-			callableStatement.setString(parametro++, hashSenha(professor.getSenha()));
-			callableStatement.setString(parametro++, hashSenha(novaSenha));
-			callableStatement.execute();
+			preparedStatement.setInt(parametro++, professor.getId());
+			preparedStatement.setString(parametro++, hashSenha(professor.getSenha()));
+			preparedStatement.setString(parametro++, hashSenha(novaSenha));
+			preparedStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 	}
 
@@ -105,10 +100,10 @@ public class ProfessorDAO {
 				returnList.add(fetch(resultSet));
 			}
 
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
-		return returnList;
+		return null;
 	}
 
 	public List<Professor> findAllFiltered(Professor professor) throws SQLException {
@@ -127,8 +122,8 @@ public class ProfessorDAO {
 			if (resultSet.next()) {
 				professor = fetch(resultSet);
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 			if (Objects.isNull(professor)) {
 				throw new EntityNotFoundException("Professor não encontrado");
 			}
@@ -152,9 +147,8 @@ public class ProfessorDAO {
 		Professor professor = null;
 		try (Connection connection = application.getDataSource().getConnection()) {
 
-			PreparedStatement preparedStatement = connection
-					.prepareStatement(SqlUtils.montarViewTable("id, nome, email, senha",
-							ProceduresViewsTables.VIEW_PROFESSOR.getValue(), new String[] { "email", "senha" }));
+			PreparedStatement preparedStatement = connection.prepareStatement(SqlUtils.montarViewTable(null,
+					ProceduresViewsTables.VIEW_PROFESSOR.getValue(), new String[] { "email", "senha" }));
 
 			int parametro = 1;
 			preparedStatement.setString(parametro++, email);
@@ -168,8 +162,8 @@ public class ProfessorDAO {
 				professor.setNome(resultSet.getString("nome"));
 				professor.setEmail(resultSet.getString("email"));
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 			if (Objects.isNull(professor)) {
 				throw new EntityNotFoundException("Professor não encontrado");
 			}

@@ -18,7 +18,7 @@ import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcedureUtils;
-import com.devs.gama.stu.utils.ProcessamentoProcedure;
+import com.devs.gama.stu.utils.ProcessamentoFuncoes;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -45,8 +45,8 @@ public class AlunoDAO {
 
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -64,8 +64,8 @@ public class AlunoDAO {
 
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -83,8 +83,8 @@ public class AlunoDAO {
 
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -100,7 +100,7 @@ public class AlunoDAO {
 
 			callableStatement.execute();
 
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -121,8 +121,8 @@ public class AlunoDAO {
 				returnList.add(fetch(resultSet));
 			}
 
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return returnList;
 	}
@@ -143,8 +143,8 @@ public class AlunoDAO {
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 			if (returnList.isEmpty()) {
 				throw new EntityNotFoundException("Aluno(s) não encontrado(s)");
 			}
@@ -174,8 +174,8 @@ public class AlunoDAO {
 				totalRegistros = resultSet.getInt("totalRegistros");
 			}
 
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return totalRegistros;
 	}
@@ -193,8 +193,8 @@ public class AlunoDAO {
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return listaRetorno;
 	}
@@ -210,8 +210,8 @@ public class AlunoDAO {
 			if (resultSet.next()) {
 				aluno = fetch(resultSet);
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 			if (Objects.isNull(aluno)) {
 				throw new EntityNotFoundException("Nenhum aluno encontrado");
 			}

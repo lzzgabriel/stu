@@ -1,24 +1,30 @@
-CREATE OR REPLACE FUNCTION public.alterar_senha_professor(id_professor integer, senhaatual character varying, senhadestino character varying)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.alterar_senha_professor(
+	OUT id_retorno integer,
+	IN id_professor integer,
+	IN senhaatual character varying,
+	IN senhadestino character varying)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     professor_exists BOOLEAN;
 BEGIN
-    SELECT EXISTS (SELECT 1 from stu.professor p WHERE p.id = id_professor AND p.senha = senhaAtual) INTO professor_exists;
+	id_retorno = 0;
+	IF id_professor IS NULL THEN
+		RETURN;
+	END IF;
+    SELECT EXISTS (SELECT 1 from professor p WHERE p.id = id_professor AND p.senha = senhaAtual) INTO professor_exists;
     IF professor_exists THEN
-        UPDATE stu.professor p SET p.senha = senhaDestino WHERE p.id = id_professor;
-        retId := 1;
+        UPDATE professor SET senha = senhaDestino WHERE id = id_professor;
+        id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN retId;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.associar_aluno_professor(id_p integer, id_a integer)
  RETURNS integer
@@ -92,26 +98,29 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.cadastrar_professor(p_nome character varying, p_email character varying, p_senha character varying)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.cadastrar_professor(
+	OUT id_retorno integer,
+	p_nome character varying,
+	p_email character varying,
+	p_senha character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     novo_id INT;
 BEGIN
-    INSERT INTO stu.professor (nome, email, senha)
+	id_retorno = 0;
+	INSERT INTO professor (nome, email, senha)
     VALUES (p_nome, p_email, p_senha)
     RETURNING id INTO novo_id;
-    retId := novo_id;
-    RETURN retId;
-EXCEPTION
-    WHEN OTHERS THEN
-        ROLLBACK;
-        RAISE;
+    id_retorno := novo_id;
+	
+	EXCEPTION WHEN OTHERS THEN
+		RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.confirmar_pagamento(p_id_aluno integer, p_momento_pagamento timestamp without time zone, p_id_forma_pagamento integer)
  RETURNS void
@@ -190,29 +199,31 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.delete_professor(p_id integer)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.delete_professor(
+	OUT id_retorno integer,
+	IN p_id integer)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    result INT := 0;
     professor_exists BOOLEAN;
 BEGIN
-    IF p_id IS NOT NULL THEN
-        SELECT EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = p_id) INTO professor_exists;
-        IF professor_exists THEN
-            DELETE FROM stu.professor p WHERE p.id = p_id;
-            result := 1;
-        END IF;
-    END IF;
-    RETURN result;
+	id_retorno = 0;
+	IF p_id IS NULL THEN
+		RETURN;
+	END IF;
+	SELECT EXISTS (SELECT 1 FROM professor p WHERE p.id = p_id) INTO professor_exists;
+	IF professor_exists THEN
+ 		DELETE FROM professor WHERE id = p_id;
+		id_retorno = 1;
+		RETURN;
+	END IF;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.editar_aluno(a_id integer, a_nome character varying, a_email character varying, a_celular character varying)
  RETURNS integer
@@ -283,24 +294,32 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.editar_professor(p_id integer, p_nome character varying, p_email character varying, p_senha character varying)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.editar_professor(
+	OUT id_retorno integer,
+	p_id integer,
+	p_nome character varying,
+	p_email character varying,
+	p_senha character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     professor_exists BOOLEAN;
 BEGIN
-    SELECT EXISTS (SELECT 1 FROM stu.professor p WHERE p.id = p_id AND p.ativo = 1) INTO professor_exists;
+	id_retorno = 0;
+	IF p_id IS NULL THEN
+		RETURN;
+	END IF;
+    SELECT EXISTS (SELECT 1 FROM professor p WHERE p.id = p_id AND p.ativo = true) INTO professor_exists;
     IF professor_exists THEN
-        UPDATE stu.professor p SET p.nome = p_nome, p.email = p_email WHERE p.id = p_id;
-        retId := 1;
+        UPDATE professor SET nome = p_nome, email = p_email WHERE id = p_id;
+        id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN retId;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;

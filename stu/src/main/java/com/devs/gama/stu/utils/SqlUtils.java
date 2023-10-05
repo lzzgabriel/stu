@@ -13,6 +13,7 @@ import java.util.TimeZone;
 
 public class SqlUtils {
 
+	@Deprecated
 	/**
 	 * Método para montar a estrutura de uma procedure
 	 * 
@@ -28,6 +29,20 @@ public class SqlUtils {
 		procedure.append(parametrosEntrada > 0 ? "?" + StringUtils.stringReplicate(", ?", parametrosEntrada - 1) : "");
 		procedure.append(")}");
 		return procedure.toString();
+	}
+	
+	/**
+	 * Método para montar a estrutura de uma função
+	 * 
+	 * @param nomeFuncao     String Texto que será colocado no nome da funcao
+	 * @param parametrosEntrada Total de parametros de entrada
+	 * @return String o texto em String
+	 */
+	public static String montarFuncao(String nomeProcedure, int parametrosEntrada) {
+		StringBuilder funcao = new StringBuilder("select * FROM " + nomeProcedure + "(");
+		funcao.append(parametrosEntrada > 0 ? "?" + StringUtils.stringReplicate(", ?", parametrosEntrada - 1) : "");
+		funcao.append(")");
+		return funcao.toString();
 	}
 
 	/**

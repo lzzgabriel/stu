@@ -13,7 +13,7 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
-import com.devs.gama.stu.utils.ProcessamentoProcedure;
+import com.devs.gama.stu.utils.ProcessamentoFuncoes;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,8 +36,8 @@ public class FormaPagamentoDAO {
 			callableStatement.setString(parametro++, formaPagamento.getDescricao());
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -51,8 +51,8 @@ public class FormaPagamentoDAO {
 			callableStatement.setString(parametro++, formaPagamento.getDescricao());
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -66,8 +66,8 @@ public class FormaPagamentoDAO {
 			callableStatement.setInt(parametro++, formaPagamento.getId());
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 
 	}
@@ -81,8 +81,8 @@ public class FormaPagamentoDAO {
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return returnList;
 	}
@@ -103,8 +103,8 @@ public class FormaPagamentoDAO {
 			if (resultSet.next()) {
 				formaPagamento = fetch(resultSet);
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 			if (formaPagamento == null) {
 				throw new EntityNotFoundException("Forma de pagamento não encontrada");
 			}

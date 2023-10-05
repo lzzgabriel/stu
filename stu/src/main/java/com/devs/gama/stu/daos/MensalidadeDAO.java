@@ -17,7 +17,7 @@ import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.ProcedureUtils;
-import com.devs.gama.stu.utils.ProcessamentoProcedure;
+import com.devs.gama.stu.utils.ProcessamentoFuncoes;
 import com.devs.gama.stu.utils.SqlUtils;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -47,8 +47,8 @@ public class MensalidadeDAO {
 
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -65,8 +65,8 @@ public class MensalidadeDAO {
 
 			callableStatement.execute();
 
-			ProcessamentoProcedure.finalizarProcedure(callableStatement, 1);
-			ProcessamentoProcedure.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
+			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
 		}
 	}
 
@@ -91,8 +91,8 @@ public class MensalidadeDAO {
 				mensalidade = fetch(resultSet);
 			}
 
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 
 			if (Objects.isNull(mensalidade)) {
 				throw new EntityNotFoundException("Nenhuma mensalidade encontrada");
@@ -114,8 +114,8 @@ public class MensalidadeDAO {
 				returnList.add(fetch(resultSet));
 			}
 
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 
 			return returnList;
 		}
@@ -141,8 +141,8 @@ public class MensalidadeDAO {
 				totalRegistros = resultSet.getInt("totalRegistros");
 			}
 
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return totalRegistros;
 	}
@@ -161,8 +161,8 @@ public class MensalidadeDAO {
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return listaRetorno;
 	}
@@ -187,8 +187,8 @@ public class MensalidadeDAO {
 				totalRegistros = resultSet.getInt("totalRegistros");
 			}
 
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return totalRegistros;
 	}
@@ -207,8 +207,8 @@ public class MensalidadeDAO {
 			while (resultSet.next()) {
 				listaRetorno.add(fetch(resultSet));
 			}
-			ProcessamentoProcedure.closeResultSet(resultSet);
-			ProcessamentoProcedure.closePreparedStatement(preparedStatement);
+			ProcessamentoFuncoes.closeResultSet(resultSet);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 		return listaRetorno;
 	}

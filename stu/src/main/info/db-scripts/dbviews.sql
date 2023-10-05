@@ -51,9 +51,10 @@ AS SELECT id,
 -- public.view_professor source
 
 CREATE OR REPLACE VIEW public.view_professor
-AS SELECT id,
-    nome,
-    email,
-    senha,
-    momento_cadastro
+AS SELECT p.id,
+    p.nome,
+    p.email,
+    p.senha,
+    p.momento_cadastro,
+	p.ativo
    FROM professor p;
