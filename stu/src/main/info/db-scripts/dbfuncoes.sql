@@ -26,29 +26,35 @@ EXCEPTION
 END;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION public.associar_aluno_professor(id_p integer, id_a integer)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.associar_aluno_professor(
+	OUT id_retorno integer,
+	id_p integer,
+	id_a integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     professor_exists BOOLEAN;
     student_exists BOOLEAN;
 BEGIN
-    SELECT EXISTS (SELECT 1 FROM view_professor vp WHERE vp.id = id_p) INTO professor_exists;
+	id_retorno = 0;
+	IF id_p IS NULL OR id_a IS NULL THEN
+		RETURN;
+	END IF;
+    SELECT EXISTS (SELECT 1 FROM professor p WHERE p.id = id_p) INTO professor_exists;
     SELECT EXISTS (SELECT 1 FROM aluno a WHERE a.id = id_a) INTO student_exists;
     IF professor_exists AND student_exists THEN
         INSERT INTO aluno_de_professor(id_aluno, id_professor) VALUES (id_a, id_p);
-        retId := 1;
+        id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN retId;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.cadastrar_aluno(a_nome character varying, a_email character varying, a_celular character varying, p_id integer)
  RETURNS integer
@@ -77,26 +83,27 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.cadastrar_forma_pagamento(f_descricao character varying)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.cadastrar_forma_pagamento(
+	OUT id_retorno integer,
+	f_descricao character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     novo_id INT;
 BEGIN
-    INSERT INTO stu.forma_pagamento (descricao)
+	id_retorno = 0;
+    INSERT INTO forma_pagamento (descricao)
     VALUES (f_descricao)
     RETURNING id INTO novo_id;
-    retId := novo_id;
-    RETURN retId;
+    id_retorno = novo_id;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.cadastrar_professor(
 	OUT id_retorno integer,
@@ -175,29 +182,32 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.delete_forma_pagamento(f_id integer)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.delete_forma_pagamento(
+	OUT id_retorno integer,
+	f_id integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    result INT := 0;
     forma_pagamento_exists BOOLEAN;
 BEGIN
-    IF f_id IS NOT NULL THEN
-        SELECT EXISTS (SELECT 1 FROM view_formas_pagamento vf WHERE vf.id = f_id) INTO forma_pagamento_exists;
-        IF forma_pagamento_exists THEN
-            DELETE FROM stu.forma_pagamento f WHERE f.id = f_id;
-            result := 1;
-        END IF;
+	id_retorno = 0;
+	IF f_id IS NULL THEN
+		RETURN;
+	END IF;
+	SELECT EXISTS (SELECT 1 FROM forma_pagamento f WHERE f.id = f_id) INTO forma_pagamento_exists;
+	IF forma_pagamento_exists THEN
+		DELETE FROM forma_pagamento WHERE id = f_id;
+		id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN result;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.delete_professor(
 	OUT id_retorno integer,
@@ -248,27 +258,33 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.editar_forma_pagamento(f_id integer, f_descricao character varying)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.editar_forma_pagamento(
+	OUT id_retorno integer,
+	f_id integer,
+	f_descricao character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    result INT := 0;
     forma_pagamento_exists BOOLEAN;
 BEGIN
-    SELECT EXISTS (SELECT 1 FROM stu.forma_pagamento fp WHERE fp.id = f_id) INTO forma_pagamento_exists;
+	id_retorno = 0;
+	IF f_id IS NULL THEN
+		RETURN;
+	END IF;
+    SELECT EXISTS (SELECT 1 FROM forma_pagamento fp WHERE fp.id = f_id) INTO forma_pagamento_exists;
     IF forma_pagamento_exists THEN
-        UPDATE stu.forma_pagamento fp SET fp.descricao = f_descricao WHERE fp.id = f_id;
-        result := 1;
+        UPDATE forma_pagamento SET descricao = f_descricao WHERE id = f_id;
+        id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN result;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.editar_mensalidade_aberta(a_id integer, valor_atualizado numeric, nova_data date)
  RETURNS integer

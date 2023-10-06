@@ -43,8 +43,8 @@ AS SELECT mc.id_aluno,
 -- public.view_formas_pagamento source
 
 CREATE OR REPLACE VIEW public.view_formas_pagamento
-AS SELECT id,
-    descricao
+AS SELECT fp.id,
+    fp.descricao
    FROM forma_pagamento fp;
 
 
