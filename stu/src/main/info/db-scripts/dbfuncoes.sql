@@ -56,32 +56,41 @@ EXCEPTION
 END;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION public.cadastrar_aluno(a_nome character varying, a_email character varying, a_celular character varying, p_id integer)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.cadastrar_aluno(
+	OUT id_retorno integer,
+	a_nome character varying,
+	a_email character varying,
+	a_celular character varying,
+	p_id integer,
+	valor numeric,
+	mensalidade date)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     novo_id INT;
-    resultAssociacao INT;
-    resultGerarMensalidade INT;
+    resultado_associacao INT;
+    resultado_gerar_mensalidade INT;
 BEGIN
-    INSERT INTO stu.aluno(nome, email, celular)
-    VALUES (a_nome, a_email, a_celular)
+	id_retorno = 0;
+	IF p_id IS NULL THEN
+		RETURN;
+	END IF;
+    INSERT INTO aluno(nome, email, celular) VALUES (a_nome, a_email, a_celular)
     RETURNING id INTO novo_id;
-    PERFORM ASSOCIAR_ALUNO_PROFESSOR(resultAssociacao, p_id, novo_id);
-    PERFORM GERAR_MENSALIDADE_ABERTA(resultGerarMensalidade, novo_id, 400.0, '2023-09-20');
-    IF resultAssociacao = 1 AND resultGerarMensalidade = 1 THEN
-        retId := novo_id;
+    select * from ASSOCIAR_ALUNO_PROFESSOR(p_id, novo_id) INTO resultado_associacao;
+    select * from GERAR_MENSALIDADE_ABERTA(novo_id, valor, mensalidade) INTO resultado_gerar_mensalidade;
+    IF resultado_associacao = 1 AND resultado_gerar_mensalidade = 1 THEN
+        id_retorno = novo_id;
+		RETURN;
     END IF;
-    RETURN retId;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.cadastrar_forma_pagamento(
 	OUT id_retorno integer,
@@ -129,34 +138,45 @@ BEGIN
 END;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION public.confirmar_pagamento(p_id_aluno integer, p_momento_pagamento timestamp without time zone, p_id_forma_pagamento integer)
- RETURNS void
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.confirmar_pagamento(
+	OUT id_retorno integer,
+	p_id_aluno integer,
+	p_momento_pagamento timestamp without time zone,
+	p_id_forma_pagamento integer)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
     id INT;
     valor DECIMAL;
     vencimento DATE;
     mensalidade DECIMAL;
+	mensalidade_exists boolean;
 BEGIN
-    SELECT id_aluno, valor_cobrar, proximo_vencimento, mensalidade
-    INTO id, valor, vencimento, mensalidade
-    FROM stu.mensalidade_aberta
-    WHERE id_aluno = p_id_aluno;
+	id_retorno = 0;
+	IF p_id_aluno IS NULL THEN
+		RETURN;
+	END IF;
+	SELECT EXISTS (SELECT 1 FROM mensalidade_aberta ma WHERE ma.id_aluno = p_id_aluno) INTO mensalidade_exists;
+	IF mensalidade_exists THEN
+		SELECT id_aluno, valor_cobrar, proximo_vencimento, mensalidade
+		FROM mensalidade_aberta
+		WHERE id_aluno = p_id_aluno INTO id, valor, vencimento, mensalidade;
 
-    INSERT INTO stu.mensalidade_cobrada (id_aluno, mensalidade, valor_cobrado, data_vencimento, id_forma_pagamento, momento_pagamento)
-    VALUES (id, mensalidade, valor, vencimento, p_id_forma_pagamento, p_momento_pagamento);
+		INSERT INTO mensalidade_cobrada (id_aluno, valor_cobrado, data_vencimento, id_forma_pagamento, momento_pagamento)
+		VALUES (id, valor, vencimento, p_id_forma_pagamento, p_momento_pagamento);
 
-    UPDATE stu.mensalidade_aberta
-    SET proximo_vencimento = vencimento + INTERVAL '1 month'
-    WHERE id_aluno = p_id_aluno;
+		UPDATE mensalidade_aberta
+		SET proximo_vencimento = vencimento + INTERVAL '1 month'
+		WHERE id_aluno = p_id_aluno;
+		id_retorno = 1;
+	END IF;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.delete_aluno(a_id integer)
  RETURNS integer
@@ -334,6 +354,35 @@ BEGIN
         id_retorno = 1;
 		RETURN;
     END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+END;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION public.gerar_mensalidade_aberta(
+	OUT id_retorno integer,
+	a_id integer,
+	valor_cobrar numeric,
+	mensalidade date)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+	aluno_exists boolean;
+BEGIN
+	id_retorno = 0;
+	IF a_id IS NULL THEN
+		RETURN;
+	END IF;
+	SELECT EXISTS (SELECT 1 FROM aluno a WHERE a.id = a_id) INTO aluno_exists;
+    IF aluno_exists THEN
+		INSERT INTO mensalidade_aberta(id_aluno, proximo_vencimento, valor_cobrar) VALUES (a_id, mensalidade, valor_cobrar);
+		id_retorno = 1;
+    	RETURN;
+	END IF;
 EXCEPTION
     WHEN OTHERS THEN
         RAISE;

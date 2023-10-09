@@ -18,13 +18,16 @@ AS SELECT adp.id_aluno,
 -- public.view_aluno_mensalidade_aberta source
 
 CREATE OR REPLACE VIEW public.view_aluno_mensalidade_aberta
-AS SELECT ma.id_aluno,
+ AS
+ SELECT ma.id_aluno,
     a.nome AS aluno_nome,
     ma.valor_cobrar,
     ma.status,
-    ma.proximo_vencimento
+    ma.proximo_vencimento,
+    adp.id_professor
    FROM mensalidade_aberta ma
-     JOIN aluno a ON ma.id_aluno = a.id;
+     JOIN aluno a ON ma.id_aluno = a.id
+     LEFT JOIN aluno_de_professor adp ON adp.id_aluno = ma.id_aluno;
 
 
 -- public.view_aluno_mensalidades_cobradas source

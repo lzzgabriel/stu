@@ -1,11 +1,9 @@
 package com.devs.gama.stu.daos;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +15,7 @@ import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.ProceduresViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
-import com.devs.gama.stu.utils.ProcedureUtils;
+import com.devs.gama.stu.utils.FuncoesUtils;
 import com.devs.gama.stu.utils.ProcessamentoFuncoes;
 import com.devs.gama.stu.utils.SqlUtils;
 
@@ -32,75 +30,74 @@ public class AlunoDAO {
 	@Inject
 	private Application application;
 
-	public void save(Professor professor, Aluno aluno) throws SQLException {
+	public void save(Professor professor, Aluno aluno, Double valor, LocalDate mensalidade) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_CADASTRAR_ALUNO.getValue(), 4, 1));
+			PreparedStatement preparedStatement = conn
+					.prepareCall(SqlUtils.montarFuncao(ProceduresViewsTables.FUNCAO_CADASTRAR_ALUNO.getValue(), 6));
 			int parametro = 1;
-			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			ProcedureUtils.setString(parametro++, aluno.getNome(), callableStatement);
-			ProcedureUtils.setString(parametro++, aluno.getEmail(), callableStatement);
-			ProcedureUtils.setString(parametro++, aluno.getCelularUnmasked(), callableStatement);
-			ProcedureUtils.setInt(parametro++, professor.getId(), callableStatement);
+			FuncoesUtils.setString(parametro++, aluno.getNome(), preparedStatement);
+			FuncoesUtils.setString(parametro++, aluno.getEmail(), preparedStatement);
+			FuncoesUtils.setString(parametro++, aluno.getCelularUnmasked(), preparedStatement);
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
+			FuncoesUtils.setDouble(parametro++, valor, preparedStatement);
+			FuncoesUtils.setDate(parametro++, mensalidade, preparedStatement);
 
-			callableStatement.execute();
+			preparedStatement.execute();
 
-			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
-			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 	}
 
 	public void edit(Professor professor, Aluno aluno) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_EDITAR_ALUNO.getValue(), 4, 1));
+			PreparedStatement preparedStatement = conn
+					.prepareCall(SqlUtils.montarFuncao(ProceduresViewsTables.FUNCAO_EDITAR_ALUNO.getValue(), 4));
 
 			int parametro = 1;
-			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
-			ProcedureUtils.setString(parametro++, aluno.getNome(), callableStatement);
-			ProcedureUtils.setString(parametro++, aluno.getEmail(), callableStatement);
-			ProcedureUtils.setString(parametro++, aluno.getCelularUnmasked(), callableStatement);
+			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
+			FuncoesUtils.setString(parametro++, aluno.getNome(), preparedStatement);
+			FuncoesUtils.setString(parametro++, aluno.getEmail(), preparedStatement);
+			FuncoesUtils.setString(parametro++, aluno.getCelularUnmasked(), preparedStatement);
 
-			callableStatement.execute();
+			preparedStatement.execute();
 
-			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
-			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 	}
 
 	public void generateMensalidadeAberta(Aluno aluno, Double valorCobrado, LocalDate mensalidadeVigente)
 			throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(SqlUtils
-					.montarProcedure(ProceduresViewsTables.PROCEDURE_GERAR_MENSALIDADE_ABERTA.getValue(), 3, 1));
+			PreparedStatement preparedStatement = conn.prepareCall(
+					SqlUtils.montarFuncao(ProceduresViewsTables.FUNCAO_GERAR_MENSALIDADE_ABERTA.getValue(), 3));
 
 			int parametro = 1;
-			callableStatement.registerOutParameter(parametro++, Types.INTEGER);
-			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
-			ProcedureUtils.setDouble(parametro++, valorCobrado, callableStatement);
-			ProcedureUtils.setDate(parametro++, mensalidadeVigente, callableStatement);
+			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
+			FuncoesUtils.setDouble(parametro++, valorCobrado, preparedStatement);
+			FuncoesUtils.setDate(parametro++, mensalidadeVigente, preparedStatement);
 
-			callableStatement.execute();
+			preparedStatement.execute();
 
-			ProcessamentoFuncoes.finalizarProcedure(callableStatement, 1);
-			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 	}
 
 	public void confirmPay(Aluno aluno, FormaPagamento formaPagameto) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(SqlUtils
-					.montarProcedure(ProceduresViewsTables.PROCEDURE_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3, 0));
+			PreparedStatement preparedStatement = conn.prepareCall(
+					SqlUtils.montarFuncao(ProceduresViewsTables.FUNCAO_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3));
 
 			int parametro = 1;
-			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
-			ProcedureUtils.setDate(parametro++, LocalDate.now(), callableStatement);
-			ProcedureUtils.setInt(parametro++, formaPagameto.getId(), callableStatement);
+			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
+			FuncoesUtils.setDate(parametro++, LocalDate.now(), preparedStatement);
+			FuncoesUtils.setInt(parametro++, formaPagameto.getId(), preparedStatement);
 
-			callableStatement.execute();
+			preparedStatement.execute();
 
-			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 	}
 
@@ -111,11 +108,15 @@ public class AlunoDAO {
 
 	}
 
-	public List<Aluno> findAll() throws SQLException {
+	public List<Aluno> findAll(Professor professor) throws SQLException {
 		List<Aluno> returnList = new ArrayList<>();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(
-					SqlUtils.montarViewTable(null, ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), null));
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(null,
+					ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id" }));
+
+			int parametro = 1;
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
+
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
@@ -129,44 +130,19 @@ public class AlunoDAO {
 
 	public List<Aluno> findAllFiltered(Aluno aluno) throws SQLException, EntityNotFoundException {
 		List<Aluno> returnList = new ArrayList<>();
-		try (Connection conn = application.getDataSource().getConnection()) {
-			CallableStatement callableStatement = conn.prepareCall(
-					SqlUtils.montarProcedure(ProceduresViewsTables.PROCEDURE_FILTRAR_ALUNOS.getValue(), 4, 0));
-			int parametro = 1;
-			ProcedureUtils.setInt(parametro++, aluno.getId(), callableStatement);
-			ProcedureUtils.setString(parametro++, aluno.getNome(), callableStatement);
-			ProcedureUtils.setBoolean(parametro++, aluno.getAtivo(), callableStatement);
-			ProcedureUtils.setTimestamp(parametro++, aluno.getMomentoCadastro(), callableStatement);
-
-			ResultSet resultSet = callableStatement.executeQuery();
-
-			while (resultSet.next()) {
-				returnList.add(fetch(resultSet));
-			}
-			ProcessamentoFuncoes.closeResultSet(resultSet);
-			ProcessamentoFuncoes.closeCallableStatement(callableStatement);
-			if (returnList.isEmpty()) {
-				throw new EntityNotFoundException("Aluno(s) não encontrado(s)");
-			}
-		}
-
+		// refatorar para usar select
 		return returnList;
 	}
 
 	public int findCount(Professor professor) throws SQLException {
 		int totalRegistros = 0;
-		String sql = "SELECT COUNT(id_aluno) as totalRegistros FROM "
-				+ ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue();
-		if (Objects.nonNull(professor)) {
-			sql += " where id_professor = ? ";
-		}
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			PreparedStatement preparedStatement = conn
+					.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno) as totalRegistros",
+							ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id" }));
 
 			int parametro = 1;
-			if (Objects.nonNull(professor)) {
-				preparedStatement.setInt(parametro, professor.getId());
-			}
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -184,9 +160,8 @@ public class AlunoDAO {
 		List<Aluno> listaRetorno = new ArrayList<Aluno>();
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(
-					"adp.id_professor, adp.id_aluno , adp.nome , adp.email , adp.celular , adp.momento_cadastro",
-					"view_aluno_de_professor adp", "adp.id_professor = " + professor.getId(), posicao,
-					padraoPaginacao));
+					"id_professor, id_aluno , nome , email , celular , momento_cadastro", "view_aluno_de_professor",
+					"id_professor = " + professor.getId(), posicao, padraoPaginacao));
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -204,8 +179,10 @@ public class AlunoDAO {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(null,
 					ProceduresViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id" }));
+
 			int parametro = 1;
-			preparedStatement.setInt(parametro++, id);
+			FuncoesUtils.setInt(parametro++, id, preparedStatement);
+
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
 				aluno = fetch(resultSet);

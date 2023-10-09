@@ -30,11 +30,11 @@ public class SqlUtils {
 		procedure.append(")}");
 		return procedure.toString();
 	}
-	
+
 	/**
 	 * Método para montar a estrutura de uma função
 	 * 
-	 * @param nomeFuncao     String Texto que será colocado no nome da funcao
+	 * @param nomeFuncao        String Texto que será colocado no nome da funcao
 	 * @param parametrosEntrada Total de parametros de entrada
 	 * @return String o texto em String
 	 */
@@ -61,7 +61,7 @@ public class SqlUtils {
 		StringBuilder paginacao = new StringBuilder(
 				"select " + (Objects.nonNull(campos) && !campos.isEmpty() ? campos : "*") + " from " + nomeViewTable);
 		paginacao.append(Objects.nonNull(camposWhere) && !camposWhere.isEmpty() ? (" where " + camposWhere) : "");
-		paginacao.append(" LIMIT " + posicao + ", " + padraoPaginacao);
+		paginacao.append(" LIMIT " + padraoPaginacao + " OFFSET " + posicao);
 		return paginacao.toString();
 	}
 

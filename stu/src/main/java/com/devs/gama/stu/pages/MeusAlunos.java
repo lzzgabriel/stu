@@ -54,7 +54,7 @@ public class MeusAlunos implements Serializable {
 	public void save() {
 		try {
 			professor.setId(Integer.valueOf(SessionUtils.getLoggedProfessorId()));
-			alunoDAO.save(professor, aluno);
+			alunoDAO.save(professor, aluno, null, null); // -> valor mensalidade e data
 			
 			MessageUtils.addInfoMessage("Aluno cadastrado");
 
