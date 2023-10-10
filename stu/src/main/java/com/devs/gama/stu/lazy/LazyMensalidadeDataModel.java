@@ -47,7 +47,7 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 		try {
 			// TODO fazer filtragem de Mensalidades
 			// TODO pagination
-			return mensalidadeDAO.findAll();
+			return mensalidadeDAO.findAllMensalidadeAberta();
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			return null;

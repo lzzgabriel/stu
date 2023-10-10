@@ -255,28 +255,33 @@ EXCEPTION
 END;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION public.editar_aluno(a_id integer, a_nome character varying, a_email character varying, a_celular character varying)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.editar_aluno(
+	OUT id_retorno integer,
+	a_id integer,
+	a_nome character varying,
+	a_email character varying,
+	a_celular character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     aluno_exists BOOLEAN;
 BEGIN
-    SELECT EXISTS (SELECT 1 FROM stu.aluno a WHERE a.id = a_id) INTO aluno_exists;
+	id_retorno = 0;
+    SELECT EXISTS (SELECT 1 FROM aluno WHERE id = a_id) INTO aluno_exists;
     IF aluno_exists THEN
-        UPDATE stu.aluno a SET a.nome = a_nome, a.email = a_email, a.celular = a_celular
-        WHERE a.id = a_id;
-        retId := 1;
+        UPDATE aluno SET nome = a_nome, email = a_email, celular = a_celular
+        WHERE id = a_id;
+        id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN retId;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.editar_forma_pagamento(
 	OUT id_retorno integer,
@@ -306,29 +311,35 @@ EXCEPTION
 END;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION public.editar_mensalidade_aberta(a_id integer, valor_atualizado numeric, nova_data date)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.editar_mensalidade_aberta(
+	OUT id_retorno integer,
+	a_id integer,
+	valor_atualizado numeric,
+	nova_data date)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     mensalidade_aberta_exists BOOLEAN;
 BEGIN
-    IF a_id IS NOT NULL THEN
-        SELECT EXISTS (SELECT 1 FROM stu.mensalidade_aberta ma WHERE ma.id_aluno = a_id) INTO mensalidade_aberta_exists;
-        IF mensalidade_aberta_exists THEN
-            UPDATE stu.mensalidade_aberta ma SET ma.valor_cobrar = valor_atualizado, ma.proximo_vencimento = nova_data WHERE ma.id_aluno = a_id;
-            retId := 1;
-        END IF;
+	id_retorno = 0;
+	IF a_id IS NULL THEN
+		RETURN;
+	END IF;
+    
+	SELECT EXISTS (SELECT 1 FROM mensalidade_aberta ma WHERE ma.id_aluno = a_id) INTO mensalidade_aberta_exists;
+	IF mensalidade_aberta_exists THEN
+		UPDATE mensalidade_aberta SET valor_cobrar = valor_atualizado, proximo_vencimento = nova_data WHERE id_aluno = a_id;
+		id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN retId;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.editar_professor(
 	OUT id_retorno integer,
