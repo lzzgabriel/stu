@@ -106,7 +106,7 @@ public class AlunoDAO {
 		List<Aluno> returnList = new ArrayList<>();
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(null,
-					FuncoesViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id", "ativo" }));
+					FuncoesViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id_professor", "ativo" }));
 
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
@@ -128,7 +128,7 @@ public class AlunoDAO {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn
 					.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno) as totalRegistros",
-							FuncoesViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id", "ativo" }));
+							FuncoesViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id_professor", "ativo" }));
 
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
