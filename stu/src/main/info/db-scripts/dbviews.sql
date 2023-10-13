@@ -24,7 +24,8 @@ CREATE OR REPLACE VIEW public.view_aluno_mensalidade_aberta
     ma.valor_cobrar,
     ma.status,
     ma.proximo_vencimento,
-    adp.id_professor
+    adp.id_professor,
+    a.ativo
    FROM mensalidade_aberta ma
      JOIN aluno a ON ma.id_aluno = a.id
      LEFT JOIN aluno_de_professor adp ON adp.id_aluno = ma.id_aluno;
@@ -40,7 +41,8 @@ CREATE OR REPLACE VIEW public.view_aluno_mensalidades_cobradas
     mc.data_vencimento,
     mc.id_forma_pagamento,
     mc.momento_pagamento,
-    adp.id_professor
+    adp.id_professor,
+    a.ativo
    FROM mensalidade_cobrada mc
      LEFT JOIN aluno a ON mc.id_aluno = a.id
      LEFT JOIN aluno_de_professor adp ON adp.id_aluno = mc.id_aluno;

@@ -178,29 +178,59 @@ EXCEPTION
 END;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION public.delete_aluno(a_id integer)
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.ativar_aluno(
+	OUT id_retorno integer,
+	a_id integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    retId INT := 0;
     aluno_exists BOOLEAN;
 BEGIN
-    IF a_id IS NOT NULL THEN
-        SELECT EXISTS (SELECT 1 FROM view_aluno va WHERE va.id = a_id) INTO aluno_exists;
-        IF aluno_exists THEN
-            DELETE FROM stu.aluno a WHERE a.id = a_id;
-            retId := 1;
-        END IF;
+	id_retorno = 0;
+	IF a_id IS NULL THEN
+		RETURN;
+	END IF;
+	SELECT EXISTS (SELECT 1 FROM aluno WHERE id = a_id) INTO aluno_exists;
+	IF aluno_exists THEN
+		UPDATE aluno SET ativo = true WHERE id = a_id;
+		id_retorno = 1;
+		RETURN;
     END IF;
-    RETURN retId;
 EXCEPTION
     WHEN OTHERS THEN
-        ROLLBACK;
         RAISE;
 END;
-$function$
-;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION public.inativar_aluno(
+	OUT id_retorno integer,
+	a_id integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    aluno_exists BOOLEAN;
+BEGIN
+	id_retorno = 0;
+	IF a_id IS NULL THEN
+		RETURN;
+	END IF;
+	SELECT EXISTS (SELECT 1 FROM aluno WHERE id = a_id) INTO aluno_exists;
+	IF aluno_exists THEN
+		UPDATE aluno SET ativo = false WHERE id = a_id;
+		id_retorno = 1;
+		RETURN;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+END;
+$BODY$;
 
 CREATE OR REPLACE FUNCTION public.delete_forma_pagamento(
 	OUT id_retorno integer,
@@ -229,9 +259,10 @@ EXCEPTION
 END;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION public.delete_professor(
+CREATE OR REPLACE FUNCTION public.ativar_professor(
 	OUT id_retorno integer,
-	IN p_id integer)
+	p_id integer)
+    RETURNS integer
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE PARALLEL UNSAFE
@@ -243,12 +274,39 @@ BEGIN
 	IF p_id IS NULL THEN
 		RETURN;
 	END IF;
-	SELECT EXISTS (SELECT 1 FROM professor p WHERE p.id = p_id) INTO professor_exists;
+	SELECT EXISTS (SELECT 1 FROM professor WHERE id = p_id) INTO professor_exists;
 	IF professor_exists THEN
- 		DELETE FROM professor WHERE id = p_id;
+		UPDATE professor SET ativo = true WHERE id = p_id;
 		id_retorno = 1;
 		RETURN;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+END;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION public.inativar_professor(
+	OUT id_retorno integer,
+	p_id integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    professor_exists BOOLEAN;
+BEGIN
+	id_retorno = 0;
+	IF p_id IS NULL THEN
+		RETURN;
 	END IF;
+	SELECT EXISTS (SELECT 1 FROM professor WHERE id = p_id) INTO professor_exists;
+	IF professor_exists THEN
+		UPDATE professor SET ativo = false WHERE id = p_id;
+		id_retorno = 1;
+		RETURN;
+    END IF;
 EXCEPTION
     WHEN OTHERS THEN
         RAISE;
@@ -397,5 +455,21 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         RAISE;
+END;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION public.atualizar_status(
+	)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+BEGIN
+    
+    UPDATE mensalidade_aberta
+    SET status = 'atrasada'
+    WHERE proximo_vencimento < CURRENT_DATE;
+
 END;
 $BODY$;

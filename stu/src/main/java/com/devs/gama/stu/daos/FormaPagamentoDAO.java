@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.FormaPagamento;
-import com.devs.gama.stu.enums.ProceduresViewsTables;
+import com.devs.gama.stu.enums.FuncoesViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;
 import com.devs.gama.stu.utils.FuncoesUtils;
 import com.devs.gama.stu.utils.ProcessamentoFuncoes;
@@ -29,7 +29,7 @@ public class FormaPagamentoDAO {
 	public void save(FormaPagamento formaPagamento) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareCall(
-					SqlUtils.montarFuncao(ProceduresViewsTables.FUNCAO_CADASTRAR_FORMA_PAGAMENTO.getValue(), 1));
+					SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_CADASTRAR_FORMA_PAGAMENTO.getValue(), 1));
 			int parametro = 1;
 			FuncoesUtils.setString(parametro++, formaPagamento.getDescricao(), preparedStatement);
 			preparedStatement.execute();
@@ -41,8 +41,8 @@ public class FormaPagamentoDAO {
 
 	public void edit(FormaPagamento formaPagamento) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareCall(
-					SqlUtils.montarFuncao(ProceduresViewsTables.FUNCAO_EDITAR_FORMA_PAGAMENTO.getValue(), 2));
+			PreparedStatement preparedStatement = conn
+					.prepareCall(SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_EDITAR_FORMA_PAGAMENTO.getValue(), 2));
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, formaPagamento.getId(), preparedStatement);
 			FuncoesUtils.setString(parametro++, formaPagamento.getDescricao(), preparedStatement);
@@ -55,7 +55,16 @@ public class FormaPagamentoDAO {
 
 	public void delete(FormaPagamento formaPagamento) throws SQLException {
 
-		// retirado por hora
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn
+					.prepareCall(SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_DELETE_FORMA_PAGAMENTO.getValue(), 1));
+			int parametro = 1;
+			FuncoesUtils.setInt(parametro++, formaPagamento.getId(), preparedStatement);
+			preparedStatement.execute();
+
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
+		}
 
 	}
 
@@ -63,7 +72,7 @@ public class FormaPagamentoDAO {
 		List<FormaPagamento> returnList = new ArrayList<>();
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(
-					SqlUtils.montarViewTable(null, ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue(), null));
+					SqlUtils.montarViewTable(null, FuncoesViewsTables.VIEW_FORMAS_PAGAMENTO.getValue(), null));
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				returnList.add(fetch(resultSet));
@@ -74,16 +83,11 @@ public class FormaPagamentoDAO {
 		return returnList;
 	}
 
-	public List<FormaPagamento> findAllFiltered(FormaPagamento formaPagamento) throws SQLException {
-		// -> procedure de filtragem
-		return null;
-	}
-
 	public FormaPagamento findById(int id) throws SQLException, EntityNotFoundException {
 		FormaPagamento formaPagamento = null;
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(null,
-					ProceduresViewsTables.VIEW_FORMAS_PAGAMENTO.getValue(), new String[] { "id" }));
+					FuncoesViewsTables.VIEW_FORMAS_PAGAMENTO.getValue(), new String[] { "id" }));
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, id, preparedStatement);
 			ResultSet resultSet = preparedStatement.executeQuery();

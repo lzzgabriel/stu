@@ -38,8 +38,8 @@ public class SqlUtils {
 	 * @param parametrosEntrada Total de parametros de entrada
 	 * @return String o texto em String
 	 */
-	public static String montarFuncao(String nomeProcedure, int parametrosEntrada) {
-		StringBuilder funcao = new StringBuilder("select * FROM " + nomeProcedure + "(");
+	public static String montarFuncao(String nomeFuncao, int parametrosEntrada) {
+		StringBuilder funcao = new StringBuilder("select * FROM " + nomeFuncao + "(");
 		funcao.append(parametrosEntrada > 0 ? "?" + StringUtils.stringReplicate(", ?", parametrosEntrada - 1) : "");
 		funcao.append(")");
 		return funcao.toString();

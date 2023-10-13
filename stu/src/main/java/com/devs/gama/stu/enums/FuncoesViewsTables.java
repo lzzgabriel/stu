@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.devs.gama.stu.exceptions.CallNotFoundException;
 
-public enum ProceduresViewsTables {
+public enum FuncoesViewsTables {
 
 	TABELA_PROFESSOR("PROFESSOR"),
 
@@ -19,8 +19,6 @@ public enum ProceduresViewsTables {
 	FUNCAO_CADASTRAR_PROFESSOR("CADASTRAR_PROFESSOR"),
 
 	FUNCAO_ALTERAR_SENHA_PROFESSOR("ALTERAR_SENHA_PROFESSOR"),
-
-	FUNCAO_DELETE_PROFESSOR("DELETE_PROFESSOR"),
 
 	FUNCAO_CADASTRAR_ALUNO("CADASTRAR_ALUNO"),
 
@@ -40,7 +38,15 @@ public enum ProceduresViewsTables {
 
 	FUNCAO_DELETE_FORMA_PAGAMENTO("DELETE_FORMA_PAGAMENTO"),
 
-	FUNCAO_FILTRAR_ALUNOS("FILTRAR_ALUNOS"),
+	FUNCAO_ATUALIZAR_STATUS("ATUALIZAR_STATUS"),
+
+	FUNCAO_INATIVAR_ALUNO("INATIVAR_ALUNO"),
+
+	FUNCAO_ATIVAR_ALUNO("ATIVAR_ALUNO"),
+
+	FUNCAO_INATIVAR_PROFESSOR("INATIVAR_PROFESSOR"),
+	
+	FUNCAO_ATIVAR_PROFESSOR("ATIVAR_PROFESSOR"),
 
 	VIEW_PROFESSOR("VIEW_PROFESSOR"),
 
@@ -54,7 +60,7 @@ public enum ProceduresViewsTables {
 
 	public final String value;
 
-	ProceduresViewsTables(String value) {
+	FuncoesViewsTables(String value) {
 		this.value = value;
 	}
 
@@ -62,8 +68,8 @@ public enum ProceduresViewsTables {
 		return this.value;
 	}
 
-	public static ProceduresViewsTables valueOfProceduresViews(String value) {
-		return Arrays.asList(ProceduresViewsTables.values()).stream().filter(s -> s.getValue().equalsIgnoreCase(value))
+	public static FuncoesViewsTables valueOfProceduresViews(String value) {
+		return Arrays.asList(FuncoesViewsTables.values()).stream().filter(s -> s.getValue().equalsIgnoreCase(value))
 				.findFirst()
 				.orElseThrow(() -> new CallNotFoundException("Procedure, View or Table not found: " + value));
 	}
