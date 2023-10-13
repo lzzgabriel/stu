@@ -1,0 +1,1 @@
+web: mvn wildfly:provision wildfly:start package install wildfly:deploy

@@ -35,10 +35,9 @@
 			<version>6.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
-			<version>8.1.0</version>
-			<scope>provided</scope>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -50,6 +49,18 @@
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals><goal>copy-dependencies</goal></goals>
+                    </execution>
+                </executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -66,9 +77,90 @@
 				<version>4.2.0.Final</version>
 				<configuration>
 					<debug>true</debug>
-					<debugPort>5005</debugPort>
-					<debugSuspend>true</debugSuspend>
+                    <debugPort>5005</debugPort>
+                    <debugSuspend>true</debugSuspend>
+					<layers>
+						<layer>jaxrs-server</layer>
+					</layers>
+					<addUser>
+						<users>
+							<user>
+								<username>admin</username>
+								<password>${env.WFY_ADMIN_P}</password>
+							</user>
+						</users>
+					</addUser>
+					<startupTimeout>300</startupTimeout>
 				</configuration>
+				<executions>
+					<execution>
+                        <id>deploy-postgresql</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>deploy-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <groupId>org.postgresql</groupId>
+                            <artifactId>postgresql</artifactId>
+                            <name>postgresql.jar</name>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-datasource</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <address>subsystem=datasources</address>
+                            <resources>
+                                <resource>
+                                    <address>xa-data-source=java:jboss/datasources/stuDB</address>
+                                    <properties>
+                                        <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
+                                        <jndi-name>java:jboss/datasources/stuDB</jndi-name>
+                                        <enabled>true</enabled>
+                                        <driver-name>postgresql.jar</driver-name>
+                                    </properties>
+                                    <resources>
+                                        <resource>
+                                            <address>
+                                                xa-datasource-properties=DatabaseName
+                                            </address>
+                                            <properties>
+                                                <value>stu</value>
+                                            </properties>
+                                        </resource>
+                                        <resource>
+                                            <address>
+                                                xa-datasource-properties=ServerName
+                                            </address>
+                                            <properties>
+                                                <value>${env.DB_SERVER}</value>
+                                            </properties>
+                                        </resource>
+                                        <resource>
+                                            <address>
+                                                xa-datasource-properties=User
+                                            </address>
+                                            <properties>
+                                                <value>${env.DB_USER}</value>
+                                            </properties>
+                                        </resource>
+                                        <resource>
+                                            <address>
+                                                xa-datasource-properties=Password
+                                            </address>
+                                            <properties>
+                                                <value>${env.DB_PASS}</value>
+                                            </properties>
+                                        </resource>
+                                    </resources>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
 			</plugin>
 		</plugins>
 	</build>

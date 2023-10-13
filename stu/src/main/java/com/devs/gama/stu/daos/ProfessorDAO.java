@@ -145,7 +145,7 @@ public class ProfessorDAO {
 					FuncoesViewsTables.VIEW_PROFESSOR.getValue(), new String[] { "email", "senha" }));
 
 			int parametro = 1;
-			FuncoesUtils.setString(parametro, email, preparedStatement);
+			FuncoesUtils.setString(parametro++, email, preparedStatement);
 			FuncoesUtils.setString(parametro++, hashSenha(senha), preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();

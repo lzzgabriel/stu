@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.postgresql.ds.PGConnectionPoolDataSource;
+import org.postgresql.ds.PGPooledConnection;
+import org.postgresql.jdbc.PgStatement;
+
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.FormaPagamento;
@@ -229,5 +233,5 @@ public class AlunoDAO {
 
 		return aluno;
 	}
-
+	
 }

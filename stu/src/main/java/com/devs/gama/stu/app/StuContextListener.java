@@ -8,8 +8,6 @@ import java.util.Enumeration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
-
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
@@ -19,7 +17,7 @@ public class StuContextListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		AbandonedConnectionCleanupThread.checkedShutdown();
+		//AbandonedConnectionCleanupThread.checkedShutdown();
 		Enumeration<Driver> drivers = DriverManager.getDrivers();
 		while (drivers.hasMoreElements()) {
 			Driver driver = drivers.nextElement();

@@ -2,6 +2,7 @@ package com.devs.gama.stu.pages;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import org.primefaces.model.LazyDataModel;
 
@@ -54,7 +55,7 @@ public class MeusAlunos implements Serializable {
 	public void save() {
 		try {
 			professor.setId(Integer.valueOf(SessionUtils.getLoggedProfessorId()));
-			alunoDAO.save(professor, aluno, null, null); // -> valor mensalidade e data
+			alunoDAO.save(professor, aluno, 0.0, LocalDate.now()); // -> valor mensalidade e data
 			
 			MessageUtils.addInfoMessage("Aluno cadastrado");
 
