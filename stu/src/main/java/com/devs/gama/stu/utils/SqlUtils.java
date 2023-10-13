@@ -101,9 +101,9 @@ public class SqlUtils {
 
 		formatoData.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-		String horaUTC = formatoData.format(date);
+		String dataUTC = formatoData.format(Date.valueOf(date));
 
-		return Date.valueOf(LocalDate.parse(horaUTC));
+		return Date.valueOf(dataUTC);
 	}
 
 	/**
