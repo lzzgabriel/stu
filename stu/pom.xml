@@ -76,7 +76,7 @@
 				<artifactId>wildfly-maven-plugin</artifactId>
 				<version>4.2.0.Final</version>
 				<configuration>
-					<debug>true</debug>
+					<debug>${env.STU_DEBUG}</debug>
                     <debugPort>5005</debugPort>
                     <debugSuspend>true</debugSuspend>
 					<layers>

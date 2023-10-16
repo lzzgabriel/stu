@@ -12,6 +12,7 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.daos.MensalidadeDAO;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
+import com.devs.gama.stu.entities.Professor;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.inject.Model;
@@ -21,17 +22,17 @@ import jakarta.inject.Inject;
 public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Inject
 	private Application application;
-	
+
 	@Inject
 	private MensalidadeDAO mensalidadeDAO;
-	
+
 	private Aluno aluno;
-	
+
 	private boolean logMode = false;
-	
+
 	@PostConstruct
 	public void init() {
 	}
@@ -42,12 +43,14 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 	}
 
 	@Override
-	public List<Mensalidade> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
-		
+	public List<Mensalidade> load(int first, int pageSize, Map<String, SortMeta> sortBy,
+			Map<String, FilterMeta> filterBy) {
+
 		try {
 			// TODO fazer filtragem de Mensalidades
 			// TODO pagination
-			return mensalidadeDAO.findAllMensalidadeAberta();
+			return mensalidadeDAO.findAllMensalidadeAberta(new Professor(1, "Professor_teste", "123@gmail.com"));
+			// substituir pelo professor com sessão logada
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			return null;
@@ -69,5 +72,5 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 	public void setLogMode(boolean logMode) {
 		this.logMode = logMode;
 	}
-	
+
 }

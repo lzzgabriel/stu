@@ -120,12 +120,17 @@ public class MensalidadeDAO {
 		return mensalidade;
 	}
 
-	public List<Mensalidade> findAllMensalidadeAberta() throws SQLException {
+	public List<Mensalidade> findAllMensalidadeAberta(Professor professor) throws SQLException {
 		List<Mensalidade> returnList = new ArrayList<>();
 
 		try (Connection connection = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement(
-					SqlUtils.montarViewTable(null, FuncoesViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(), null));
+					SqlUtils.montarViewTable(null, FuncoesViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(),
+							new String[] { "id_professor", "ativo" }));
+			int parametro = 1;
+
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
+			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -140,12 +145,17 @@ public class MensalidadeDAO {
 		}
 	}
 
-	public List<Mensalidade> findAllMensalidadeCobrada() throws SQLException {
+	public List<Mensalidade> findAllMensalidadeCobrada(Professor professor) throws SQLException {
 		List<Mensalidade> returnList = new ArrayList<>();
 
 		try (Connection connection = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement(SqlUtils.montarViewTable(null,
 					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(), null));
+			int parametro = 1;
+
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
+			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
+
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {

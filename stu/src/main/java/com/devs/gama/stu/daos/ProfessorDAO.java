@@ -141,11 +141,12 @@ public class ProfessorDAO {
 		try (Connection connection = application.getDataSource().getConnection()) {
 
 			PreparedStatement preparedStatement = connection.prepareStatement(SqlUtils.montarViewTable(null,
-					FuncoesViewsTables.VIEW_PROFESSOR.getValue(), new String[] { "email", "senha" }));
+					FuncoesViewsTables.VIEW_PROFESSOR.getValue(), new String[] { "email", "senha", "ativo" }));
 
 			int parametro = 1;
 			FuncoesUtils.setString(parametro++, email, preparedStatement);
 			FuncoesUtils.setString(parametro++, hashSenha(senha), preparedStatement);
+			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
