@@ -1,17 +1,15 @@
 package com.devs.gama.stu.daos;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import org.postgresql.ds.PGConnectionPoolDataSource;
-import org.postgresql.ds.PGPooledConnection;
-import org.postgresql.jdbc.PgStatement;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
@@ -34,7 +32,7 @@ public class AlunoDAO {
 	@Inject
 	private Application application;
 
-	public void save(Professor professor, Aluno aluno, Double valor, LocalDate mensalidade) throws SQLException {
+	public void save(Professor professor, Aluno aluno, BigDecimal valor, LocalDate mensalidade) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn
 					.prepareCall(SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_CADASTRAR_ALUNO.getValue(), 6));
@@ -43,7 +41,7 @@ public class AlunoDAO {
 			FuncoesUtils.setString(parametro++, aluno.getEmail(), preparedStatement);
 			FuncoesUtils.setString(parametro++, aluno.getCelularUnmasked(), preparedStatement);
 			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
-			FuncoesUtils.setDouble(parametro++, valor, preparedStatement);
+			FuncoesUtils.setBigDecimal(parametro++, valor, preparedStatement);
 			FuncoesUtils.setDate(parametro++, mensalidade, preparedStatement);
 
 			preparedStatement.execute();
@@ -71,7 +69,7 @@ public class AlunoDAO {
 		}
 	}
 
-	public void generateMensalidadeAberta(Aluno aluno, Double valorCobrado, LocalDate mensalidadeVigente)
+	public void generateMensalidadeAberta(Aluno aluno, BigDecimal valorCobrado, LocalDate mensalidadeVigente)
 			throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareCall(
@@ -79,7 +77,7 @@ public class AlunoDAO {
 
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
-			FuncoesUtils.setDouble(parametro++, valorCobrado, preparedStatement);
+			FuncoesUtils.setBigDecimal(parametro++, valorCobrado, preparedStatement);
 			FuncoesUtils.setDate(parametro++, mensalidadeVigente, preparedStatement);
 
 			preparedStatement.execute();
@@ -94,9 +92,10 @@ public class AlunoDAO {
 			PreparedStatement preparedStatement = conn.prepareCall(
 					SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3));
 
+			
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
-			FuncoesUtils.setDate(parametro++, LocalDate.now(), preparedStatement);
+			FuncoesUtils.setTimestamp(parametro++, LocalDateTime.now(), preparedStatement);
 			FuncoesUtils.setInt(parametro++, formaPagameto.getId(), preparedStatement);
 
 			preparedStatement.execute();

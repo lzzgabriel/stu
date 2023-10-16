@@ -403,8 +403,7 @@ CREATE OR REPLACE FUNCTION public.editar_professor(
 	OUT id_retorno integer,
 	p_id integer,
 	p_nome character varying,
-	p_email character varying,
-	p_senha character varying)
+	p_email character varying)
     RETURNS integer
     LANGUAGE 'plpgsql'
     COST 100

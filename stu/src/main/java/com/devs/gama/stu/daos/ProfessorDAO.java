@@ -52,14 +52,13 @@ public class ProfessorDAO {
 	public void edit(Professor professor) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn
-					.prepareCall(SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_EDITAR_PROFESSOR.getValue(), 4));
+					.prepareCall(SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_EDITAR_PROFESSOR.getValue(), 3));
 
 			int parametro = 1;
 
 			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
 			FuncoesUtils.setString(parametro++, professor.getNome(), preparedStatement);
 			FuncoesUtils.setString(parametro++, professor.getEmail(), preparedStatement);
-			FuncoesUtils.setString(parametro++, hashSenha(professor.getSenha()), preparedStatement);
 			preparedStatement.execute();
 
 			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);

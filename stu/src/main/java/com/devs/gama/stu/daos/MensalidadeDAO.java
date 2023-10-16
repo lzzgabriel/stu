@@ -38,7 +38,7 @@ public class MensalidadeDAO {
 			int param = 1;
 
 			FuncoesUtils.setInt(param++, mensalidade.getAluno().getId(), preparedStatement);
-			FuncoesUtils.setDouble(param++, mensalidade.getValor().doubleValue(), preparedStatement);
+			FuncoesUtils.setBigDecimal(param++, mensalidade.getValor(), preparedStatement);
 			FuncoesUtils.setDate(param++, mensalidade.getMensalidade(), preparedStatement);
 
 			preparedStatement.execute();
@@ -55,7 +55,7 @@ public class MensalidadeDAO {
 
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, mensalidade.getAluno().getId(), preparedStatement);
-			FuncoesUtils.setDouble(parametro++, mensalidade.getValor().doubleValue(), preparedStatement);
+			FuncoesUtils.setBigDecimal(parametro++, mensalidade.getValor(), preparedStatement);
 			FuncoesUtils.setDate(parametro++, mensalidade.getMensalidade(), preparedStatement);
 
 			preparedStatement.execute();

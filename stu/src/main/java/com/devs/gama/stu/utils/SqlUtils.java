@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -107,20 +108,14 @@ public class SqlUtils {
 	}
 
 	/**
-	 * Metódo para transformar um LocalDateTime no TimeZone local da máquina para o
-	 * TimeZone UTC e em seguida transformar em um java.sql.Timestamp
+	 * Metódo para transformar um LocalDateTime no TimeZone local da máquina para um
+	 * LocalDateTime no TimeZone UTC
 	 * 
 	 * @param date LocalDateTime que será transformado
 	 * @return Timestamp da API java.sql.Timestamp
 	 */
-	public static Timestamp localDateTimeToTimestampUTC(LocalDateTime date) {
-		SimpleDateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		formatoData.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		String horaUTC = formatoData.format(date);
-
-		return Timestamp.valueOf(LocalDateTime.parse(horaUTC));
+	public static LocalDateTime localDateTimeToLocalDateTimeUTC(LocalDateTime date) {
+		return date.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 	}
 
 	/**

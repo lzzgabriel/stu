@@ -1,5 +1,6 @@
 package com.devs.gama.stu.utils;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -49,11 +50,11 @@ public class FuncoesUtils {
 	 * @param preparedStatement preparedStatement que será passado o parametro
 	 * @throws SQLException
 	 */
-	public static void setDouble(int parametro, Double value, PreparedStatement preparedStatement) throws SQLException {
+	public static void setBigDecimal(int parametro, BigDecimal value, PreparedStatement preparedStatement) throws SQLException {
 		if (Objects.isNull(value)) {
-			preparedStatement.setNull(parametro, Types.DECIMAL);
+			preparedStatement.setNull(parametro, Types.NUMERIC);
 		} else {
-			preparedStatement.setDouble(parametro, value.doubleValue());
+			preparedStatement.setBigDecimal(parametro, value);
 		}
 	}
 
@@ -70,7 +71,7 @@ public class FuncoesUtils {
 		if (Objects.isNull(value)) {
 			preparedStatement.setNull(parametro, Types.DATE);
 		} else {
-			preparedStatement.setDate(parametro, SqlUtils.localDateToDateUTC(value));
+			preparedStatement.setObject(parametro, value);
 		}
 	}
 
@@ -95,7 +96,7 @@ public class FuncoesUtils {
 	 * Metódo para setar um Timestamp no PreparedStatement
 	 * 
 	 * @param parametro         posição do parâmetro
-	 * @param value             valor no tipo Timestamp
+	 * @param value             valor no tipo LocalDateTime
 	 * @param preparedStatement preparedStatement que será passado o parametro
 	 * @throws SQLException
 	 */
@@ -104,7 +105,8 @@ public class FuncoesUtils {
 		if (Objects.isNull(value)) {
 			preparedStatement.setNull(parametro, Types.TIMESTAMP);
 		} else {
-			preparedStatement.setTimestamp(parametro, SqlUtils.localDateTimeToTimestampUTC(value));
+			preparedStatement.setObject(parametro, SqlUtils.localDateTimeToLocalDateTimeUTC(value));
+			// https://stackoverflow.com/questions/34626382/convert-localdatetime-to-localdatetime-in-utc/64832898#64832898
 		}
 	}
 
