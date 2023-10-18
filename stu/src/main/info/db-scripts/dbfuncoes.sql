@@ -472,3 +472,35 @@ BEGIN
 
 END;
 $BODY$;
+
+CREATE OR REPLACE FUNCTION public.cadastrar_aluno_sem_mensalidade(
+	OUT id_retorno integer,
+	a_nome character varying,
+	a_email character varying,
+	a_celular character varying,
+	p_id integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    novo_id INT;
+    resultado_associacao INT;
+BEGIN
+	id_retorno = 0;
+	IF p_id IS NULL THEN
+		RETURN;
+	END IF;
+    INSERT INTO aluno(nome, email, celular) VALUES (a_nome, a_email, a_celular)
+    RETURNING id INTO novo_id;
+    select * from ASSOCIAR_ALUNO_PROFESSOR(p_id, novo_id) INTO resultado_associacao;
+    IF resultado_associacao = 1 THEN
+        id_retorno = novo_id;
+		RETURN;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+END;
+$BODY$;

@@ -32,7 +32,8 @@ public class AlunoDAO {
 	@Inject
 	private Application application;
 
-	public void save(Professor professor, Aluno aluno, BigDecimal valor, LocalDate mensalidade) throws SQLException {
+	public void saveComMensalidade(Professor professor, Aluno aluno, BigDecimal valor, LocalDate mensalidade)
+			throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn
 					.prepareCall(SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_CADASTRAR_ALUNO.getValue(), 6));
@@ -43,6 +44,23 @@ public class AlunoDAO {
 			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
 			FuncoesUtils.setBigDecimal(parametro++, valor, preparedStatement);
 			FuncoesUtils.setDate(parametro++, mensalidade, preparedStatement);
+
+			preparedStatement.execute();
+
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
+		}
+	}
+
+	public void saveSemMensalidade(Professor professor, Aluno aluno) throws SQLException {
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn
+					.prepareCall(SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_CADASTRAR_ALUNO.getValue(), 4));
+			int parametro = 1;
+			FuncoesUtils.setString(parametro++, aluno.getNome(), preparedStatement);
+			FuncoesUtils.setString(parametro++, aluno.getEmail(), preparedStatement);
+			FuncoesUtils.setString(parametro++, aluno.getCelularUnmasked(), preparedStatement);
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
 
 			preparedStatement.execute();
 
@@ -92,7 +110,6 @@ public class AlunoDAO {
 			PreparedStatement preparedStatement = conn.prepareCall(
 					SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3));
 
-			
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
 			FuncoesUtils.setTimestamp(parametro++, LocalDateTime.now(), preparedStatement);
@@ -129,9 +146,9 @@ public class AlunoDAO {
 	public int findCount(Professor professor) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn
-					.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno) as totalRegistros",
-							FuncoesViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(), new String[] { "id_professor", "ativo" }));
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(
+					"COUNT(id_aluno) as totalRegistros", FuncoesViewsTables.VIEW_ALUNO_DE_PROFESSOR.getValue(),
+					new String[] { "id_professor", "ativo" }));
 
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
@@ -232,5 +249,5 @@ public class AlunoDAO {
 
 		return aluno;
 	}
-	
+
 }
