@@ -172,12 +172,12 @@ public class MensalidadeDAO {
 	public int findCountMensalidadeAberta(Professor professor) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno)",
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno) as totalRegistros",
 					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(),
 					new String[] { "id_professor", "ativo" }));
 
 			int parametro = 1;
-			FuncoesUtils.setInt(parametro, professor.getId(), preparedStatement);
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
 			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -214,12 +214,12 @@ public class MensalidadeDAO {
 	public int findCountMensalidadeCobrada(Professor professor) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno)",
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno) as totalRegistros",
 					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
 					new String[] { "id_professor", "ativo" }));
 
 			int parametro = 1;
-			FuncoesUtils.setInt(parametro, professor.getId(), preparedStatement);
+			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
 			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -240,7 +240,7 @@ public class MensalidadeDAO {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(null,
 					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
-					"id_professor = " + professor.getId() + "and ativo = " + Boolean.TRUE, posicao, padraoPaginacao));
+					"id_professor = " + professor.getId() + " and ativo = " + Boolean.TRUE, posicao, padraoPaginacao));
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -264,7 +264,7 @@ public class MensalidadeDAO {
 
 		mensalidade.setValor(res.getBigDecimal("valor_cobrar"));
 		mensalidade.setStatus(Mensalidade.parse(res.getString("status")));
-		mensalidade.setProximoVencimento(SqlUtils.dateToLocalDate(res.getDate("proximo_vencimento")));
+		mensalidade.setVencimento(SqlUtils.dateToLocalDate(res.getDate("proximo_vencimento")));
 
 		return mensalidade;
 	}
