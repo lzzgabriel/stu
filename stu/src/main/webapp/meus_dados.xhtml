@@ -39,10 +39,14 @@
 
 					<p:commandButton value="Editar dados"
 						rendered="#{not stMeusDados.editMode}"
-						actionListener="#{stMeusDados.enterEditMode()}" update="@form" />
+						actionListener="#{stMeusDados.enableEditMode()}" update="@form" />
 					<p:commandButton value="Salvar alterações"
-						rendered="#{stMeusDados.editMode}"
+						rendered="#{stMeusDados.editMode}" icon="pi pi-check-circle"
 						actionListener="#{stMeusDados.edit()}" update="@form" />
+					<p:commandButton value="Cancelar" icon="pi pi-times-circle"
+						partialSubmit="true" process="@this"
+						rendered="#{stMeusDados.editMode}" styleClass="ml-2 ui-button-secondary"
+						actionListener="#{stMeusDados.disableEditMode()}" update="@form" />
 
 				</div>
 
