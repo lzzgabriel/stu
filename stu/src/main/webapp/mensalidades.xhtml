@@ -55,7 +55,7 @@
 										<div class="flex justify-content-center">Vencimento</div>
 									</f:facet>
 									<div class="flex justify-content-center">
-										<h:outputText value="#{mensalidade.proximoVencimentoAsDate}">
+										<h:outputText value="#{mensalidade.vencimentoAsDate}">
 											<f:convertDateTime dateStyle="short" locale="pt_BR" />
 										</h:outputText>
 									</div>
@@ -97,20 +97,27 @@
 								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
 								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
-
-								<p:column headerText="Nome do aluno">
+								
+								<f:facet name="header">
 									<h:outputText value="#{mensalidade.aluno.nome}" />
-								</p:column>
+								</f:facet>
 
 								<p:column headerText="Valor cobrado">
 									<h:outputText value="#{mensalidade.valor}">
-										<f:convertNumber type="currency" currencyCode="BRL" />
+										<f:convertNumber type="cur\rency" currencyCode="BRL" />
 									</h:outputText>
 								</p:column>
-
-								<p:column>
-									<p:commandButton icon="pi pi-history" partialSubmit="true"
-										process="@this" update="main" />
+								
+								<p:column headerText="Vencimento">
+									<h:outputText value="#{mensalidade.vencimentoAsDate}">
+										<f:convertDateTime locale="pt_BR" dateStyle="short" />
+									</h:outputText>
+								</p:column>
+								
+								<p:column headerText="Pagamento">
+									<h:outputText value="#{mensalidade}">
+										<f:convertDateTime locale="pt_BR" dateStyle="short" />
+									</h:outputText>
 								</p:column>
 
 							</p:dataTable>
@@ -118,114 +125,6 @@
 						</div>
 
 					</h:panelGroup>
-
-				</h:form>
-
-				<h:form id="saveForm" rendered="false">
-
-					<p:growl id="messages" globalOnly="true" />
-
-					<div class="mx-4 pt-4">
-						<p:outputPanel>
-							<h2>Inserir aluno</h2>
-						</p:outputPanel>
-					</div>
-
-					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true"
-						process="@this" actionListener="#{stMensalidades.normalMode()}"
-						update="main" />
-
-					<div class="mx-8">
-
-						<div class="grid py-4">
-
-							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
-							<p:inputText id="nome" styleClass="col-7"
-								value="#{stMensalidades.aluno.nome}" required="true"
-								requiredMessage="Obrigatório" />
-							<p:message for="nome" styleClass="col-2" />
-
-						</div>
-
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
-							<p:inputText id="email" styleClass="col-7"
-								validator="emailValidator" validatorMessage="Inválido"
-								value="#{stMensalidades.aluno.email}" />
-							<p:message styleClass="col-2" for="email" />
-						</div>
-
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
-							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
-								required="true" requiredMessage="Obrigatório"
-								validateMask="false" value="#{stMensalidades.aluno.celular}" />
-							<p:message styleClass="col-2" for="celular" />
-
-						</div>
-
-					</div>
-
-					<div class="flex justify-content-center flex-wrap py-4">
-
-						<p:commandButton value="Salvar alterações"
-							actionListener="#{stMensalidades.save()}" update="main" />
-
-					</div>
-
-				</h:form>
-
-				<h:form id="editForm" rendered="false">
-
-					<p:growl id="messages" globalOnly="true" />
-
-					<div class="mx-4 pt-4">
-						<p:outputPanel>
-							<h2>Inserir aluno</h2>
-						</p:outputPanel>
-					</div>
-
-					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true"
-						process="@this" actionListener="#{stMensalidades.normalMode()}"
-						update="main" />
-
-					<div class="mx-8">
-
-						<div class="grid py-4">
-
-							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
-							<p:inputText id="nome" styleClass="col-7"
-								value="#{stMensalidades.aluno.nome}" required="true"
-								requiredMessage="Obrigatório" />
-							<p:message for="nome" styleClass="col-2" />
-
-						</div>
-
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
-							<p:inputText id="email" styleClass="col-7"
-								validator="emailValidator" validatorMessage="Inválido"
-								value="#{stMensalidades.aluno.email}" />
-							<p:message styleClass="col-2" for="email" />
-						</div>
-
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
-							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
-								required="true" requiredMessage="Obrigatório"
-								validateMask="false" value="#{stMensalidades.aluno.celular}" />
-							<p:message styleClass="col-2" for="celular" />
-
-						</div>
-
-					</div>
-
-					<div class="flex justify-content-center flex-wrap py-4">
-
-						<p:commandButton value="Salvar alterações"
-							actionListener="#{stMensalidades.edit()}" update="main" />
-
-					</div>
 
 				</h:form>
 

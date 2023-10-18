@@ -10,7 +10,7 @@ public class Mensalidade {
 
 	private Aluno aluno;
 	private LocalDate mensalidade;
-	private LocalDate proximoVencimento;
+	private LocalDate vencimento;
 	private Boolean status;
 	private BigDecimal valor;
 	private FormaPagamento formaPagamento;
@@ -32,16 +32,16 @@ public class Mensalidade {
 		this.mensalidade = mensalidade;
 	}
 	
-	public Date getProximoVencimentoAsDate() {
-		return Date.from(proximoVencimento.atStartOfDay(ZoneId.of("UTC")).toInstant());
+	public Date getVencimentoAsDate() {
+		return Date.from(vencimento.atStartOfDay(ZoneId.of("UTC")).toInstant());
 	}
 
-	public LocalDate getProximoVencimento() {
-		return proximoVencimento;
+	public LocalDate getVencimento() {
+		return vencimento;
 	}
 
-	public void setProximoVencimento(LocalDate proximoVencimento) {
-		this.proximoVencimento = proximoVencimento;
+	public void setVencimento(LocalDate proximoVencimento) {
+		this.vencimento = proximoVencimento;
 	}
 
 	public Boolean getStatus() {
@@ -66,6 +66,10 @@ public class Mensalidade {
 
 	public void setFormaPagamento(FormaPagamento formaPagamento) {
 		this.formaPagamento = formaPagamento;
+	}
+	
+	public Date getMomentoPagamentoAsDate() {
+		return Date.from(momentoPagamento.toInstant());
 	}
 
 	public ZonedDateTime getMomentoPagamento() {

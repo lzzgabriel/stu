@@ -12,7 +12,7 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.daos.MensalidadeDAO;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
-import com.devs.gama.stu.entities.Professor;
+import com.devs.gama.stu.utils.SessionUtils;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.inject.Model;
@@ -39,7 +39,16 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 
 	@Override
 	public int count(Map<String, FilterMeta> filterBy) {
-		return 1;
+		try {
+			if (!logMode) {
+				return mensalidadeDAO.findCountMensalidadeAberta(SessionUtils.getLoggedProfessor());
+			} else {
+				return mensalidadeDAO.findCountMensalidadeCobrada(SessionUtils.getLoggedProfessor());
+			}
+		} catch (SQLException e) {
+			application.getLogger().error(e.getMessage(),e);
+			return 0;
+		}
 	}
 
 	@Override
@@ -47,10 +56,11 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 			Map<String, FilterMeta> filterBy) {
 
 		try {
-			// TODO fazer filtragem de Mensalidades
-			// TODO pagination
-			return mensalidadeDAO.findAllMensalidadeAberta(new Professor(1, "Professor_teste", "123@gmail.com"));
-			// substituir pelo professor com sessão logada
+			if (!logMode) {
+				return mensalidadeDAO.paginationMensalidadeAberta(SessionUtils.getLoggedProfessor(), first, pageSize);
+			} else {
+				return mensalidadeDAO.paginationMensalidadeCobrada(SessionUtils.getLoggedProfessor(), first, pageSize);
+			}
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			return null;
