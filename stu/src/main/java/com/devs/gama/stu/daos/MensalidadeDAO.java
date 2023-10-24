@@ -4,12 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
+import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.entities.Mensalidade;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.FuncoesViewsTables;
@@ -79,7 +81,7 @@ public class MensalidadeDAO {
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
-				mensalidade = fetch(resultSet);
+				mensalidade = fetch(resultSet, true);
 			}
 
 			ProcessamentoFuncoes.closeResultSet(resultSet);
@@ -107,7 +109,7 @@ public class MensalidadeDAO {
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
-				mensalidade = fetch(resultSet);
+				mensalidade = fetch(resultSet, false);
 			}
 
 			ProcessamentoFuncoes.closeResultSet(resultSet);
@@ -135,7 +137,7 @@ public class MensalidadeDAO {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
-				returnList.add(fetch(resultSet));
+				returnList.add(fetch(resultSet, true));
 			}
 
 			ProcessamentoFuncoes.closeResultSet(resultSet);
@@ -159,7 +161,7 @@ public class MensalidadeDAO {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
-				returnList.add(fetch(resultSet));
+				returnList.add(fetch(resultSet, false));
 			}
 
 			ProcessamentoFuncoes.closeResultSet(resultSet);
@@ -172,8 +174,8 @@ public class MensalidadeDAO {
 	public int findCountMensalidadeAberta(Professor professor) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno) as totalRegistros",
-					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(),
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(
+					"COUNT(id_aluno) as totalRegistros", FuncoesViewsTables.VIEW_ALUNO_MENSALIDADE_ABERTA.getValue(),
 					new String[] { "id_professor", "ativo" }));
 
 			int parametro = 1;
@@ -203,7 +205,7 @@ public class MensalidadeDAO {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
-				listaRetorno.add(fetch(resultSet));
+				listaRetorno.add(fetch(resultSet, true));
 			}
 			ProcessamentoFuncoes.closeResultSet(resultSet);
 			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
@@ -214,8 +216,8 @@ public class MensalidadeDAO {
 	public int findCountMensalidadeCobrada(Professor professor) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable("COUNT(id_aluno) as totalRegistros",
-					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
+			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(
+					"COUNT(id_aluno) as totalRegistros", FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
 					new String[] { "id_professor", "ativo" }));
 
 			int parametro = 1;
@@ -245,7 +247,7 @@ public class MensalidadeDAO {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
-				listaRetorno.add(fetch(resultSet));
+				listaRetorno.add(fetch(resultSet, false));
 			}
 			ProcessamentoFuncoes.closeResultSet(resultSet);
 			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
@@ -253,7 +255,7 @@ public class MensalidadeDAO {
 		return listaRetorno;
 	}
 
-	public Mensalidade fetch(ResultSet res) throws SQLException {
+	public Mensalidade fetch(ResultSet res, boolean b) throws SQLException {
 		Mensalidade mensalidade = new Mensalidade();
 
 		Aluno aluno = new Aluno();
@@ -262,9 +264,13 @@ public class MensalidadeDAO {
 
 		mensalidade.setAluno(aluno);
 
-		mensalidade.setValor(res.getBigDecimal("valor_cobrar"));
-		mensalidade.setStatus(Mensalidade.parse(res.getString("status")));
-		mensalidade.setVencimento(SqlUtils.dateToLocalDate(res.getDate("proximo_vencimento")));
+		mensalidade.setValor(res.getBigDecimal(b ? "valor_cobrar" : "valor_cobrado"));
+		if (b)
+			mensalidade.setStatus(Mensalidade.parse(res.getString("status")));
+		mensalidade.setVencimento(SqlUtils.dateToLocalDate(res.getDate(b ? "proximo_vencimento" : "data_vencimento")));
+
+		mensalidade.setMomentoPagamento(SqlUtils
+				.timestampToZonedDateTime(res.getTimestamp(b ? "momento_ultimo_pagamento" : "momento_pagamento")));
 
 		return mensalidade;
 	}
@@ -277,6 +283,23 @@ public class MensalidadeDAO {
 			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
 		}
 
+	}
+
+	public void confirmPay(Aluno aluno, FormaPagamento formaPagameto) throws SQLException {
+		try (Connection conn = application.getDataSource().getConnection()) {
+			PreparedStatement preparedStatement = conn.prepareCall(
+					SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3));
+
+			int parametro = 1;
+			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
+			FuncoesUtils.setTimestamp(parametro++, LocalDateTime.now(), preparedStatement);
+			FuncoesUtils.setInt(parametro++, formaPagameto.getId(), preparedStatement);
+
+			preparedStatement.execute();
+
+			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
+			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
+		}
 	}
 
 }

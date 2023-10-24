@@ -15,9 +15,10 @@
 
 					<p:growl id="messages" globalOnly="true" />
 
-					<h:panelGroup rendered="#{!stMensalidades.logMode}">
+					<h:panelGroup
+						rendered="#{not stMensalidades.logMode and not stMensalidades.editMode}">
 
-						<div class="mx-4 pt-4">
+						<div class="md:mx-4 md:pt-4 sm:mx-0 sm:pt-0">
 
 							<p:outputPanel>
 								<h2>Mensalidades</h2>
@@ -26,10 +27,10 @@
 							<p:dataTable id="dataTable" paginator="true" lazy="true"
 								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
 								emptyMessage="Nenhum registro encontrado"
-								paginatorPosition="bottom" rows="10" styleClass="grid"
+								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
-								<p:column styleClass="col-6">
+								<p:column styleClass="col-5">
 									<f:facet name="header">
 										<div class="flex justify-content-center">Nome</div>
 									</f:facet>
@@ -62,20 +63,37 @@
 								</p:column>
 
 								<p:column styleClass="col-1">
+									<f:facet name="header">
+										<div class="flex justify-content-center">Status</div>
+									</f:facet>
 									<div class="flex justify-content-center">
-										<p:tag value="Aberta" severity="success" rendered="#{mensalidade.status}" />
-										<p:tag value="Atrasada" severity="danger" rendered="#{!mensalidade.status}" />
+										<p:tag value="Aberta" severity="success"
+											rendered="#{mensalidade.status}" />
+										<p:tag value="Atrasada" severity="danger"
+											rendered="#{!mensalidade.status}" />
 									</div>
 								</p:column>
 
-								<p:column styleClass="col-1">
+								<p:column styleClass="col-2">
 									<div class="flex justify-content-center">
 										<p:tooltip for="@next" position="top"
 											value="Ver mensalidades cobradas para este aluno" />
 										<p:commandButton icon="pi pi-history"
-											styleClass="rounded-button"
+											styleClass="rounded-button mx-1"
 											actionListener="#{stMensalidades.enableLogMode()}"
-											partialSubmit="true" process="@this" update="@form" />
+											partialSubmit="true" process="@this" update="@form">
+											<f:setPropertyActionListener value="#{mensalidade.aluno}"
+												target="#{stMensalidades.selectedAluno}" />
+										</p:commandButton>
+										<p:tooltip for="@next" position="top"
+											value="Confirmar pagamento realizado" />
+										<p:commandButton icon="pi pi-money-bill"
+											styleClass="rounded-button mx-1" partialSubmit="true"
+											process="@this" oncomplete="PF('confirmDialog').show()"
+											actionListener="#{stMensalidades.loadFormaPagamento()}">
+											<f:setPropertyActionListener value="#{mensalidade.aluno}"
+												target="#{stMensalidades.selectedAluno}" />
+										</p:commandButton>
 									</div>
 								</p:column>
 
@@ -93,34 +111,103 @@
 								<h2>Mensalidades</h2>
 							</p:outputPanel>
 
+							<p:commandLink partialSubmit="true" process="@this"
+								styleClass="no-underscore-link"
+								actionListener="#{stMensalidades.disableLogMode()}"
+								update="main">
+								<i class="pi pi-chevron-left" />Voltar
+							</p:commandLink>
+
 							<p:dataTable id="dataTable2" paginator="true" lazy="true"
 								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
 								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
-								
+
 								<f:facet name="header">
-									<h:outputText value="#{mensalidade.aluno.nome}" />
+									<h:outputText value="#{stMensalidades.selectedAluno.nome}" />
 								</f:facet>
 
-								<p:column headerText="Valor cobrado">
+								<p:column>
+									<f:facet name="header">
+										<div class="flex justify-content-center">Valor cobrado</div>
+									</f:facet>
 									<h:outputText value="#{mensalidade.valor}">
-										<f:convertNumber type="cur\rency" currencyCode="BRL" />
+										<f:convertNumber type="currency" currencyCode="BRL" />
 									</h:outputText>
 								</p:column>
-								
-								<p:column headerText="Vencimento">
+
+								<p:column>
+									<f:facet name="header">
+										<div class="flex justify-content-center">Vencimento</div>
+									</f:facet>
 									<h:outputText value="#{mensalidade.vencimentoAsDate}">
 										<f:convertDateTime locale="pt_BR" dateStyle="short" />
 									</h:outputText>
 								</p:column>
-								
-								<p:column headerText="Pagamento">
-									<h:outputText value="#{mensalidade}">
+
+								<p:column>
+									<f:facet name="header">
+										<div class="flex justify-content-center">Pagamento</div>
+									</f:facet>
+									<h:outputText value="#{mensalidade.momentoPagamentoAsDate}">
 										<f:convertDateTime locale="pt_BR" dateStyle="short" />
 									</h:outputText>
 								</p:column>
 
 							</p:dataTable>
+
+						</div>
+
+					</h:panelGroup>
+
+					<p:dialog widgetVar="confirmDialog" dynamic="true" modal="true"
+						header="Confirmação">
+
+						<div class="flex flex-column">
+
+							<p:outputLabel value="Selecione a forma de pagamento" for="@next" />
+							<p:selectOneMenu value="#{stMensalidades.selectedFormaPagamento}"
+								converter="formaPagamentoConverter"
+								styleClass="mt-1">
+								<f:selectItems
+									value="#{stMensalidades.availableFormaPagamentos}"
+									var="formaPg" itemLabel="#{formaPg.descricao}"
+									itemValue="#{formaPg}" />
+							</p:selectOneMenu>
+
+							<p:commandButton value="Confirmar pagamento"
+								actionListener="#{stMensalidades.confirmarPagamento()}"
+								partialSubmit="true" process="@parent" update="@form"
+								styleClass="mt-4">
+								<p:confirm type="popup" header="Confirmação"
+									message="Deseja confirmar pagamento desta mensalidade?"
+									icon="pi pi-exclamation-triangle" />
+							</p:commandButton>
+
+						</div>
+
+					</p:dialog>
+
+					<p:confirmPopup global="true">
+						<p:commandButton value="Não" type="button"
+							styleClass="ui-confirm-popup-no ui-button-flat" />
+						<p:commandButton value="Sim" type="button"
+							styleClass="ui-confirm-popup-yes" />
+					</p:confirmPopup>
+
+					<h:panelGroup rendered="#{stMensalidades.editMode}">
+
+						<div class="mx-4 pt-4">
+
+							<p:outputPanel>
+								<h2>Alterar mensalidade</h2>
+							</p:outputPanel>
+
+							<p:commandLink partialSubmit="true" process="@this"
+								actionListener="#{stMensalidades.disableEditMode()}"
+								update="main">
+								<i class="pi pi-chevron-left" />Voltar
+							</p:commandLink>
 
 						</div>
 

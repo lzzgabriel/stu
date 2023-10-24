@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -137,7 +138,11 @@ public class SqlUtils {
 	 * @return LocalDateTime da API java.time.LocalDateTime
 	 */
 	public static LocalDateTime timestampToLocalDateTime(Timestamp timestamp) {
-		return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
+		return Objects.isNull(timestamp) ? null : LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
+	}
+	
+	public static ZonedDateTime timestampToZonedDateTime(Timestamp timestamp) {
+		return Objects.isNull(timestamp) ? null : ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
 	}
 
 }

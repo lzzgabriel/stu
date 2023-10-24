@@ -2,7 +2,6 @@ package com.devs.gama.stu.pages;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.time.LocalDate;
 
 import org.primefaces.model.LazyDataModel;
@@ -61,9 +60,9 @@ public class MeusAlunos implements Serializable {
 			MessageUtils.addInfoMessage("Aluno cadastrado");
 
 			normalMode();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			application.getLogger().error(e.getMessage(), e);
-			MessageUtils.addErrorMessage("Erro ao cadastrar aluno", "messages", e.getMessage());
+			MessageUtils.addErrorMessage("Erro ao cadastrar aluno", null, e.getMessage());
 		}
 	}
 	
@@ -75,9 +74,9 @@ public class MeusAlunos implements Serializable {
 			MessageUtils.addInfoMessage("Dados alterados");
 
 			normalMode();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			application.getLogger().error(e.getMessage(), e);
-			MessageUtils.addErrorMessage("Erro ao cadastrar aluno", "messages", e.getMessage());
+			MessageUtils.addErrorMessage("Erro ao cadastrar aluno", null, e.getMessage());
 		}
 	}
 	

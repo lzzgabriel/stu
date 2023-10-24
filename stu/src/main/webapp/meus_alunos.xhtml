@@ -34,16 +34,25 @@
 								</div>
 							</f:facet>
 
-							<p:column headerText="Nome">
+							<p:column styleClass="col-5">
+								<f:facet name="header">
+									<div class="flex justify-content-center">Nome</div>
+								</f:facet>
 								<h:outputText value="#{aluno.nome}" />
 							</p:column>
 
-							<p:column headerText="E-mail">
+							<p:column styleClass="col-4">
+								<f:facet name="header">
+									<div class="flex justify-content-center">E-mail</div>
+								</f:facet>
 								<h:outputText value="#{aluno.email}" />
 							</p:column>
 
-							<p:column headerText="Celular">
-								<h:outputText value="#{aluno.celularMasked}">
+							<p:column styleClass="col-3">
+								<f:facet name="header">
+									<div class="flex justify-content-center">Celular</div>
+								</f:facet>
+								<h:outputText styleClass="flex justify-content-center" value="#{aluno.celularMasked}">
 								</h:outputText>
 							</p:column>
 
@@ -70,7 +79,7 @@
 					</div>
 					
 					<p:commandLink partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main">
-						<i class="pi pi-chevron-left">Voltar</i>
+						<i class="pi pi-chevron-left"/>Voltar
 					</p:commandLink>
 
 					<div class="mx-8">
@@ -127,9 +136,7 @@
 					</div>
 					
 					<p:commandLink partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main">
-						<i class="pi pi-chevron-left">
-							<p:outputLabel value="Voltar"/>
-						</i>
+						<i class="pi pi-chevron-left"/>Voltar
 					</p:commandLink>
 
 					<div class="mx-8">

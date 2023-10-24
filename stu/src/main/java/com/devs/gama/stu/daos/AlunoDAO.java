@@ -105,23 +105,6 @@ public class AlunoDAO {
 		}
 	}
 
-	public void confirmPay(Aluno aluno, FormaPagamento formaPagameto) throws SQLException {
-		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareCall(
-					SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_GERAR_CONFIRMAR_PAGAMENTO.getValue(), 3));
-
-			int parametro = 1;
-			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
-			FuncoesUtils.setTimestamp(parametro++, LocalDateTime.now(), preparedStatement);
-			FuncoesUtils.setInt(parametro++, formaPagameto.getId(), preparedStatement);
-
-			preparedStatement.execute();
-
-			ProcessamentoFuncoes.finalizarFuncao(preparedStatement);
-			ProcessamentoFuncoes.closePreparedStatement(preparedStatement);
-		}
-	}
-
 	public List<Aluno> findAll(Professor professor) throws SQLException {
 		List<Aluno> returnList = new ArrayList<>();
 		try (Connection conn = application.getDataSource().getConnection()) {

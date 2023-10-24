@@ -33,10 +33,6 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 
 	private boolean logMode = false;
 
-	@PostConstruct
-	public void init() {
-	}
-
 	@Override
 	public int count(Map<String, FilterMeta> filterBy) {
 		try {
