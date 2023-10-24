@@ -13,11 +13,13 @@
 </h:head>
 <h:body styleClass="bg-bluegray-200 m-0">
 	<div class="flex justify-content-center align-content-center flex-wrap" style="height: 100vh">
-			<div class="flex flex-column justify-content-center flex-wrap shadow-5 p-5 bg-white border-round-lg"
-				style="width: auto; height: auto;">
-				<p:graphicImage style="width: 150px; align-self: center" library="svg" name="error-page-svgrepo-com.svg" />
-				<h4 class="flex justify-content-center">Página não encontrada</h4>
-			</div>
+		<div class="flex flex-column justify-content-center flex-wrap shadow-5 p-5 bg-white border-round-lg"
+			style="width: auto; height: auto;">
+			<p:graphicImage style="width: 150px; align-self: center" library="svg" name="error-page-svgrepo-com.svg" />
+			<h4 class="flex justify-content-center">Página não encontrada</h4>
+			<p:outputLabel styleClass="mt-1" value="não conseguimos encotrar a página com o URL solicitado"/>
+			<p:linkButton styleClass="mt-4" value="Voltar à página inicial" href="home.xhtml"/>
+		</div>
 	</div>
 
 </h:body>
