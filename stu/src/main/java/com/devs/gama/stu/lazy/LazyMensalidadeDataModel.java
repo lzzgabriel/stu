@@ -42,7 +42,7 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 				return mensalidadeDAO.findCountMensalidadeCobrada(SessionUtils.getLoggedProfessor());
 			}
 		} catch (SQLException e) {
-			application.getLogger().error(e.getMessage(),e);
+			application.getLogger().error(e.getMessage(), e);
 			return 0;
 		}
 	}
@@ -55,7 +55,10 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 			if (!logMode) {
 				return mensalidadeDAO.paginationMensalidadeAberta(SessionUtils.getLoggedProfessor(), first, pageSize);
 			} else {
-				return mensalidadeDAO.paginationMensalidadeCobrada(SessionUtils.getLoggedProfessor(), first, pageSize);
+				Aluno aluno = new Aluno();
+				aluno.setId(37); // -> trocar pelo aluno selecionado
+				return mensalidadeDAO.paginationMensalidadeCobrada(SessionUtils.getLoggedProfessor(), aluno, first,
+						pageSize);
 			}
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);

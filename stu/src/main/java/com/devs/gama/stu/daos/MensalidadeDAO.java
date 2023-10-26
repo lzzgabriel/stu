@@ -147,16 +147,15 @@ public class MensalidadeDAO {
 		}
 	}
 
-	public List<Mensalidade> findAllMensalidadeCobrada(Professor professor) throws SQLException {
+	public List<Mensalidade> findAllMensalidadeCobrada(Professor professor, Aluno aluno) throws SQLException {
 		List<Mensalidade> returnList = new ArrayList<>();
 
 		try (Connection connection = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement(SqlUtils.montarViewTable(null,
-					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(), null));
+					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(), new String[] { "id_aluno" }));
 			int parametro = 1;
 
-			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
-			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
+			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -236,13 +235,14 @@ public class MensalidadeDAO {
 		return totalRegistros;
 	}
 
-	public List<Mensalidade> paginationMensalidadeCobrada(Professor professor, int posicao, int padraoPaginacao)
-			throws SQLException {
+	public List<Mensalidade> paginationMensalidadeCobrada(Professor professor, Aluno aluno, int posicao,
+			int padraoPaginacao) throws SQLException {
 		List<Mensalidade> listaRetorno = new ArrayList<Mensalidade>();
 		try (Connection conn = application.getDataSource().getConnection()) {
-			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarPaginacao(null,
-					FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
-					"id_professor = " + professor.getId() + " and ativo = " + Boolean.TRUE, posicao, padraoPaginacao));
+			PreparedStatement preparedStatement = conn.prepareStatement(
+					SqlUtils.montarPaginacao(null, FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
+							"id_professor = " + professor.getId() + " and id_aluno = " + aluno.getId(), posicao,
+							padraoPaginacao));
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
