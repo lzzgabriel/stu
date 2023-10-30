@@ -16,7 +16,7 @@
 					<p:growl id="messages" globalOnly="true" />
 
 					<h:panelGroup
-						rendered="#{not stMensalidades.logMode and not stMensalidades.editMode}">
+						rendered="#{not mensalidadesView.logMode and not mensalidadesView.editMode}">
 
 						<div class="md:mx-4 md:pt-4 sm:mx-0 sm:pt-0">
 
@@ -25,7 +25,7 @@
 							</p:outputPanel>
 
 							<p:dataTable id="dataTable" paginator="true" lazy="true"
-								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
+								value="#{mensalidadesView.lazyDataModel}" var="mensalidade"
 								emptyMessage="Nenhum registro encontrado"
 								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
@@ -80,19 +80,19 @@
 											value="Ver mensalidades cobradas para este aluno" />
 										<p:commandButton icon="pi pi-history"
 											styleClass="rounded-button mx-1"
-											actionListener="#{stMensalidades.enableLogMode()}"
+											actionListener="#{mensalidadesView.enableLogMode()}"
 											partialSubmit="true" process="@this" update="@form">
 											<f:setPropertyActionListener value="#{mensalidade.aluno}"
-												target="#{stMensalidades.selectedAluno}" />
+												target="#{mensalidadesView.selectedAluno}" />
 										</p:commandButton>
 										<p:tooltip for="@next" position="top"
 											value="Confirmar pagamento realizado" />
 										<p:commandButton icon="pi pi-money-bill"
 											styleClass="rounded-button mx-1" partialSubmit="true"
 											process="@this" oncomplete="PF('confirmDialog').show()"
-											actionListener="#{stMensalidades.loadFormaPagamento()}">
+											actionListener="#{mensalidadesView.loadFormaPagamento()}">
 											<f:setPropertyActionListener value="#{mensalidade.aluno}"
-												target="#{stMensalidades.selectedAluno}" />
+												target="#{mensalidadesView.selectedAluno}" />
 										</p:commandButton>
 									</div>
 								</p:column>
@@ -103,7 +103,7 @@
 
 					</h:panelGroup>
 
-					<h:panelGroup rendered="#{stMensalidades.logMode}">
+					<h:panelGroup rendered="#{mensalidadesView.logMode}">
 
 						<div class="mx-4 pt-4">
 
@@ -113,18 +113,18 @@
 
 							<p:commandLink partialSubmit="true" process="@this"
 								styleClass="no-underscore-link"
-								actionListener="#{stMensalidades.disableLogMode()}"
+								actionListener="#{mensalidadesView.disableLogMode()}"
 								update="main">
 								<i class="pi pi-chevron-left" />Voltar
 							</p:commandLink>
 
 							<p:dataTable id="dataTable2" paginator="true" lazy="true"
-								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
+								value="#{mensalidadesView.lazyDataModel}" var="mensalidade"
 								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
 								<f:facet name="header">
-									<h:outputText value="#{stMensalidades.selectedAluno.nome}" />
+									<h:outputText value="#{mensalidadesView.selectedAluno.nome}" />
 								</f:facet>
 
 								<p:column>
@@ -166,17 +166,17 @@
 						<div class="flex flex-column">
 
 							<p:outputLabel value="Selecione a forma de pagamento" for="@next" />
-							<p:selectOneMenu value="#{stMensalidades.selectedFormaPagamento}"
+							<p:selectOneMenu value="#{mensalidadesView.selectedFormaPagamento}"
 								converter="formaPagamentoConverter"
 								styleClass="mt-1">
 								<f:selectItems
-									value="#{stMensalidades.availableFormaPagamentos}"
+									value="#{mensalidadesView.availableFormaPagamentos}"
 									var="formaPg" itemLabel="#{formaPg.descricao}"
 									itemValue="#{formaPg}" />
 							</p:selectOneMenu>
 
 							<p:commandButton value="Confirmar pagamento"
-								actionListener="#{stMensalidades.confirmarPagamento()}"
+								actionListener="#{mensalidadesView.confirmarPagamento()}"
 								partialSubmit="true" process="@parent" update="@form"
 								styleClass="mt-4">
 								<p:confirm type="popup" header="Confirmação"
@@ -195,7 +195,7 @@
 							styleClass="ui-confirm-popup-yes" />
 					</p:confirmPopup>
 
-					<h:panelGroup rendered="#{stMensalidades.editMode}">
+					<h:panelGroup rendered="#{mensalidadesView.editMode}">
 
 						<div class="mx-4 pt-4">
 
@@ -204,7 +204,7 @@
 							</p:outputPanel>
 
 							<p:commandLink partialSubmit="true" process="@this"
-								actionListener="#{stMensalidades.disableEditMode()}"
+								actionListener="#{mensalidadesView.disableEditMode()}"
 								update="main">
 								<i class="pi pi-chevron-left" />Voltar
 							</p:commandLink>

@@ -20,9 +20,9 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-@Named("stMensalidades")
+@Named
 @ViewScoped
-public class Mensalidades implements Serializable {
+public class MensalidadesView implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -97,6 +97,7 @@ public class Mensalidades implements Serializable {
 
 	public void setSelectedAluno(Aluno selectedAluno) {
 		this.selectedAluno = selectedAluno;
+		lazyDataModel.setAluno(selectedAluno);
 	}
 
 	public FormaPagamento getSelectedFormaPagamento() {

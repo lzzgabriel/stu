@@ -212,15 +212,16 @@ public class MensalidadeDAO {
 		return listaRetorno;
 	}
 
-	public int findCountMensalidadeCobrada(Professor professor) throws SQLException {
+	public int findCountMensalidadeCobrada(Professor professor, Aluno aluno) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareStatement(SqlUtils.montarViewTable(
 					"COUNT(id_aluno) as totalRegistros", FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
-					new String[] { "id_professor", "ativo" }));
+					new String[] { "id_professor", "id_aluno", "ativo" }));
 
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, professor.getId(), preparedStatement);
+			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
 			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();

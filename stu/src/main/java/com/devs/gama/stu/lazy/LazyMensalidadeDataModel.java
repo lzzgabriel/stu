@@ -14,7 +14,6 @@ import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
 import com.devs.gama.stu.utils.SessionUtils;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.inject.Model;
 import jakarta.inject.Inject;
 
@@ -39,7 +38,7 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 			if (!logMode) {
 				return mensalidadeDAO.findCountMensalidadeAberta(SessionUtils.getLoggedProfessor());
 			} else {
-				return mensalidadeDAO.findCountMensalidadeCobrada(SessionUtils.getLoggedProfessor());
+				return mensalidadeDAO.findCountMensalidadeCobrada(SessionUtils.getLoggedProfessor(), aluno);
 			}
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
@@ -55,8 +54,6 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 			if (!logMode) {
 				return mensalidadeDAO.paginationMensalidadeAberta(SessionUtils.getLoggedProfessor(), first, pageSize);
 			} else {
-				Aluno aluno = new Aluno();
-				aluno.setId(37); // -> trocar pelo aluno selecionado
 				return mensalidadeDAO.paginationMensalidadeCobrada(SessionUtils.getLoggedProfessor(), aluno, first,
 						pageSize);
 			}
