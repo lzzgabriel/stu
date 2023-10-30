@@ -22,38 +22,47 @@ AS SELECT ma.id_aluno,
     a.nome AS aluno_nome,
     ma.valor_cobrar,
     ma.status,
-    ma.proximo_vencimento
+    ma.proximo_vencimento,
+    adp.id_professor,
+    a.ativo,
+    ma.momento_ultimo_pagamento
    FROM mensalidade_aberta ma
-     JOIN aluno a ON ma.id_aluno = a.id;
+     JOIN aluno a ON ma.id_aluno = a.id
+     LEFT JOIN aluno_de_professor adp ON adp.id_aluno = ma.id_aluno;
 
 
 -- public.view_aluno_mensalidades_cobradas source
 
 CREATE OR REPLACE VIEW public.view_aluno_mensalidades_cobradas
-AS SELECT mc.id_aluno,
+ AS
+ SELECT mc.id_aluno,
     a.nome AS aluno_nome,
     mc.valor_cobrado,
     mc.data_vencimento,
     mc.id_forma_pagamento,
-    mc.momento_pagamento
+    mc.momento_pagamento,
+    adp.id_professor,
+    a.ativo
    FROM mensalidade_cobrada mc
-     LEFT JOIN aluno a ON mc.id_aluno = a.id;
+     LEFT JOIN aluno a ON mc.id_aluno = a.id
+     LEFT JOIN aluno_de_professor adp ON adp.id_aluno = mc.id_aluno;
 
 
 -- public.view_formas_pagamento source
 
 CREATE OR REPLACE VIEW public.view_formas_pagamento
-AS SELECT id,
-    descricao
+AS SELECT fp.id,
+    fp.descricao
    FROM forma_pagamento fp;
 
 
 -- public.view_professor source
 
 CREATE OR REPLACE VIEW public.view_professor
-AS SELECT id,
-    nome,
-    email,
-    senha,
-    momento_cadastro
+AS SELECT p.id,
+    p.nome,
+    p.email,
+    p.senha,
+    p.momento_cadastro,
+	p.ativo
    FROM professor p;

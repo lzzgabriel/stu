@@ -15,21 +15,22 @@
 
 					<p:growl id="messages" globalOnly="true" />
 
-					<h:panelGroup rendered="#{!stMensalidades.logMode}">
+					<h:panelGroup
+						rendered="#{not mensalidadesView.logMode and not mensalidadesView.editMode}">
 
-						<div class="mx-4 pt-4">
+						<div class="md:mx-4 md:pt-4 sm:mx-0 sm:pt-0">
 
 							<p:outputPanel>
 								<h2>Mensalidades</h2>
 							</p:outputPanel>
 
 							<p:dataTable id="dataTable" paginator="true" lazy="true"
-								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
+								value="#{mensalidadesView.lazyDataModel}" var="mensalidade"
 								emptyMessage="Nenhum registro encontrado"
-								paginatorPosition="bottom" rows="10" styleClass="grid"
+								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
-								<p:column styleClass="col-6">
+								<p:column styleClass="col-5">
 									<f:facet name="header">
 										<div class="flex justify-content-center">Nome</div>
 									</f:facet>
@@ -55,27 +56,44 @@
 										<div class="flex justify-content-center">Vencimento</div>
 									</f:facet>
 									<div class="flex justify-content-center">
-										<h:outputText value="#{mensalidade.proximoVencimentoAsDate}">
+										<h:outputText value="#{mensalidade.vencimentoAsDate}">
 											<f:convertDateTime dateStyle="short" locale="pt_BR" />
 										</h:outputText>
 									</div>
 								</p:column>
 
 								<p:column styleClass="col-1">
+									<f:facet name="header">
+										<div class="flex justify-content-center">Status</div>
+									</f:facet>
 									<div class="flex justify-content-center">
-										<p:tag value="Aberta" severity="success" rendered="#{mensalidade.status}" />
-										<p:tag value="Atrasada" severity="danger" rendered="#{!mensalidade.status}" />
+										<p:tag value="Aberta" severity="success"
+											rendered="#{mensalidade.status}" />
+										<p:tag value="Atrasada" severity="danger"
+											rendered="#{!mensalidade.status}" />
 									</div>
 								</p:column>
 
-								<p:column styleClass="col-1">
+								<p:column styleClass="col-2">
 									<div class="flex justify-content-center">
 										<p:tooltip for="@next" position="top"
 											value="Ver mensalidades cobradas para este aluno" />
 										<p:commandButton icon="pi pi-history"
-											styleClass="rounded-button"
-											actionListener="#{stMensalidades.enableLogMode()}"
-											partialSubmit="true" process="@this" update="@form" />
+											styleClass="rounded-button mx-1"
+											actionListener="#{mensalidadesView.enableLogMode()}"
+											partialSubmit="true" process="@this" update="@form">
+											<f:setPropertyActionListener value="#{mensalidade.aluno}"
+												target="#{mensalidadesView.selectedAluno}" />
+										</p:commandButton>
+										<p:tooltip for="@next" position="top"
+											value="Confirmar pagamento realizado" />
+										<p:commandButton icon="pi pi-money-bill"
+											styleClass="rounded-button mx-1" partialSubmit="true"
+											process="@this" oncomplete="PF('confirmDialog').show()"
+											actionListener="#{mensalidadesView.loadFormaPagamento()}">
+											<f:setPropertyActionListener value="#{mensalidade.aluno}"
+												target="#{mensalidadesView.selectedAluno}" />
+										</p:commandButton>
 									</div>
 								</p:column>
 
@@ -85,7 +103,7 @@
 
 					</h:panelGroup>
 
-					<h:panelGroup rendered="#{stMensalidades.logMode}">
+					<h:panelGroup rendered="#{mensalidadesView.logMode}">
 
 						<div class="mx-4 pt-4">
 
@@ -93,24 +111,47 @@
 								<h2>Mensalidades</h2>
 							</p:outputPanel>
 
+							<p:commandLink partialSubmit="true" process="@this"
+								styleClass="no-underscore-link"
+								actionListener="#{mensalidadesView.disableLogMode()}"
+								update="main">
+								<i class="pi pi-chevron-left" />Voltar
+							</p:commandLink>
+
 							<p:dataTable id="dataTable2" paginator="true" lazy="true"
-								value="#{stMensalidades.lazyDataModel}" var="mensalidade"
+								value="#{mensalidadesView.lazyDataModel}" var="mensalidade"
 								paginatorPosition="bottom" rows="10"
 								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
-								<p:column headerText="Nome do aluno">
-									<h:outputText value="#{mensalidade.aluno.nome}" />
-								</p:column>
+								<f:facet name="header">
+									<h:outputText value="#{mensalidadesView.selectedAluno.nome}" />
+								</f:facet>
 
-								<p:column headerText="Valor cobrado">
+								<p:column>
+									<f:facet name="header">
+										<div class="flex justify-content-center">Valor cobrado</div>
+									</f:facet>
 									<h:outputText value="#{mensalidade.valor}">
 										<f:convertNumber type="currency" currencyCode="BRL" />
 									</h:outputText>
 								</p:column>
 
 								<p:column>
-									<p:commandButton icon="pi pi-history" partialSubmit="true"
-										process="@this" update="main" />
+									<f:facet name="header">
+										<div class="flex justify-content-center">Vencimento</div>
+									</f:facet>
+									<h:outputText value="#{mensalidade.vencimentoAsDate}">
+										<f:convertDateTime locale="pt_BR" dateStyle="short" />
+									</h:outputText>
+								</p:column>
+
+								<p:column>
+									<f:facet name="header">
+										<div class="flex justify-content-center">Pagamento</div>
+									</f:facet>
+									<h:outputText value="#{mensalidade.momentoPagamentoAsDate}">
+										<f:convertDateTime locale="pt_BR" dateStyle="short" />
+									</h:outputText>
 								</p:column>
 
 							</p:dataTable>
@@ -119,113 +160,58 @@
 
 					</h:panelGroup>
 
-				</h:form>
+					<p:dialog widgetVar="confirmDialog" dynamic="true" modal="true"
+						header="Confirmação">
 
-				<h:form id="saveForm" rendered="false">
+						<div class="flex flex-column">
 
-					<p:growl id="messages" globalOnly="true" />
+							<p:outputLabel value="Selecione a forma de pagamento" for="@next" />
+							<p:selectOneMenu value="#{mensalidadesView.selectedFormaPagamento}"
+								converter="formaPagamentoConverter"
+								styleClass="mt-1">
+								<f:selectItems
+									value="#{mensalidadesView.availableFormaPagamentos}"
+									var="formaPg" itemLabel="#{formaPg.descricao}"
+									itemValue="#{formaPg}" />
+							</p:selectOneMenu>
 
-					<div class="mx-4 pt-4">
-						<p:outputPanel>
-							<h2>Inserir aluno</h2>
-						</p:outputPanel>
-					</div>
-
-					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true"
-						process="@this" actionListener="#{stMensalidades.normalMode()}"
-						update="main" />
-
-					<div class="mx-8">
-
-						<div class="grid py-4">
-
-							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
-							<p:inputText id="nome" styleClass="col-7"
-								value="#{stMensalidades.aluno.nome}" required="true"
-								requiredMessage="Obrigatório" />
-							<p:message for="nome" styleClass="col-2" />
+							<p:commandButton value="Confirmar pagamento"
+								actionListener="#{mensalidadesView.confirmarPagamento()}"
+								partialSubmit="true" process="@parent" update="@form"
+								styleClass="mt-4">
+								<p:confirm type="popup" header="Confirmação"
+									message="Deseja confirmar pagamento desta mensalidade?"
+									icon="pi pi-exclamation-triangle" />
+							</p:commandButton>
 
 						</div>
 
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
-							<p:inputText id="email" styleClass="col-7"
-								validator="emailValidator" validatorMessage="Inválido"
-								value="#{stMensalidades.aluno.email}" />
-							<p:message styleClass="col-2" for="email" />
-						</div>
+					</p:dialog>
 
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
-							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
-								required="true" requiredMessage="Obrigatório"
-								validateMask="false" value="#{stMensalidades.aluno.celular}" />
-							<p:message styleClass="col-2" for="celular" />
+					<p:confirmPopup global="true">
+						<p:commandButton value="Não" type="button"
+							styleClass="ui-confirm-popup-no ui-button-flat" />
+						<p:commandButton value="Sim" type="button"
+							styleClass="ui-confirm-popup-yes" />
+					</p:confirmPopup>
 
-						</div>
+					<h:panelGroup rendered="#{mensalidadesView.editMode}">
 
-					</div>
+						<div class="mx-4 pt-4">
 
-					<div class="flex justify-content-center flex-wrap py-4">
+							<p:outputPanel>
+								<h2>Alterar mensalidade</h2>
+							</p:outputPanel>
 
-						<p:commandButton value="Salvar alterações"
-							actionListener="#{stMensalidades.save()}" update="main" />
-
-					</div>
-
-				</h:form>
-
-				<h:form id="editForm" rendered="false">
-
-					<p:growl id="messages" globalOnly="true" />
-
-					<div class="mx-4 pt-4">
-						<p:outputPanel>
-							<h2>Inserir aluno</h2>
-						</p:outputPanel>
-					</div>
-
-					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true"
-						process="@this" actionListener="#{stMensalidades.normalMode()}"
-						update="main" />
-
-					<div class="mx-8">
-
-						<div class="grid py-4">
-
-							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
-							<p:inputText id="nome" styleClass="col-7"
-								value="#{stMensalidades.aluno.nome}" required="true"
-								requiredMessage="Obrigatório" />
-							<p:message for="nome" styleClass="col-2" />
+							<p:commandLink partialSubmit="true" process="@this"
+								actionListener="#{mensalidadesView.disableEditMode()}"
+								update="main">
+								<i class="pi pi-chevron-left" />Voltar
+							</p:commandLink>
 
 						</div>
 
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
-							<p:inputText id="email" styleClass="col-7"
-								validator="emailValidator" validatorMessage="Inválido"
-								value="#{stMensalidades.aluno.email}" />
-							<p:message styleClass="col-2" for="email" />
-						</div>
-
-						<div class="grid py-4">
-							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
-							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
-								required="true" requiredMessage="Obrigatório"
-								validateMask="false" value="#{stMensalidades.aluno.celular}" />
-							<p:message styleClass="col-2" for="celular" />
-
-						</div>
-
-					</div>
-
-					<div class="flex justify-content-center flex-wrap py-4">
-
-						<p:commandButton value="Salvar alterações"
-							actionListener="#{stMensalidades.edit()}" update="main" />
-
-					</div>
+					</h:panelGroup>
 
 				</h:form>
 

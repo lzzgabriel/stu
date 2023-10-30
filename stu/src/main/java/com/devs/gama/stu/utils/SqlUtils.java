@@ -7,12 +7,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
 public class SqlUtils {
 
+	@Deprecated
 	/**
 	 * Método para montar a estrutura de uma procedure
 	 * 
@@ -31,6 +34,20 @@ public class SqlUtils {
 	}
 
 	/**
+	 * Método para montar a estrutura de uma função
+	 * 
+	 * @param nomeFuncao        String Texto que será colocado no nome da funcao
+	 * @param parametrosEntrada Total de parametros de entrada
+	 * @return String o texto em String
+	 */
+	public static String montarFuncao(String nomeFuncao, int parametrosEntrada) {
+		StringBuilder funcao = new StringBuilder("select * FROM " + nomeFuncao + "(");
+		funcao.append(parametrosEntrada > 0 ? "?" + StringUtils.stringReplicate(", ?", parametrosEntrada - 1) : "");
+		funcao.append(")");
+		return funcao.toString();
+	}
+
+	/**
 	 * Método para montar a estrutura de uma query com páginação
 	 * 
 	 * @param campos          Campos que serão buscados no select
@@ -46,7 +63,7 @@ public class SqlUtils {
 		StringBuilder paginacao = new StringBuilder(
 				"select " + (Objects.nonNull(campos) && !campos.isEmpty() ? campos : "*") + " from " + nomeViewTable);
 		paginacao.append(Objects.nonNull(camposWhere) && !camposWhere.isEmpty() ? (" where " + camposWhere) : "");
-		paginacao.append(" LIMIT " + posicao + ", " + padraoPaginacao);
+		paginacao.append(" LIMIT " + padraoPaginacao + " OFFSET " + posicao);
 		return paginacao.toString();
 	}
 
@@ -86,26 +103,20 @@ public class SqlUtils {
 
 		formatoData.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-		String horaUTC = formatoData.format(date);
+		String dataUTC = formatoData.format(Date.valueOf(date));
 
-		return Date.valueOf(LocalDate.parse(horaUTC));
+		return Date.valueOf(dataUTC);
 	}
 
 	/**
-	 * Metódo para transformar um LocalDateTime no TimeZone local da máquina para o
-	 * TimeZone UTC e em seguida transformar em um java.sql.Timestamp
+	 * Metódo para transformar um LocalDateTime no TimeZone local da máquina para um
+	 * LocalDateTime no TimeZone UTC
 	 * 
 	 * @param date LocalDateTime que será transformado
 	 * @return Timestamp da API java.sql.Timestamp
 	 */
-	public static Timestamp localDateTimeToTimestampUTC(LocalDateTime date) {
-		SimpleDateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		formatoData.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		String horaUTC = formatoData.format(date);
-
-		return Timestamp.valueOf(LocalDateTime.parse(horaUTC));
+	public static LocalDateTime localDateTimeToLocalDateTimeUTC(LocalDateTime date) {
+		return date.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 	}
 
 	/**
@@ -127,7 +138,11 @@ public class SqlUtils {
 	 * @return LocalDateTime da API java.time.LocalDateTime
 	 */
 	public static LocalDateTime timestampToLocalDateTime(Timestamp timestamp) {
-		return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
+		return Objects.isNull(timestamp) ? null : LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
+	}
+	
+	public static ZonedDateTime timestampToZonedDateTime(Timestamp timestamp) {
+		return Objects.isNull(timestamp) ? null : ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
 	}
 
 }

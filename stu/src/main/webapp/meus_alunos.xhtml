@@ -34,16 +34,25 @@
 								</div>
 							</f:facet>
 
-							<p:column headerText="Nome">
+							<p:column styleClass="col-5">
+								<f:facet name="header">
+									<div class="flex justify-content-center">Nome</div>
+								</f:facet>
 								<h:outputText value="#{aluno.nome}" />
 							</p:column>
 
-							<p:column headerText="E-mail">
+							<p:column styleClass="col-4">
+								<f:facet name="header">
+									<div class="flex justify-content-center">E-mail</div>
+								</f:facet>
 								<h:outputText value="#{aluno.email}" />
 							</p:column>
 
-							<p:column headerText="Celular">
-								<h:outputText value="#{aluno.celularMasked}">
+							<p:column styleClass="col-3">
+								<f:facet name="header">
+									<div class="flex justify-content-center">Celular</div>
+								</f:facet>
+								<h:outputText styleClass="flex justify-content-center" value="#{aluno.celularMasked}">
 								</h:outputText>
 							</p:column>
 
@@ -69,7 +78,9 @@
 						</p:outputPanel>
 					</div>
 					
-					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main"/>
+					<p:commandLink partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main">
+						<i class="pi pi-chevron-left"/>Voltar
+					</p:commandLink>
 
 					<div class="mx-8">
 
@@ -106,6 +117,9 @@
 
 						<p:commandButton value="Salvar alterações"
 							actionListener="#{stMeusAlunos.save()}" update="main" />
+						<p:commandButton value="Cancelar" icon="pi pi-times-circle"
+							partialSubmit="true" process="@this" styleClass="ml-2 ui-button-secondary"
+							actionListener="#{stMeusAlunos.normalMode()}" update="main" />
 
 					</div>
 
@@ -117,11 +131,13 @@
 
 					<div class="mx-4 pt-4">
 						<p:outputPanel>
-							<h2>Inserir aluno</h2>
+							<h2>Alterar cadastro</h2>
 						</p:outputPanel>
 					</div>
 					
-					<p:commandLink value="&#x21A9; Voltar" partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main"/>
+					<p:commandLink partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main">
+						<i class="pi pi-chevron-left"/>Voltar
+					</p:commandLink>
 
 					<div class="mx-8">
 
@@ -158,6 +174,9 @@
 
 						<p:commandButton value="Salvar alterações"
 							actionListener="#{stMeusAlunos.edit()}" update="main" />
+						<p:commandButton value="Cancelar" icon="pi pi-times-circle"
+							partialSubmit="true" process="@this" styleClass="ml-2 ui-button-secondary"
+							actionListener="#{stMeusAlunos.normalMode()}" update="main" />
 
 					</div>
 

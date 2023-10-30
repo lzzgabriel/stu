@@ -9,6 +9,7 @@
 	<title><ui:insert name="title">Stu App</ui:insert></title>
 	<h:outputStylesheet library="webjars"
 		name="primeflex/3.3.1/primeflex.min.css" />
+	<h:outputStylesheet library="css" name="global.css"/>
 
 	<script type="text/javascript"
 		src="#{request.getContextPath()}/resources/js/utils.js"></script>
@@ -25,7 +26,7 @@
 		</ui:insert>
 	</div>
 
-	<div id="content" class="mx-8 px-8 bg-white border-round">
+	<div id="content" class="md:mx-8 sm:mx-0 md:px-8 sm:px-1 bg-white md:border-round">
 		<ui:insert name="content">
 		</ui:insert>
 	</div>

@@ -20,12 +20,8 @@ public final class StringUtils {
 	 */
 	public static String stringReplicate(String text, int quantidade) {
 		StringBuffer sb = new StringBuffer("");
-		try {
-			for (int i = 0; i < quantidade; i++) {
-				sb.append(text);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		for (int i = 0; i < quantidade; i++) {
+			sb.append(text);
 		}
 		return sb.toString();
 	}

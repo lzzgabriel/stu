@@ -12,8 +12,8 @@ import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.daos.MensalidadeDAO;
 import com.devs.gama.stu.entities.Aluno;
 import com.devs.gama.stu.entities.Mensalidade;
+import com.devs.gama.stu.utils.SessionUtils;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.inject.Model;
 import jakarta.inject.Inject;
 
@@ -21,33 +21,42 @@ import jakarta.inject.Inject;
 public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Inject
 	private Application application;
-	
+
 	@Inject
 	private MensalidadeDAO mensalidadeDAO;
-	
+
 	private Aluno aluno;
-	
+
 	private boolean logMode = false;
-	
-	@PostConstruct
-	public void init() {
-	}
 
 	@Override
 	public int count(Map<String, FilterMeta> filterBy) {
-		return 1;
+		try {
+			if (!logMode) {
+				return mensalidadeDAO.findCountMensalidadeAberta(SessionUtils.getLoggedProfessor());
+			} else {
+				return mensalidadeDAO.findCountMensalidadeCobrada(SessionUtils.getLoggedProfessor(), aluno);
+			}
+		} catch (SQLException e) {
+			application.getLogger().error(e.getMessage(), e);
+			return 0;
+		}
 	}
 
 	@Override
-	public List<Mensalidade> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
-		
+	public List<Mensalidade> load(int first, int pageSize, Map<String, SortMeta> sortBy,
+			Map<String, FilterMeta> filterBy) {
+
 		try {
-			// TODO fazer filtragem de Mensalidades
-			// TODO pagination
-			return mensalidadeDAO.findAll();
+			if (!logMode) {
+				return mensalidadeDAO.paginationMensalidadeAberta(SessionUtils.getLoggedProfessor(), first, pageSize);
+			} else {
+				return mensalidadeDAO.paginationMensalidadeCobrada(SessionUtils.getLoggedProfessor(), aluno, first,
+						pageSize);
+			}
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);
 			return null;
@@ -69,5 +78,5 @@ public class LazyMensalidadeDataModel extends LazyDataModel<Mensalidade> {
 	public void setLogMode(boolean logMode) {
 		this.logMode = logMode;
 	}
-	
+
 }

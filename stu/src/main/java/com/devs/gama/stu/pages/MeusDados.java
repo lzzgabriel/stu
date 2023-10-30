@@ -65,8 +65,12 @@ public class MeusDados implements Serializable {
 		}
 	}
 	
-	public void enterEditMode() {
+	public void enableEditMode() {
 		editMode = true;
+	}
+	
+	public void disableEditMode() {
+		editMode = false;
 	}
 
 	public Professor getProfessor() {

@@ -2,7 +2,7 @@ banco de dados MySQL v 8.0.33
 nome do banco: stu
 
 -----------------------------
-PARA RODAR O BANCO PELO CMD:
+PARA RODAR O BANCO PELO CMD: DEPReCateDewdad
 
 mysqld --initialize
 	^-- isso vai inicializar o banco

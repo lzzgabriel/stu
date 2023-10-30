@@ -28,8 +28,7 @@ public class Application implements Serializable {
 	public void init() {
 		try {
 			Context c = InitialContext.doLookup("java:");
-			dataSource = (DataSource) c.lookup("/StuDB");
-			
+			dataSource = (DataSource) c.lookup("jboss/datasources/stuDB");
 		} catch (NamingException e) {
 			logger.error(e.getMessage(), e);
 		}
