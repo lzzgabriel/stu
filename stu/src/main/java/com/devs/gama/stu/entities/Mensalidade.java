@@ -83,7 +83,7 @@ public class Mensalidade {
 	public static Boolean parse(String s) {
 		if (s == null)
 			return null;
-		return (s.equalsIgnoreCase("em aberto") || s.equalsIgnoreCase("atrasada"));
+		return (s.equalsIgnoreCase("em aberto"));
 	}
 
 }
