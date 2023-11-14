@@ -55,10 +55,13 @@ public class MensalidadeDAO {
 			PreparedStatement preparedStatement = conn.prepareCall(
 					SqlUtils.montarFuncao(FuncoesViewsTables.FUNCAO_EDITAR_MENSALIDADE_ABERTA.getValue(), 3));
 
+			var venc = mensalidade.getVencimento();
+			mensalidade.setVencimento(venc.withDayOfMonth(mensalidade.getDiaVencimento()));
+			
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, mensalidade.getAluno().getId(), preparedStatement);
 			FuncoesUtils.setBigDecimal(parametro++, mensalidade.getValor(), preparedStatement);
-			FuncoesUtils.setDate(parametro++, mensalidade.getMensalidade(), preparedStatement);
+			FuncoesUtils.setDate(parametro++, mensalidade.getVencimento(), preparedStatement);
 
 			preparedStatement.execute();
 
@@ -269,6 +272,7 @@ public class MensalidadeDAO {
 		if (b)
 			mensalidade.setStatus(Mensalidade.parse(res.getString("status")));
 		mensalidade.setVencimento(SqlUtils.dateToLocalDate(res.getDate(b ? "proximo_vencimento" : "data_vencimento")));
+		mensalidade.setDiaVencimento(mensalidade.getVencimento().getDayOfMonth());
 
 		mensalidade.setMomentoPagamento(SqlUtils
 				.timestampToZonedDateTime(res.getTimestamp(b ? "momento_ultimo_pagamento" : "momento_pagamento")));

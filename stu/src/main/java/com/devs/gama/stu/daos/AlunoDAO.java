@@ -6,14 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import com.devs.gama.stu.app.Application;
 import com.devs.gama.stu.entities.Aluno;
-import com.devs.gama.stu.entities.FormaPagamento;
 import com.devs.gama.stu.entities.Professor;
 import com.devs.gama.stu.enums.FuncoesViewsTables;
 import com.devs.gama.stu.exceptions.EntityNotFoundException;

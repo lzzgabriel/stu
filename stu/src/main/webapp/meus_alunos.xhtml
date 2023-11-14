@@ -11,7 +11,7 @@
 
 			<h:panelGroup id="main">
 
-				<h:form id="tableForm" rendered="#{!stMeusAlunos.editMode and !stMeusAlunos.insertMode}">
+				<h:form id="tableForm" rendered="#{!meusAlunosView.editMode and !meusAlunosView.insertMode}">
 
 					<p:growl id="messages" globalOnly="true" />
 
@@ -22,14 +22,14 @@
 						</p:outputPanel>
 
 						<p:dataTable id="dataTable" paginator="true" lazy="true"
-							value="#{stMeusAlunos.lazyDataModel}" var="aluno"
+							value="#{meusAlunosView.lazyDataModel}" var="aluno"
 							paginatorPosition="bottom" rows="10"
 							paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
 
 							<f:facet name="header">
 								<div class="flex justify-content-end">
 									<p:commandButton value="Cadastrar aluno"
-										actionListener="#{stMeusAlunos.enableInsertMode()}" partialSubmit="true"
+										actionListener="#{meusAlunosView.enableInsertMode()}" partialSubmit="true"
 										process="@this" update="main" icon="pi pi-user-plus" />
 								</div>
 							</f:facet>
@@ -48,7 +48,7 @@
 								<h:outputText value="#{aluno.email}" />
 							</p:column>
 
-							<p:column styleClass="col-3">
+							<p:column styleClass="col-2">
 								<f:facet name="header">
 									<div class="flex justify-content-center">Celular</div>
 								</f:facet>
@@ -56,9 +56,9 @@
 								</h:outputText>
 							</p:column>
 
-							<p:column>
-								<p:commandButton icon="pi pi-pencil"
-									actionListener="#{stMeusAlunos.enableEditMode(aluno)}" partialSubmit="true"
+							<p:column styleClass="col-1">
+								<p:commandButton styleClass="rounded-button" icon="pi pi-pencil"
+									actionListener="#{meusAlunosView.enableEditMode(aluno)}" partialSubmit="true"
 									process="@this" update="main" />
 							</p:column>
 
@@ -68,7 +68,7 @@
 
 				</h:form>
 
-				<h:form id="saveForm" rendered="#{stMeusAlunos.insertMode}">
+				<h:form id="saveForm" rendered="#{meusAlunosView.insertMode}">
 
 					<p:growl id="messages" globalOnly="true" />
 
@@ -78,7 +78,7 @@
 						</p:outputPanel>
 					</div>
 					
-					<p:commandLink partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main">
+					<p:commandLink partialSubmit="true" process="@this" actionListener="#{meusAlunosView.normalMode()}" update="main">
 						<i class="pi pi-chevron-left"/>Voltar
 					</p:commandLink>
 
@@ -88,7 +88,7 @@
 
 							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
 							<p:inputText id="nome" styleClass="col-7"
-								value="#{stMeusAlunos.aluno.nome}" required="true"
+								value="#{meusAlunosView.aluno.nome}" required="true"
 								requiredMessage="Obrigatório" />
 							<p:message for="nome" styleClass="col-2" />
 
@@ -98,7 +98,7 @@
 							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
 							<p:inputText id="email" styleClass="col-7"
 								validator="emailValidator" validatorMessage="Inválido"
-								value="#{stMeusAlunos.aluno.email}" />
+								value="#{meusAlunosView.aluno.email}" />
 							<p:message styleClass="col-2" for="email" />
 						</div>
 
@@ -106,7 +106,7 @@
 							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
 							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
 								required="true" requiredMessage="Obrigatório"
-								validateMask="false" value="#{stMeusAlunos.aluno.celular}" />
+								validateMask="false" value="#{meusAlunosView.aluno.celular}" />
 							<p:message styleClass="col-2" for="celular" />
 
 						</div>
@@ -116,16 +116,16 @@
 					<div class="flex justify-content-center flex-wrap py-4">
 
 						<p:commandButton value="Salvar alterações"
-							actionListener="#{stMeusAlunos.save()}" update="main" />
+							actionListener="#{meusAlunosView.save()}" update="main" />
 						<p:commandButton value="Cancelar" icon="pi pi-times-circle"
 							partialSubmit="true" process="@this" styleClass="ml-2 ui-button-secondary"
-							actionListener="#{stMeusAlunos.normalMode()}" update="main" />
+							actionListener="#{meusAlunosView.normalMode()}" update="main" />
 
 					</div>
 
 				</h:form>
 
-				<h:form id="editForm" rendered="#{stMeusAlunos.editMode}">
+				<h:form id="editForm" rendered="#{meusAlunosView.editMode}">
 
 					<p:growl id="messages" globalOnly="true" />
 
@@ -135,7 +135,7 @@
 						</p:outputPanel>
 					</div>
 					
-					<p:commandLink partialSubmit="true" process="@this" actionListener="#{stMeusAlunos.normalMode()}" update="main">
+					<p:commandLink partialSubmit="true" process="@this" actionListener="#{meusAlunosView.normalMode()}" update="main">
 						<i class="pi pi-chevron-left"/>Voltar
 					</p:commandLink>
 
@@ -145,7 +145,7 @@
 
 							<p:outputLabel styleClass="col-2" value="Nome:" for="@next" />
 							<p:inputText id="nome" styleClass="col-7"
-								value="#{stMeusAlunos.aluno.nome}" required="true"
+								value="#{meusAlunosView.aluno.nome}" required="true"
 								requiredMessage="Obrigatório" />
 							<p:message for="nome" styleClass="col-2" />
 
@@ -155,7 +155,7 @@
 							<p:outputLabel styleClass="col-2" value="E-mail:" for="@next" />
 							<p:inputText id="email" styleClass="col-7"
 								validator="emailValidator" validatorMessage="Inválido"
-								value="#{stMeusAlunos.aluno.email}" />
+								value="#{meusAlunosView.aluno.email}" />
 							<p:message styleClass="col-2" for="email" />
 						</div>
 
@@ -163,7 +163,7 @@
 							<p:outputLabel styleClass="col-2" value="Celular:" for="@next" />
 							<p:inputMask mask="(99)9999-9999" styleClass="col-7" id="celular"
 								required="true" requiredMessage="Obrigatório"
-								validateMask="false" value="#{stMeusAlunos.aluno.celular}" />
+								validateMask="false" value="#{meusAlunosView.aluno.celular}" />
 							<p:message styleClass="col-2" for="celular" />
 
 						</div>
@@ -173,10 +173,10 @@
 					<div class="flex justify-content-center flex-wrap py-4">
 
 						<p:commandButton value="Salvar alterações"
-							actionListener="#{stMeusAlunos.edit()}" update="main" />
+							actionListener="#{meusAlunosView.edit()}" update="main" />
 						<p:commandButton value="Cancelar" icon="pi pi-times-circle"
 							partialSubmit="true" process="@this" styleClass="ml-2 ui-button-secondary"
-							actionListener="#{stMeusAlunos.normalMode()}" update="main" />
+							actionListener="#{meusAlunosView.normalMode()}" update="main" />
 
 					</div>
 

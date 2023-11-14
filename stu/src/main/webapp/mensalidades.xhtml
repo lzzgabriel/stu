@@ -15,8 +15,7 @@
 
 					<p:growl id="messages" globalOnly="true" />
 
-					<h:panelGroup
-						rendered="#{not mensalidadesView.logMode and not mensalidadesView.editMode}">
+					<h:panelGroup rendered="#{not mensalidadesView.logMode}">
 
 						<div class="md:mx-4 md:pt-4 sm:mx-0 sm:pt-0">
 
@@ -94,6 +93,14 @@
 											<f:setPropertyActionListener value="#{mensalidade.aluno}"
 												target="#{mensalidadesView.selectedAluno}" />
 										</p:commandButton>
+										<p:tooltip for="@next" position="top"
+											value="Alterar mensalidade" />
+										<p:commandButton styleClass="rounded-button"
+											icon="pi pi-pencil" partialSubmit="true" process="@this"
+											oncomplete="PF('editDialog').show()" update="@id(edit-dialog)">
+											<f:setPropertyActionListener value="#{mensalidade}"
+												target="#{mensalidadesView.selectedMensalidade}" />
+										</p:commandButton>
 									</div>
 								</p:column>
 
@@ -150,7 +157,8 @@
 										<div class="flex justify-content-center">Pagamento</div>
 									</f:facet>
 									<h:outputText value="#{mensalidade.momentoPagamentoAsDate}">
-										<f:convertDateTime locale="pt_BR" dateStyle="short" />
+										<f:convertDateTime locale="pt_BR" dateStyle="short"
+											timeStyle="medium" />
 									</h:outputText>
 								</p:column>
 
@@ -166,9 +174,9 @@
 						<div class="flex flex-column">
 
 							<p:outputLabel value="Selecione a forma de pagamento" for="@next" />
-							<p:selectOneMenu value="#{mensalidadesView.selectedFormaPagamento}"
-								converter="formaPagamentoConverter"
-								styleClass="mt-1">
+							<p:selectOneMenu
+								value="#{mensalidadesView.selectedFormaPagamento}"
+								converter="formaPagamentoConverter" styleClass="mt-1">
 								<f:selectItems
 									value="#{mensalidadesView.availableFormaPagamentos}"
 									var="formaPg" itemLabel="#{formaPg.descricao}"
@@ -188,30 +196,44 @@
 
 					</p:dialog>
 
+					<p:dialog widgetVar="editDialog" modal="true"
+						header="Alteração">
+
+						<p:outputPanel id="edit-dialog">
+
+							<div class="flex flex-column">
+
+								<p:outputLabel value="Valor" for="@next" />
+								<p:inputNumber symbol="R$ " decimalPlaces="2"
+									decimalSeparator="," thousandSeparator="." emptyValue="zero"
+									value="#{mensalidadesView.selectedMensalidade.valor}" />
+
+								<p:outputLabel value="Dia de vencimento" for="@next" />
+								<p:inputNumber decimalPlaces="0" maxValue="30" minValue="0"
+									emptyValue="1"
+									value="#{mensalidadesView.selectedMensalidade.valor}" />
+
+								<p:commandButton value="Alterar mensalidade"
+									actionListener="#{mensalidadesView.editarMensalidade()}"
+									partialSubmit="true" process="@parent" update="@form"
+									styleClass="mt-4">
+									<p:confirm type="popup" header="Confirmação"
+										message="Deseja alterar o valor desta mensalidade?"
+										icon="pi pi-exclamation-triangle" />
+								</p:commandButton>
+
+							</div>
+
+						</p:outputPanel>
+
+					</p:dialog>
+
 					<p:confirmPopup global="true">
 						<p:commandButton value="Não" type="button"
 							styleClass="ui-confirm-popup-no ui-button-flat" />
 						<p:commandButton value="Sim" type="button"
 							styleClass="ui-confirm-popup-yes" />
 					</p:confirmPopup>
-
-					<h:panelGroup rendered="#{mensalidadesView.editMode}">
-
-						<div class="mx-4 pt-4">
-
-							<p:outputPanel>
-								<h2>Alterar mensalidade</h2>
-							</p:outputPanel>
-
-							<p:commandLink partialSubmit="true" process="@this"
-								actionListener="#{mensalidadesView.disableEditMode()}"
-								update="main">
-								<i class="pi pi-chevron-left" />Voltar
-							</p:commandLink>
-
-						</div>
-
-					</h:panelGroup>
 
 				</h:form>
 

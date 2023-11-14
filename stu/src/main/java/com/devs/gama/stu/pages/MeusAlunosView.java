@@ -20,9 +20,9 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-@Named("stMeusAlunos")
+@Named
 @ViewScoped
-public class MeusAlunos implements Serializable {
+public class MeusAlunosView implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

@@ -15,7 +15,7 @@ import java.util.TimeZone;
 
 public class SqlUtils {
 
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	/**
 	 * Método para montar a estrutura de uma procedure
 	 * 

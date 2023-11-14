@@ -40,9 +40,9 @@ public class MensalidadesView implements Serializable {
 
 	private Aluno selectedAluno;
 	private FormaPagamento selectedFormaPagamento;
+	private Mensalidade selectedMensalidade;
 
 	private boolean logMode = false;
-	private boolean editMode = false;
 
 	private List<FormaPagamento> availableFormaPagamentos;
 
@@ -56,14 +56,6 @@ public class MensalidadesView implements Serializable {
 		lazyDataModel.setLogMode(false);
 	}
 
-	public void enableEditMode() {
-		editMode = true;
-	}
-
-	public void disableEditMode() {
-		editMode = false;
-	}
-
 	public void confirmarPagamento() {
 		try {
 			mensalidadeDAO.confirmPay(selectedAluno, selectedFormaPagamento);
@@ -71,6 +63,16 @@ public class MensalidadesView implements Serializable {
 		} catch (Exception e) {
 			application.getLogger().error(e.getMessage(), e);
 			MessageUtils.addErrorMessage("Erro ao confirmar pagamento", null);
+		}
+	}
+	
+	public void editarMensalidade() {
+		try {
+			mensalidadeDAO.editMensalidadeAberta(selectedMensalidade);
+			MessageUtils.addInfoMessage("Mensalidade alterada", null);
+		} catch (SQLException e) {
+			application.getLogger().error(e.getMessage(), e);
+			MessageUtils.addErrorMessage("Erro ao alterar a mensalidade", null);
 		}
 	}
 
@@ -108,20 +110,20 @@ public class MensalidadesView implements Serializable {
 		this.selectedFormaPagamento = selectedFormaPagamento;
 	}
 
+	public Mensalidade getSelectedMensalidade() {
+		return selectedMensalidade;
+	}
+
+	public void setSelectedMensalidade(Mensalidade selectedMensalidade) {
+		this.selectedMensalidade = selectedMensalidade;
+	}
+
 	public boolean isLogMode() {
 		return logMode;
 	}
 
 	public void setLogMode(boolean logMode) {
 		this.logMode = logMode;
-	}
-
-	public boolean isEditMode() {
-		return editMode;
-	}
-
-	public void setEditMode(boolean payMode) {
-		this.editMode = payMode;
 	}
 
 	public List<FormaPagamento> getAvailableFormaPagamentos() {

@@ -6,15 +6,22 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
+/**
+ * Referente às tabelas {@code mensalidade_aberta} e {@code mensalidade_cobrada}
+ * 
+ * @author Gabriel Lezo
+ */
 public class Mensalidade {
 
-	private Aluno aluno;
-	private LocalDate mensalidade;
-	private LocalDate vencimento;
-	private Boolean status;
-	private BigDecimal valor;
+	private Aluno          aluno;
+	private LocalDate      mensalidade;
+	private LocalDate      vencimento;
+	private Boolean        status;
+	private BigDecimal     valor;
 	private FormaPagamento formaPagamento;
-	private ZonedDateTime momentoPagamento;
+	private ZonedDateTime  momentoPagamento;
+	
+	private int            diaVencimento;
 
 	public Aluno getAluno() {
 		return aluno;
@@ -80,6 +87,14 @@ public class Mensalidade {
 		this.momentoPagamento = momentoPagamento;
 	}
 	
+	public int getDiaVencimento() {
+		return diaVencimento;
+	}
+
+	public void setDiaVencimento(int diaVencimento) {
+		this.diaVencimento = diaVencimento;
+	}
+
 	public static Boolean parse(String s) {
 		if (s == null)
 			return null;
