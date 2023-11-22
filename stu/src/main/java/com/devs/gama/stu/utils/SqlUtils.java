@@ -15,15 +15,17 @@ import java.util.TimeZone;
 
 public class SqlUtils {
 
-	@Deprecated(forRemoval = true)
 	/**
 	 * Método para montar a estrutura de uma procedure
+	 * 
+	 * @deprecated replaced by {@link #montarFuncao(String, int) montarFuncao}
 	 * 
 	 * @param nomeProcedure     String Texto que será colocado no nome da procedure
 	 * @param parametrosEntrada Total de parametros de entrada
 	 * @param parametrosRetorno Total de parametros de retorno
 	 * @return String o texto em String
 	 */
+	@Deprecated(forRemoval = true)
 	public static String montarProcedure(String nomeProcedure, int parametrosEntrada, int parametrosRetorno) {
 		StringBuilder procedure = new StringBuilder("{call " + nomeProcedure + "(");
 		procedure.append(parametrosRetorno > 0 ? "?" + StringUtils.stringReplicate(", ?", parametrosRetorno - 1) : "");
@@ -140,7 +142,7 @@ public class SqlUtils {
 	public static LocalDateTime timestampToLocalDateTime(Timestamp timestamp) {
 		return Objects.isNull(timestamp) ? null : LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
 	}
-	
+
 	public static ZonedDateTime timestampToZonedDateTime(Timestamp timestamp) {
 		return Objects.isNull(timestamp) ? null : ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.of("UTC"));
 	}

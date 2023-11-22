@@ -40,7 +40,7 @@ public class LazyAlunoDataModel extends LazyDataModel<Aluno> {
 	public int count(Map<String, FilterMeta> filterBy) {
 		
 		try {
-			// TODO fazer filtragem de alunos
+//			 TODO fazer filtragem de alunos
 			return alunoDAO.findCount(professor);
 		} catch (SQLException e) {
 			application.getLogger().error(e.getMessage(), e);

@@ -26,6 +26,17 @@ public class FormaPagamentoDAO {
 	@Inject
 	private Application application;
 
+	/**
+	 * <h1>Método para cadastro de novas formas de pagamentos</h1>
+	 * <p>
+	 * - Método utilizado para cadastrar uma nova forma de pagamento no banco de
+	 * dados
+	 * </p>
+	 * 
+	 * @param formaPagamento Informações da nova forma de pagamento que será
+	 *                       registrada
+	 * @throws SQLException
+	 */
 	public void save(FormaPagamento formaPagamento) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareCall(
@@ -39,6 +50,16 @@ public class FormaPagamentoDAO {
 		}
 	}
 
+	/**
+	 * <h1>Método para edição de formas de pagamentos</h1>
+	 * 
+	 * <p>
+	 * - Método utilizado para edição de formas de pagamento
+	 * </p>
+	 * 
+	 * @param formaPagamento Forma de pagamento que terá seus dados alterados
+	 * @throws SQLException
+	 */
 	public void edit(FormaPagamento formaPagamento) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn
@@ -53,6 +74,12 @@ public class FormaPagamentoDAO {
 		}
 	}
 
+	/**
+	 * <h1>Método para deletar uma forma de pagamento do banco de dados</h1>
+	 * 
+	 * @param formaPagamento forma de pagamento que será excluida
+	 * @throws SQLException
+	 */
 	public void delete(FormaPagamento formaPagamento) throws SQLException {
 
 		try (Connection conn = application.getDataSource().getConnection()) {
@@ -68,6 +95,16 @@ public class FormaPagamentoDAO {
 
 	}
 
+	/**
+	 * <h1>Método para retornar todas as formas de pagamentos</h1>
+	 * <p>
+	 * - Método deve ser utilizado para fazer uma listagem de todas as formas de
+	 * pagamentos,
+	 * </p>
+	 * 
+	 * @return Retorna um {@code List<FormaPagamento>}
+	 * @throws SQLException
+	 */
 	public List<FormaPagamento> findAll() throws SQLException {
 		List<FormaPagamento> returnList = new ArrayList<>();
 		try (Connection conn = application.getDataSource().getConnection()) {
@@ -83,6 +120,19 @@ public class FormaPagamentoDAO {
 		return returnList;
 	}
 
+	/**
+	 * <h1>Metódo para buscar uma forma de pagamento por id</h1>
+	 * <p>
+	 * - Metódo deve ser utilizado passando um id, para ser feita a busca da forma
+	 * de pagamento
+	 * </p>
+	 * 
+	 * @param id Id da forma de pagamento que será feita a busca
+	 * @return Novo objeto {@code FormaPagamento} ou um objeto
+	 *         {@code FormaPagamento} nulo no caso de não encontrar no banco
+	 * @throws SQLException
+	 * @throws EntityNotFoundException
+	 */
 	public FormaPagamento findById(int id) throws SQLException, EntityNotFoundException {
 		FormaPagamento formaPagamento = null;
 		try (Connection conn = application.getDataSource().getConnection()) {
@@ -103,6 +153,17 @@ public class FormaPagamentoDAO {
 		return formaPagamento;
 	}
 
+	/**
+	 * <h1>Metódo de parse automático</h1>
+	 * <p>
+	 * - Metódo deve ser utilizado passando um ResultSet, populando um objeto
+	 * {@code FormaPagamento} e retornando o mesmo
+	 * </p>
+	 * 
+	 * @param res {@code ResultSet} que será usado fazer o parse automatico
+	 * @return Novo objeto {@code FormaPagamento}
+	 * @throws SQLException
+	 */
 	public FormaPagamento fetch(ResultSet res) throws SQLException {
 		FormaPagamento formaPagamento = new FormaPagamento();
 

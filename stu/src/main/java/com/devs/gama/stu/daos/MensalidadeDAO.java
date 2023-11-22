@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,23 @@ public class MensalidadeDAO {
 	@Inject
 	private Application application;
 
+	/**
+	 * <h1>Método para cadastrar uma nova mensalidade aberta</h1>
+	 * <p>
+	 * - Método utilizado para cadastrar uma nova mensalidade aberta, lembrando que
+	 * ao utilizar o método {@code saveComMensalidade} do DAO {@link AlunoDAO} ele
+	 * automaticamente gera uma mensalidade aberta, não tendo necessidade de
+	 * utilizar separadamente
+	 * </p>
+	 * <p>
+	 * - Funciona bem junto com o método {@code saveSemMensalidade} do DAO
+	 * {@link AlunoDAO} já que este metódo não gera automaticamente as mensalidade
+	 * abertas
+	 * </p>
+	 * 
+	 * @param mensalidade Informações da mensalidade que será gerada
+	 * @throws SQLException
+	 */
 	public void saveMensalidadeAberta(Mensalidade mensalidade) throws SQLException {
 		try (Connection connection = application.getDataSource().getConnection()) {
 
@@ -50,6 +68,16 @@ public class MensalidadeDAO {
 		}
 	}
 
+	/**
+	 * <h1>Método para edição de mensalidade aberta</h1>
+	 * 
+	 * <p>
+	 * - Método utilizado para edição de uma mensalidade aberta
+	 * </p>
+	 * 
+	 * @param mensalidade Mensalidade que terá suas informações alteradas
+	 * @throws SQLException
+	 */
 	public void editMensalidadeAberta(Mensalidade mensalidade) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareCall(
@@ -57,7 +85,7 @@ public class MensalidadeDAO {
 
 			var venc = mensalidade.getVencimento();
 			mensalidade.setVencimento(venc.withDayOfMonth(mensalidade.getDiaVencimento()));
-			
+
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, mensalidade.getAluno().getId(), preparedStatement);
 			FuncoesUtils.setBigDecimal(parametro++, mensalidade.getValor(), preparedStatement);
@@ -70,6 +98,20 @@ public class MensalidadeDAO {
 		}
 	}
 
+	/**
+	 * <h1>Metódo para buscar uma mensalidade aberta por aluno</h1>
+	 * <p>
+	 * - Metódo deve ser utilizado passando um id, para ser feita a busca da
+	 * mensalidade por aluno
+	 * </p>
+	 * 
+	 * @param aluno Será utilizado o id do aluno para ser feita a busca da
+	 *              mensalidade aberta
+	 * @return Novo objeto {@code Mensalidade} ou um objeto {@code Mensalidade} nulo
+	 *         no caso de não encontrar no banco
+	 * @throws SQLException
+	 * @throws EntityNotFoundException
+	 */
 	public Mensalidade findByIdMensalidadeAberta(Aluno aluno) throws SQLException, EntityNotFoundException {
 
 		Mensalidade mensalidade = null;
@@ -97,18 +139,41 @@ public class MensalidadeDAO {
 		return mensalidade;
 	}
 
-	public Mensalidade findByIdMensalidadeCobrada(Aluno aluno) throws SQLException, EntityNotFoundException {
+	/**
+	 * <h1>Método para buscar uma mensalidade cobrada</h1>
+	 * <p>
+	 * - Metódo deve sert utilizado para buscar uma mensalidade cobrada, levando em
+	 * conta: a data de busca, se está ativo e o aluno. No banco esta tabela possui
+	 * chave primária composta, então na filtragem precisamos da data e do id do
+	 * aluno
+	 * </p>
+	 * <p>
+	 * - No caso do aluno estar inativo e tiver a necessidade buscar as mensalidades
+	 * dele, é necessário ativa-lo para buscar, utilizando o método
+	 * {@code ativarAluno} do DAO {@link AlunoDAO}.
+	 * </p>
+	 * 
+	 * @param aluno Aluno para busca da mensalidade cobrada
+	 * @param data  Data para busca da mensalidade cobrada
+	 * @return Novo objeto {@code Mensalidade} ou um objeto {@code Mensalidade} nulo
+	 *         no caso de não encontrar no banco
+	 * @throws SQLException
+	 * @throws EntityNotFoundException
+	 */
+	public Mensalidade findByIdMensalidadeCobrada(Aluno aluno, LocalDate data)
+			throws SQLException, EntityNotFoundException {
 
 		Mensalidade mensalidade = null;
 
 		try (Connection connection = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement(
 					SqlUtils.montarViewTable(null, FuncoesViewsTables.VIEW_ALUNO_MENSALIDADES_COBRADAS.getValue(),
-							new String[] { "id_aluno", "ativo" }));
+							new String[] { "id_aluno", "ativo", "data_vencimento" }));
 
 			int parametro = 1;
 			FuncoesUtils.setInt(parametro++, aluno.getId(), preparedStatement);
 			FuncoesUtils.setBoolean(parametro++, Boolean.TRUE, preparedStatement);
+			FuncoesUtils.setDate(parametro++, data, preparedStatement);
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
@@ -125,6 +190,23 @@ public class MensalidadeDAO {
 		return mensalidade;
 	}
 
+	/**
+	 * <h1>Método para retornar todos as mensalidades referentes a um professor</h1>
+	 * <p>
+	 * - Método deve ser utilizado para fazer uma listagem com todas as mensalidades
+	 * abertas, levando em conta: Professor e se o mesmo está ativo.
+	 * </p>
+	 * <p>
+	 * - No caso do professor estar inativo e ter a necessidade de buscar suas
+	 * mensalidades, deve-se usar o método {@link #ativarProfessor(int)
+	 * ativarProfessor}
+	 * </p>
+	 * 
+	 * @param professor Professor logado no sistema
+	 * @return Retorna um {@code List<Mensalidade>} com base no professor passado
+	 *         via parametro.
+	 * @throws SQLException
+	 */
 	public List<Mensalidade> findAllMensalidadeAberta(Professor professor) throws SQLException {
 		List<Mensalidade> returnList = new ArrayList<>();
 
@@ -150,7 +232,19 @@ public class MensalidadeDAO {
 		}
 	}
 
-	public List<Mensalidade> findAllMensalidadeCobrada(Professor professor, Aluno aluno) throws SQLException {
+	/**
+	 * <h1>Método para retornar todos as mensalidades cobradas referente a um
+	 * aluno</h1>
+	 * <p>
+	 * - Método deve ser utilizado para fazer uma listagem com todas as mensalidades
+	 * cobradas, levando em conta o aluno.
+	 * </p>
+	 * 
+	 * @param aluno Aluno que será utilizado para buscar as mensalidades cobradas
+	 * @return Retorna um {@code List<Mensalidade>} de mensalidades cobradas
+	 * @throws SQLException
+	 */
+	public List<Mensalidade> findAllMensalidadeCobrada(Aluno aluno) throws SQLException {
 		List<Mensalidade> returnList = new ArrayList<>();
 
 		try (Connection connection = application.getDataSource().getConnection()) {
@@ -173,6 +267,20 @@ public class MensalidadeDAO {
 		}
 	}
 
+	/**
+	 * <h1>Método para ser feita a contagem total de mensalidades abertas com base
+	 * em um professor</h1>
+	 * <p>
+	 * - Método que deve ser utilizado para saber a contagem total de mensalidades
+	 * abertas referente a um professor, normalmente utilizado em conjunto com o
+	 * método {@link #paginationMensalidadeAberta(Professor, int, int)
+	 * paginationMensalidadeAberta} para ser feita a paginação
+	 * </p>
+	 * 
+	 * @param professor Professor logado no sistema
+	 * @return Retorna um {@code int totalRegistros} encontrados
+	 * @throws SQLException
+	 */
 	public int findCountMensalidadeAberta(Professor professor) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
@@ -196,6 +304,23 @@ public class MensalidadeDAO {
 		return totalRegistros;
 	}
 
+	/**
+	 * <h1>Metódo para ser feita uma paginação de mensalidades abertas com base em
+	 * um professor</h1>
+	 * <p>
+	 * - Método deve ser utilizado em conjunto com o método
+	 * {@link #findCountMensalidadeAberta(Professor) findCountMensalidadeAberta},
+	 * este sendo para fazer a contagem de registros, e este de paginação para
+	 * paginar os registros totais com base em um padrão pré-estabelecido.
+	 * </p>
+	 * 
+	 * @param professor       Professor logado no sistema
+	 * @param posicao         Página em que a paginação esta
+	 * @param padraoPaginacao Quantidade de registros que deverá ser retornado por
+	 *                        página
+	 * @return Retorna um {@code List<Mensalidade>} com base nos parâmetros passados
+	 * @throws SQLException
+	 */
 	public List<Mensalidade> paginationMensalidadeAberta(Professor professor, int posicao, int padraoPaginacao)
 			throws SQLException {
 		List<Mensalidade> listaRetorno = new ArrayList<Mensalidade>();
@@ -215,6 +340,22 @@ public class MensalidadeDAO {
 		return listaRetorno;
 	}
 
+	/**
+	 * <h1>Método para ser feita a contagem total de mensalidades cobradas com base
+	 * em um professor e um aluno</h1>
+	 * <p>
+	 * - Método que deve ser utilizado para saber a contagem total de mensalidades
+	 * cobradas referente a um aluno e um professor, normalmente utilizado em
+	 * conjunto com o método
+	 * {@link #paginationMensalidadeCobrada(Professor, Aluno, int, int)
+	 * paginationMensalidadeCobrada} para ser feita a paginação
+	 * </p>
+	 * 
+	 * @param professor Professor logado no sistema
+	 * @param aluno     Aluno que será buscado as mensalidades cobradas
+	 * @return Retorna um {@code int totalRegistros} encontrados
+	 * @throws SQLException
+	 */
 	public int findCountMensalidadeCobrada(Professor professor, Aluno aluno) throws SQLException {
 		int totalRegistros = 0;
 		try (Connection conn = application.getDataSource().getConnection()) {
@@ -239,6 +380,25 @@ public class MensalidadeDAO {
 		return totalRegistros;
 	}
 
+	/**
+	 * <h1>Metódo para ser feita uma paginação de mensalidades cobradas com base em
+	 * um professor e um aluno</h1>
+	 * <p>
+	 * - Método deve ser utilizado em conjunto com o método
+	 * {@link #findCountMensalidadeCobrada(Professor, Aluno)
+	 * findCountMensalidadeCobrada}, este sendo para fazer a contagem de registros,
+	 * e este de paginação para paginar os registros totais com base em um padrão
+	 * pré-estabelecido.
+	 * </p>
+	 * 
+	 * @param professor       Professor logado no sistema
+	 * @param aluno           Aluno que será utilizado na filtragem para a paginação
+	 * @param posicao         Página em que a paginação esta
+	 * @param padraoPaginacao Quantidade de registros que deverá ser retornado por
+	 *                        página
+	 * @return Retorna um {@code List<Mensalidade>} com base nos parâmetros passados
+	 * @throws SQLException
+	 */
 	public List<Mensalidade> paginationMensalidadeCobrada(Professor professor, Aluno aluno, int posicao,
 			int padraoPaginacao) throws SQLException {
 		List<Mensalidade> listaRetorno = new ArrayList<Mensalidade>();
@@ -259,6 +419,17 @@ public class MensalidadeDAO {
 		return listaRetorno;
 	}
 
+	/**
+	 * <h1>Metódo de parse automático</h1>
+	 * <p>
+	 * - Metódo deve ser utilizado passando um ResultSet, populando um objeto
+	 * {@code Mensalidade} e retornando o mesmo
+	 * </p>
+	 * 
+	 * @param res {@code ResultSet} que será usado fazer o parse automatico
+	 * @return Novo objeto {@code Mensalidade}
+	 * @throws SQLException
+	 */
 	public Mensalidade fetch(ResultSet res, boolean b) throws SQLException {
 		Mensalidade mensalidade = new Mensalidade();
 
@@ -280,6 +451,11 @@ public class MensalidadeDAO {
 		return mensalidade;
 	}
 
+	/**
+	 * <h1>Método para atualizar o status das mensalidades no banco de dados</h1>
+	 * 
+	 * @throws SQLException
+	 */
 	public void atualizarMensalidades() throws SQLException {
 		try (Connection connection = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = connection
@@ -290,6 +466,18 @@ public class MensalidadeDAO {
 
 	}
 
+	/**
+	 * <h1>Método para confirmar pagamento</h1>
+	 * <p>
+	 * - Método para fazer a confirmação de pagamentos das mensalidades abertas,
+	 * transacionando elas para as mensalidades cobradas e atualizar a mensalidade
+	 * aberta
+	 * </p>
+	 * 
+	 * @param aluno         Aluno que terá o pagamento confirmado
+	 * @param formaPagameto Forma de pagamento utilizada no processo
+	 * @throws SQLException
+	 */
 	public void confirmPay(Aluno aluno, FormaPagamento formaPagameto) throws SQLException {
 		try (Connection conn = application.getDataSource().getConnection()) {
 			PreparedStatement preparedStatement = conn.prepareCall(
