@@ -26,6 +26,11 @@ EXCEPTION
 END;
 $BODY$;
 
+-- Descrição função alterar_senha_professor
+COMMENT ON FUNCTION public.alterar_senha_professor(integer, character varying, character varying)
+    IS 'Função - Alterar_senha_professor
+Principal utilização para alteração de senha de professores';
+
 CREATE OR REPLACE FUNCTION public.associar_aluno_professor(
 	OUT id_retorno integer,
 	id_p integer,
@@ -55,6 +60,11 @@ EXCEPTION
         RAISE;
 END;
 $BODY$;
+
+-- Descrição função associar_aluno_professor
+COMMENT ON FUNCTION public.associar_aluno_professor(integer, integer)
+    IS 'Função associar_aluno_professor
+Principal utilização para associar um aluno a um professor, normalmente utilizada ao cadastrar um novo aluno, já que o mesmo existe apenas com um professor.';
 
 CREATE OR REPLACE FUNCTION public.cadastrar_aluno(
 	OUT id_retorno integer,
@@ -92,6 +102,11 @@ EXCEPTION
 END;
 $BODY$;
 
+-- Descrição função cadastrar_aluno
+COMMENT ON FUNCTION public.cadastrar_aluno(character varying, character varying, character varying, integer, numeric, date)
+    IS 'Função cadastrar_aluno
+Principal utilização para cadastrar novos alunos';
+
 CREATE OR REPLACE FUNCTION public.cadastrar_forma_pagamento(
 	OUT id_retorno integer,
 	f_descricao character varying)
@@ -113,6 +128,11 @@ EXCEPTION
         RAISE;
 END;
 $BODY$;
+
+-- Descrição função cadastrar_forma_pagamento
+COMMENT ON FUNCTION public.cadastrar_forma_pagamento(character varying)
+    IS 'Função - cadastrar_forma_pagamento
+Principal utilização para cadastrar formas de pagamentos';
 
 CREATE OR REPLACE FUNCTION public.cadastrar_professor(
 	OUT id_retorno integer,
@@ -137,6 +157,11 @@ BEGIN
 		RAISE;
 END;
 $BODY$;
+
+-- Descrição função cadastrar_professor
+COMMENT ON FUNCTION public.cadastrar_professor(character varying, character varying, character varying)
+    IS 'Função cadastrar_professor
+Principal utilização para cadastrar novos professores';
 
 CREATE OR REPLACE FUNCTION public.confirmar_pagamento(
 	OUT id_retorno integer,
@@ -178,6 +203,11 @@ EXCEPTION
 END;
 $BODY$;
 
+-- Descrição função confirmar_pagamento
+COMMENT ON FUNCTION public.confirmar_pagamento(integer, timestamp without time zone, integer)
+    IS 'Função confirmar_pagamento
+Principal utilização para confirmar novos pagamentos, gerando uma mensalidade cobrada e gerando uma nova mensalidade aberta';
+
 CREATE OR REPLACE FUNCTION public.ativar_aluno(
 	OUT id_retorno integer,
 	a_id integer)
@@ -204,6 +234,11 @@ EXCEPTION
         RAISE;
 END;
 $BODY$;
+
+-- Descrição função ativar_aluno
+COMMENT ON FUNCTION public.ativar_aluno(integer)
+    IS 'Funçao ativar_aluno
+Principal utilização para ativar um aluno que esteja inativado, por padrão sempre estarão ativados';
 
 CREATE OR REPLACE FUNCTION public.inativar_aluno(
 	OUT id_retorno integer,
@@ -232,6 +267,11 @@ EXCEPTION
 END;
 $BODY$;
 
+-- Descrição função inativar_aluno
+COMMENT ON FUNCTION public.inativar_aluno(integer)
+    IS 'Função inativar_aluno
+Principal utilização para inativar um aluno, por padrão sempre estarão ativados';
+
 CREATE OR REPLACE FUNCTION public.delete_forma_pagamento(
 	OUT id_retorno integer,
 	f_id integer)
@@ -258,6 +298,11 @@ EXCEPTION
         RAISE;
 END;
 $BODY$;
+
+-- Descrição funlão delete_forma_pagamento
+COMMENT ON FUNCTION public.delete_forma_pagamento(integer)
+    IS 'Função delete_forma_pagamento
+Principal utilização para deletar formas de pagamentos';
 
 CREATE OR REPLACE FUNCTION public.ativar_professor(
 	OUT id_retorno integer,
@@ -286,6 +331,12 @@ EXCEPTION
 END;
 $BODY$;
 
+
+-- Descrição função ativar_professor
+COMMENT ON FUNCTION public.ativar_professor(integer)
+    IS 'Função ativar_professor
+Principal utilização para ativar um professor, por padrão ao cadastrar um novo professor ele estará ativo';
+
 CREATE OR REPLACE FUNCTION public.inativar_professor(
 	OUT id_retorno integer,
 	p_id integer)
@@ -312,6 +363,11 @@ EXCEPTION
         RAISE;
 END;
 $BODY$;
+
+-- Descrição função inativar_professor
+COMMENT ON FUNCTION public.inativar_professor(integer)
+    IS 'Função inativar_professor
+Principal utilização para inativar um professor, por padrão ao cadastrar um novo professor ele estará ativo';
 
 CREATE OR REPLACE FUNCTION public.editar_aluno(
 	OUT id_retorno integer,
@@ -341,6 +397,11 @@ EXCEPTION
 END;
 $BODY$;
 
+-- Descrição função editar_aluno
+COMMENT ON FUNCTION public.editar_aluno(integer, character varying, character varying, character varying)
+    IS 'Função editar_aluno
+Principal utilização para editar alunos, vale ressaltar que o aluno precisa estar ativo';
+
 CREATE OR REPLACE FUNCTION public.editar_forma_pagamento(
 	OUT id_retorno integer,
 	f_id integer,
@@ -368,6 +429,11 @@ EXCEPTION
         RAISE;
 END;
 $BODY$;
+
+-- Descrição função editar_forma_pagamento
+COMMENT ON FUNCTION public.editar_forma_pagamento(integer, character varying)
+    IS 'Função editar_forma_pagamento
+Principal utilização para editar formas de pagamentos';
 
 CREATE OR REPLACE FUNCTION public.editar_mensalidade_aberta(
 	OUT id_retorno integer,
@@ -399,6 +465,11 @@ EXCEPTION
 END;
 $BODY$;
 
+-- Descrição função editar_mensalidade_aberta
+COMMENT ON FUNCTION public.editar_mensalidade_aberta(integer, numeric, date)
+    IS 'Função editar_mensalidade_aberta
+Principal utilização para editar mensalidade abertas';
+
 CREATE OR REPLACE FUNCTION public.editar_professor(
 	OUT id_retorno integer,
 	p_id integer,
@@ -427,6 +498,11 @@ EXCEPTION
         RAISE;
 END;
 $BODY$;
+
+-- Descrição função editar_professor
+COMMENT ON FUNCTION public.editar_professor(integer, character varying, character varying)
+    IS 'Função editar_professor
+Principal utilização para edição de professores, necessário estarem ativos para ocorrer a edição';
 
 CREATE OR REPLACE FUNCTION public.gerar_mensalidade_aberta(
 	OUT id_retorno integer,
@@ -457,6 +533,12 @@ EXCEPTION
 END;
 $BODY$;
 
+-- Descrição função gerar_mensalidade_aberta
+COMMENT ON FUNCTION public.gerar_mensalidade_aberta(integer, numeric, date)
+    IS 'Função gerar_mensalidade_aberta
+Principal utilização para gerar novas mensalidades abertas, normalmente utilizada em conjunta a função de confirmar_pagamento';
+
+
 CREATE OR REPLACE FUNCTION public.atualizar_status(
 	)
     RETURNS void
@@ -472,6 +554,12 @@ BEGIN
 
 END;
 $BODY$;
+
+-- Descrição função cadastrar_aluno_sem_mensalidade
+COMMENT ON FUNCTION public.cadastrar_aluno_sem_mensalidade(character varying, character varying, character varying, integer)
+    IS 'Função cadastrar_aluno_sem_mensalidade
+Principal utilização para cadastrar alunos sem mensalidades, vale ressaltar que o controle de mensalidades destes alunos devem ser feitos manualmente';
+
 
 CREATE OR REPLACE FUNCTION public.cadastrar_aluno_sem_mensalidade(
 	OUT id_retorno integer,
